@@ -1,0 +1,13 @@
+package com.game.rpgbackend.repository;
+
+import com.game.rpgbackend.domain.Skill;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.Optional;
+import java.util.List;
+
+@Repository
+public interface SkillRepository extends JpaRepository<Skill, Integer> {
+    Optional<Skill> findByName(String name);
+    List<Skill> findByType(String type);
+}
