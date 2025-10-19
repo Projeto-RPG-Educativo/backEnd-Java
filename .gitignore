@@ -34,11 +34,13 @@ build/
 .bloop/
 project/metals.sbt
 
-# Configurações sensíveis
+# Configurações sensíveis - NÃO COMMITAR
 .env
 .env.local
+**/application.properties
 **/application-dev.properties
 **/application-prod.properties
+**/application-local.properties
 
 # Maven específicos adicionais
 dependency-reduced-pom.xml
@@ -48,13 +50,3 @@ buildNumber.properties
 
 # Spring Boot específicos
 spring-boot-devtools.properties
-
-# Arquivos temporários
-*.tmp
-*.bak
-*.swp
-*~.nib
-
-# Logs e outputs de execução
-run
-*.log
