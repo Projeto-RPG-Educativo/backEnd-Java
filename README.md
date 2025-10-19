@@ -1,408 +1,120 @@
-# RPG Educativo - Backend Spring Boot
+# RPG Educativo - Backend
 
-## 📋 Descrição
-
-Backend completo do RPG Educativo migrado de TypeScript/Node.js para Java 17 + Spring Boot 3.
-
-Sistema de RPG educacional baseado em perguntas e respostas com sistema de batalhas, progressão de personagens, e hub interativo.
+API REST para o jogo RPG Educativo desenvolvida com Spring Boot.
 
 ## 🚀 Tecnologias
 
-- **Java 17**
-- **Spring Boot 3.5.6**
-- **Spring Data JPA / Hibernate**
-- **Spring Security + JWT**
-- **PostgreSQL**
-- **Lombok**
-- **Maven**
+- Java 17
+- Spring Boot 3.5.6
+- PostgreSQL 14
+- Docker & Docker Compose
+- Maven
 
-## 📦 Estrutura do Projeto
+## ⚙️ Configuração Local
 
-```
-rpg-backend/
-├── src/main/java/com/game/rpgbackend/
-│   ├── config/              # Configurações (Security, Game)
-│   ├── controller/          # Controllers REST
-│   ├── domain/              # Entidades JPA
-│   ├── dto/                 # DTOs de Request/Response
-│   ├── enums/               # Enumerações
-│   ├── exception/           # Exceções customizadas
-│   ├── repository/          # Repositórios JPA
-│   ├── security/            # JWT e filtros de segurança
-│   └── service/             # Lógica de negócio
-└── src/main/resources/
-    └── application.properties
-```
+### 1. Pré-requisitos
 
-## ⚙️ Configuração
+- Java 17+
+- Docker e Docker Compose
+- Maven (opcional, o projeto inclui Maven Wrapper)
 
-### 1. Banco de Dados
+### 2. Configurar variáveis de ambiente
 
-Configure as credenciais do PostgreSQL em `application.properties`:
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/rpg_game_db
-spring.datasource.username=postgres
-spring.datasource.password=RPGedu
-```
-
-### 2. JWT Secret
-
-Configure uma chave secreta forte para JWT:
-
-```properties
-jwt.secret=SUA_CHAVE_SECRETA_AQUI
-jwt.expiration=36000000
-```
-
-### 3. Executar o Projeto
+Copie o arquivo de exemplo e configure suas credenciais:
 
 ```bash
-mvn clean install
-mvn spring-boot:run
+cp src/main/resources/application.properties.example src/main/resources/application.properties
 ```
 
-O servidor estará disponível em: `http://localhost:8080`
+Edite o arquivo `application.properties` e configure:
+- **spring.datasource.url**: URL do seu banco PostgreSQL
+- **spring.datasource.username**: Usuário do banco
+- **spring.datasource.password**: Senha do banco
+- **jwt.secret**: Uma chave secreta forte (mínimo 32 caracteres)
 
-## 🔐 Autenticação
+### 3. Executar com Docker
 
-### Registrar Usuário
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "nome_usuario": "jogador123",
-  "email": "jogador@email.com",
-  "senha": "senha123"
-}
-```
-
-### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "nome_usuario": "jogador123",
-  "senha": "senha123"
-}
-```
-
-**Resposta:**
-```json
-{
-  "message": "Login bem-sucedido!",
-  "user": {
-    "id": 1,
-    "nome_usuario": "jogador123",
-    "email": "jogador@email.com"
-  },
-  "token": "eyJhbGciOiJIUzI1NiIs..."
-}
-```
-
-## 📚 APIs Disponíveis
-
-### 🎭 Classes
-
-#### Listar todas as classes
-```http
-GET /api/classes
-```
-
-#### Buscar classe por ID
-```http
-GET /api/classes/{id}
-```
-
-### 👤 Personagens
-
-#### Criar personagem
-```http
-POST /api/characters
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "classe": "Mago"
-}
-```
-
-#### Buscar personagem
-```http
-GET /api/characters/{id}
-Authorization: Bearer {token}
-```
-
-#### Salvar progresso
-```http
-PUT /api/characters/{id}/progress?xp=100&hp=80
-Authorization: Bearer {token}
-```
-
-### ⚔️ Batalha
-
-#### Iniciar batalha
-```http
-POST /api/battle/start
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "monsterId": 1,
-  "difficulty": "Médio"
-}
-```
-
-#### Responder pergunta
-```http
-POST /api/battle/answer
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "battleId": 1234567890,
-  "questionId": 5,
-  "answer": "A"
-}
-```
-
-#### Executar ação (Atacar/Defender/Habilidade)
-```http
-POST /api/battle/action
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "action": "ATTACK"
-}
-```
-
-**Ações disponíveis:** `ATTACK`, `DEFEND`, `ABILITY`
-
-### 🎯 Hub
-
-#### Torre do Conhecimento
-
-```http
-# Listar skills disponíveis
-GET /api/hub/tower/skills
-Authorization: Bearer {token}
-
-# Listar conteúdos disponíveis
-GET /api/hub/tower/content?level=5
-Authorization: Bearer {token}
-
-# Buscar conteúdo específico
-GET /api/hub/tower/content/{id}?level=5
-Authorization: Bearer {token}
-
-# Comprar skill
-POST /api/hub/tower/skills/purchase
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "skillId": 1
-}
-```
-
-#### Biblioteca Silenciosa
-
-```http
-# Listar livros
-GET /api/hub/library/books
-Authorization: Bearer {token}
-
-# Detalhes do livro
-GET /api/hub/library/books/{id}
-Authorization: Bearer {token}
-```
-
-#### Palco da Retórica
-
-```http
-# Listar professores/NPCs
-GET /api/hub/stage/professors
-Authorization: Bearer {token}
-
-# Diálogos do professor
-GET /api/hub/stage/professors/{id}/dialogues
-Authorization: Bearer {token}
-```
-
-#### Sebo da Linguística (Loja)
-
-```http
-# Listar lojas
-GET /api/hub/store/shops
-Authorization: Bearer {token}
-
-# Comprar item
-POST /api/hub/store/purchase
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "itemId": 1
-}
-```
-
-#### Estatísticas do Jogador
-
-```http
-# Ver estatísticas
-GET /api/hub/player/stats
-Authorization: Bearer {token}
-
-# Atualizar estatísticas
-PUT /api/hub/player/stats
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "gold": 100,
-  "experience": 500
-}
-
-# Ver conquistas
-GET /api/hub/player/achievements
-Authorization: Bearer {token}
-
-# Histórico de batalhas
-GET /api/hub/player/battle-history
-Authorization: Bearer {token}
-
-# Rankings
-GET /api/hub/player/rankings
-```
-
-### 💾 Saves
-
-#### Salvar jogo
-```http
-POST /api/saves
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "characterId": 1,
-  "slotName": "save1",
-  "characterState": "{\"hp\":80,\"xp\":100}"
-}
-```
-
-#### Listar saves
-```http
-GET /api/saves
-Authorization: Bearer {token}
-```
-
-### ❓ Perguntas
-
-```http
-GET /api/questions/random?difficulty=Médio&level=5&contentId=1
-Authorization: Bearer {token}
-```
-
-### 💬 Diálogos
-
-```http
-# Buscar diálogos por nível
-GET /api/dialogs?level=5&contentId=1
-Authorization: Bearer {token}
-
-# Buscar diálogo específico
-GET /api/dialogs/{id}?level=5
-Authorization: Bearer {token}
-```
-
-## 🎮 Sistema de Batalha
-
-### Mecânicas
-
-1. **Custos de Energia:**
-   - Ataque: 2 energia
-   - Defesa: 1 energia
-   - Habilidade: 3 energia
-
-2. **Recuperação:**
-   - +1 energia ao acertar uma pergunta
-
-3. **Dificuldades:**
-   - Fácil
-   - Médio
-   - Difícil
-
-### Habilidades por Classe
-
-- **Mago**: Clarividência (remove uma opção errada)
-- **Tank**: Eu Aguento! (bloqueia próximo dano)
-- **Lutador**: Investida (próximo acerto causa dano extra)
-- **Paladino**: Cura (+10 HP)
-- **Ladino**: Roubo (fornece uma dica)
-- **Bardo**: Lábia (pergunta desafio - tudo ou nada)
-
-## 📊 Sistema de Progressão
-
-### Level Up
-
-- XP base necessário: 100
-- Multiplicador: 1.5 por nível
-- Recompensa: +1 ponto de habilidade
-
-### Fórmula XP
-```
-XP_necessário = 100 * (nível_atual ^ 1.5)
-```
-
-## 🔒 Segurança
-
-- Autenticação JWT
-- Tokens expiram em 10 horas
-- Senhas criptografadas com BCrypt
-- CORS configurado
-- Session Stateless
-
-## 🛠️ Desenvolvimento
-
-### Compilar
 ```bash
-mvn clean compile
+# Construir e iniciar os containers
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f app
+
+# Parar os containers
+docker-compose down
+
+# Parar e remover volumes (limpa o banco de dados)
+docker-compose down -v
 ```
 
-### Testar
-```bash
-mvn test
-```
+A aplicação estará disponível em: `http://localhost:8000`
 
-### Gerar JAR
-```bash
-mvn clean package
-```
+### 4. Executar localmente (sem Docker)
 
-### Executar JAR
 ```bash
+# Compilar
+./mvnw clean package -DskipTests
+
+# Executar
 java -jar target/rpg-backend-0.0.1-SNAPSHOT.jar
 ```
 
-## 📝 Notas
+## 🐳 Deploy no Render
 
-- Sistema de batalha em memória (não persiste entre restarts)
-- Todas as rotas (exceto `/api/auth/**` e `/api/classes/**`) requerem autenticação
-- O token JWT deve ser enviado no header: `Authorization: Bearer {token}`
+### 1. Preparar a imagem Docker
 
-## 🐛 Debug
+```bash
+# Build da imagem
+docker build -t seu-usuario/rpg-backend:latest .
 
-Para ver logs detalhados, o projeto está configurado com nível DEBUG:
+# Login no Docker Hub
+docker login
 
-```properties
-logging.level.com.game.rpgbackend=DEBUG
-logging.level.org.springframework.security=DEBUG
+# Push da imagem
+docker push seu-usuario/rpg-backend:latest
 ```
 
-## 📄 Licença
+### 2. Configurar no Render
 
-Este projeto é parte do RPG Educativo.
+1. Crie um banco PostgreSQL no Render
+2. Crie um Web Service apontando para sua imagem Docker
+3. Configure as variáveis de ambiente:
+   - `SPRING_DATASOURCE_URL`: URL do banco PostgreSQL do Render
+   - `SPRING_DATASOURCE_USERNAME`: Usuário do banco
+   - `SPRING_DATASOURCE_PASSWORD`: Senha do banco
+   - `JWT_SECRET`: Sua chave JWT secreta
+   - `SPRING_PROFILES_ACTIVE`: `docker` ou `prod`
+
+## 📝 Variáveis de Ambiente
+
+| Variável | Descrição | Exemplo |
+|----------|-----------|---------|
+| `SPRING_DATASOURCE_URL` | URL de conexão com PostgreSQL | `jdbc:postgresql://localhost:5432/rpg_game_db` |
+| `SPRING_DATASOURCE_USERNAME` | Usuário do banco | `postgres` |
+| `SPRING_DATASOURCE_PASSWORD` | Senha do banco | `sua_senha_segura` |
+| `JWT_SECRET` | Chave secreta para JWT | `uma_chave_muito_secreta_32chars` |
+| `SERVER_PORT` | Porta da aplicação | `8000` |
+
+## 🔒 Segurança
+
+⚠️ **IMPORTANTE**: Nunca commite o arquivo `application.properties` com credenciais reais!
+
+- O arquivo `application.properties` está no `.gitignore`
+- Use `application.properties.example` como template
+- Configure variáveis de ambiente em produção
+
+## 📚 Endpoints Principais
+
+- `POST /api/auth/register` - Registro de usuário
+- `POST /api/auth/login` - Login
+- `GET /api/classes` - Listar classes disponíveis
+- `GET /api/characters` - Listar personagens (requer autenticação)
+- E muitos outros...
+
+## 🤝 Contribuindo
+
+1. Copie o `application.properties.example` para `application.properties`
+2. Configure suas credenciais locais
+3. Nunca commite o `application.properties` original
 
