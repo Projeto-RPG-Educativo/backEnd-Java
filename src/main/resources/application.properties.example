@@ -1,0 +1,41 @@
+# Database Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/seu_banco
+spring.datasource.username=seu_usuario
+spring.datasource.password=sua_senha
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA/Hibernate Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# JWT Configuration
+jwt.secret=COLOQUE_SUA_CHAVE_SECRETA_AQUI_COM_PELO_MENOS_32_CARACTERES
+jwt.expiration=36000000
+
+# Game Configuration
+game.costs.attack=2
+game.costs.defend=1
+game.costs.ability=3
+
+game.battle.xp-win-reward=50
+game.battle.energy-recovery=1
+
+game.leveling.base-xp=100
+game.leveling.xp-multiplier=1.5
+
+game.skills.mago.damage-multiplier=2
+game.skills.tank.heal-amount=15
+game.skills.lutador.bonus-damage=10
+game.skills.paladino.heal-amount=10
+game.skills.bardo.heal-amount=8
+game.skills.ladino.bonus-damage=8
+
+# Server Configuration
+server.port=8000
+
+# Logging
+logging.level.com.game.rpgbackend=DEBUG
+logging.level.org.springframework.security=DEBUG
+
