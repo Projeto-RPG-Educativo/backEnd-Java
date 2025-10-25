@@ -33,11 +33,11 @@ public class QuestionService {
         // Busca perguntas adequadas ao nível do jogador
         List<Question> questions;
         if (contentId != null) {
-            questions = questionRepository.findByDificuldadeAndLevelMinimoLessThanEqualAndContentId(
+            questions = questionRepository.findByDifficultyAndMinLevelLessThanEqualAndContentId(
                     normalizedDifficulty, playerLevel, contentId
             );
         } else {
-            questions = questionRepository.findByDificuldadeAndLevelMinimoLessThanEqual(
+            questions = questionRepository.findByDifficultyAndMinLevelLessThanEqual(
                     normalizedDifficulty, playerLevel
             );
         }
@@ -71,7 +71,7 @@ public class QuestionService {
      * Busca uma pergunta baseada em múltiplas dificuldades.
      */
     public Question getQuestionByDifficultyRange(List<String> difficulties, Integer playerLevel) {
-        long questionCount = questionRepository.countByDificuldadeInAndLevelMinimoLessThanEqual(
+        long questionCount = questionRepository.countByDifficultyInAndMinLevelLessThanEqual(
                 difficulties, playerLevel
         );
 
@@ -81,7 +81,7 @@ public class QuestionService {
 
         int skip = random.nextInt((int) questionCount);
 
-        List<Question> questions = questionRepository.findByDificuldadeInAndLevelMinimoLessThanEqual(
+        List<Question> questions = questionRepository.findByDifficultyInAndMinLevelLessThanEqual(
                 difficulties, playerLevel
         );
 

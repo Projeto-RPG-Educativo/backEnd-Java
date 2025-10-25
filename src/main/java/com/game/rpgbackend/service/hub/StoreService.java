@@ -37,7 +37,7 @@ public class StoreService {
      * Busca os itens de uma loja específica.
      */
     public List<ItemStore> getStoreItems(Integer lojaId) {
-        return itemLojaRepository.findByLojaId(lojaId);
+        return itemLojaRepository.findByStoreId(lojaId);
     }
 
     /**
@@ -50,7 +50,7 @@ public class StoreService {
             .orElseThrow(() -> new NotFoundException("Jogador não encontrado"));
 
         // Busca o item na loja
-        ItemStore itemStore = itemLojaRepository.findByLojaId(lojaId).stream()
+        ItemStore itemStore = itemLojaRepository.findByStoreId(lojaId).stream()
             .filter(il -> il.getItemId().equals(itemId))
             .findFirst()
             .orElseThrow(() -> new NotFoundException("Item não encontrado na loja"));
@@ -93,4 +93,3 @@ public class StoreService {
         public Integer getRemainingGold() { return remainingGold; }
     }
 }
-

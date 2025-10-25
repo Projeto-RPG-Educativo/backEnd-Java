@@ -8,6 +8,6 @@ import java.util.List;
 @Repository
 public interface DialogRepository extends JpaRepository<Dialog, Integer> {
     List<Dialog> findByContentId(Integer contentId);
-    List<Dialog> findByLevelMinimoLessThanEqual(Integer level);
-    List<Dialog> findByContentIdAndLevelMinimoLessThanEqual(Integer contentId, Integer level);
+    List<Dialog> findByMinLevelLessThanEqual(Integer level);
+    List<Dialog> findByContentIdAndMinLevelLessThanEqual(Integer contentId, Integer level);
 }

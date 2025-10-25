@@ -38,7 +38,7 @@ public class TowerService {
      * Busca conteúdos disponíveis para o nível do jogador.
      */
     public List<ContentWithProgress> getAvailableContent(Integer playerLevel) {
-        List<Content> contents = contentRepository.findByLevelMinimoLessThanEqual(playerLevel);
+        List<Content> contents = contentRepository.findByMinLevelLessThanEqual(playerLevel);
 
         // TODO: Implementar cálculo de progresso real baseado nas questões respondidas
         return contents.stream()
@@ -141,4 +141,3 @@ public class TowerService {
         public int getProgress() { return progress; }
     }
 }
-

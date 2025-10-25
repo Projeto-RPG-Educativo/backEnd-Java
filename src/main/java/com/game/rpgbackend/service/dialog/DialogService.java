@@ -24,7 +24,7 @@ public class DialogService {
      * Busca diálogos por nível do personagem e conteúdo.
      */
     public List<DialogResponse> getDialogsByLevel(Integer characterLevel, Integer contentId) {
-        List<Dialog> dialogs = dialogRepository.findByContentIdAndLevelMinimoLessThanEqual(contentId, characterLevel);
+        List<Dialog> dialogs = dialogRepository.findByContentIdAndMinLevelLessThanEqual(contentId, characterLevel);
 
         return dialogs.stream()
             .map(this::mapToDialogResponse)
@@ -115,4 +115,3 @@ public class DialogService {
         public void setDestaque(Boolean destaque) { this.destaque = destaque; }
     }
 }
-

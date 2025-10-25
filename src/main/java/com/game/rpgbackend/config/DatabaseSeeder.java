@@ -688,7 +688,7 @@ public class DatabaseSeeder {
         }
 
         // Busca os itens que já estão na loja para não duplicar
-        Map<Integer, ItemStore> existingShopItems = itemLojaRepository.findByLojaId(store.getId()).stream()
+        Map<Integer, ItemStore> existingShopItems = itemLojaRepository.findByStoreId(store.getId()).stream()
                 .collect(Collectors.toMap(ItemStore::getItemId, Function.identity()));
 
         List<ItemStore> newShopItems = new ArrayList<>();

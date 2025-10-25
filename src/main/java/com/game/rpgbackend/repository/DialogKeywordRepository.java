@@ -8,5 +8,5 @@ import java.util.List;
 @Repository
 public interface DialogKeywordRepository extends JpaRepository<DialogKeyword, Integer> {
     List<DialogKeyword> findByDialogId(Integer dialogId);
-    List<DialogKeyword> findByDestaque(Boolean destaque);
+    List<DialogKeyword> findByHighlight(Boolean highlight);
 }

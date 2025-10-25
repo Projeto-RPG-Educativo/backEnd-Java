@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ContentRepository extends JpaRepository<Content, Integer> {
-    Optional<Content> findByNome(String nome);
-    List<Content> findByLevelMinimoLessThanEqual(Integer level);
+    Optional<Content> findByContentName(String contentName);
+    List<Content> findByMinLevelLessThanEqual(Integer level);
 }

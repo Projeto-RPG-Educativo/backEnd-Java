@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ItemLojaRepository extends JpaRepository<ItemStore, ItemStoreId> {
-    List<ItemStore> findByLojaId(Integer lojaId);
+    List<ItemStore> findByStoreId(Integer storeId);
     List<ItemStore> findByItemId(Integer itemId);
 }
