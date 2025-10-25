@@ -13,7 +13,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Controller responsável pela autenticação de usuários.
+ * Controller REST responsável pela autenticação e registro de usuários.
+ * <p>
+ * Fornece endpoints para registro de novos usuários e login no sistema,
+ * gerando tokens JWT para autenticação nas requisições subsequentes.
+ * </p>
+ *
+ * @author D0UGH5
+ * @version 1.0
+ * @since 1.0
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -23,7 +31,14 @@ public class AuthController {
     private final UserService userService;
 
     /**
-     * Endpoint para registro de novo usuário.
+     * Registra um novo usuário no sistema.
+     * <p>
+     * Cria uma nova conta de usuário com as credenciais fornecidas.
+     * A senha será criptografada antes de ser armazenada.
+     * </p>
+     *
+     * @param request dados de registro contendo nome de usuário, email e senha
+     * @return DTO com informações básicas do usuário criado
      */
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@Valid @RequestBody RegisterUserDto request) {
@@ -39,7 +54,14 @@ public class AuthController {
     }
 
     /**
-     * Endpoint para login de usuário.
+     * Realiza o login de um usuário no sistema.
+     * <p>
+     * Autentica as credenciais fornecidas e retorna um token JWT
+     * que deve ser usado nas próximas requisições protegidas.
+     * </p>
+     *
+     * @param request credenciais de login (nome de usuário e senha)
+     * @return resposta contendo token JWT e dados do usuário autenticado
      */
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginUserDto request) {

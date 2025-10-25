@@ -18,7 +18,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Controller responsável pelas operações de personagens.
+ * Controller REST responsável pelas operações de personagens.
+ * <p>
+ * Gerencia a criação, consulta, atualização e exclusão de personagens,
+ * além de operações específicas como salvamento de progresso.
+ * </p>
+ *
+ * @author D0UGH5
+ * @version 1.0
+ * @since 1.0
  */
 @RestController
 @RequestMapping("/api/characters")
@@ -30,7 +38,10 @@ public class CharacterController {
     private final CharacterMapper characterMapper;
 
     /**
-     * Busca um personagem por ID.
+     * Busca um personagem específico por ID.
+     *
+     * @param id identificador único do personagem
+     * @return DTO completo do personagem ou 404 se não encontrado
      */
     @GetMapping("/{id}")
     public ResponseEntity<CharacterDTO> getCharacter(@PathVariable Integer id) {
@@ -41,7 +52,10 @@ public class CharacterController {
     }
 
     /**
-     * Busca todos os personagens de um usuário.
+     * Busca todos os personagens do usuário autenticado.
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @return lista simplificada com todos os personagens do usuário
      */
     @GetMapping("/user")
     public ResponseEntity<List<CharacterListDTO>> getUserCharacters(
@@ -56,7 +70,14 @@ public class CharacterController {
     }
 
     /**
-     * Cria um novo personagem.
+     * Cria um novo personagem para o usuário autenticado.
+     * <p>
+     * O personagem é inicializado com atributos base da classe escolhida.
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @param request mapa contendo a classe do personagem (campo "classe")
+     * @return DTO do personagem criado com status 201 Created
      */
     @PostMapping
     public ResponseEntity<CharacterDTO> createCharacter(
@@ -76,6 +97,12 @@ public class CharacterController {
 
     /**
      * Salva o progresso do personagem (XP e HP).
+     * <p>
+     * Atualiza os valores de experiência e pontos de vida do personagem.
+     * </p>
+     *
+     * @param request mapa contendo characterId, xp e hp
+     * @return DTO do personagem atualizado
      */
     @PutMapping("/progress")
     public ResponseEntity<CharacterDTO> saveProgress(@RequestBody Map<String, Integer> request) {
@@ -92,7 +119,11 @@ public class CharacterController {
     }
 
     /**
-     * Atualiza um personagem.
+     * Atualiza os dados de um personagem.
+     *
+     * @param id identificador do personagem
+     * @param character objeto com os novos dados do personagem
+     * @return DTO do personagem atualizado
      */
     @PutMapping("/{id}")
     public ResponseEntity<CharacterDTO> updateCharacter(
@@ -104,7 +135,10 @@ public class CharacterController {
     }
 
     /**
-     * Deleta um personagem.
+     * Remove um personagem do sistema.
+     *
+     * @param id identificador do personagem a ser removido
+     * @return resposta vazia com status 204 No Content
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCharacter(@PathVariable Integer id) {

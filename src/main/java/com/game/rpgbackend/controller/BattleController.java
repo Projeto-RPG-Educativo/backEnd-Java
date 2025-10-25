@@ -14,7 +14,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Controller responsável pelas operações de batalha.
+ * Controller REST responsável pelas operações de batalha.
+ * <p>
+ * Gerencia o sistema de batalhas do jogo, incluindo início de batalhas,
+ * respostas a questões, ações de combate e consulta de estado.
+ * Todas as batalhas incluem questões educacionais que devem ser respondidas.
+ * </p>
+ *
+ * @author D0UGH5
+ * @version 1.0
+ * @since 1.0
  */
 @RestController
 @RequestMapping("/api/battle")
@@ -25,7 +34,16 @@ public class BattleController {
     private final AuthenticationUtil authenticationUtil;
 
     /**
-     * Inicia uma nova batalha.
+     * Inicia uma nova batalha contra um monstro específico.
+     * <p>
+     * Cria uma instância de batalha com o monstro escolhido e
+     * nível de dificuldade especificado. A primeira questão
+     * é apresentada imediatamente.
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @param request dados da batalha (ID do monstro e dificuldade)
+     * @return estado inicial da batalha com a primeira questão
      */
     @PostMapping("/start")
     public ResponseEntity<BattleStateResponse> startBattle(
@@ -44,7 +62,16 @@ public class BattleController {
     }
 
     /**
-     * Processa a resposta do jogador a uma questão.
+     * Processa a resposta do jogador a uma questão durante a batalha.
+     * <p>
+     * Valida a resposta fornecida e aplica os efeitos no combate:
+     * - Resposta correta: personagem ataca o monstro
+     * - Resposta incorreta: monstro causa dano ao personagem
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @param request dados da resposta (ID da batalha, questão e resposta)
+     * @return novo estado da batalha após processar a resposta
      */
     @PostMapping("/answer")
     public ResponseEntity<BattleStateResponse> submitAnswer(
@@ -64,7 +91,18 @@ public class BattleController {
     }
 
     /**
-     * Executa uma ação de batalha (attack, defend, useSkill).
+     * Executa uma ação de batalha específica.
+     * <p>
+     * Ações disponíveis:
+     * - attack: ataque básico ao monstro
+     * - defend: postura defensiva para reduzir dano recebido
+     * - useSkill: usa habilidade especial da classe do personagem
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @param request tipo de ação a ser executada
+     * @return estado atualizado da batalha após a ação
+     * @throws IllegalArgumentException se a ação for inválida
      */
     @PostMapping("/action")
     public ResponseEntity<BattleStateResponse> performAction(
@@ -94,7 +132,14 @@ public class BattleController {
     }
 
     /**
-     * Retorna o estado atual da batalha.
+     * Retorna o estado atual da batalha ativa do usuário.
+     * <p>
+     * Permite consultar o progresso da batalha em andamento,
+     * incluindo HP de ambos os combatentes e questão atual.
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @return estado atual da batalha ou 204 No Content se não houver batalha ativa
      */
     @GetMapping("/current")
     public ResponseEntity<BattleStateResponse> getCurrentBattle(
