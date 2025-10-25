@@ -30,7 +30,7 @@ public class Book {
 
     /** Título do livro */
     @Column(nullable = false)
-    private String title;
+    private String bookTitle;
 
     /** Conteúdo/texto completo do livro */
     @Column(nullable = false)

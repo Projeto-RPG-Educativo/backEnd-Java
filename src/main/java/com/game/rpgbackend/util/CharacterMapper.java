@@ -36,7 +36,7 @@ public class CharacterMapper {
 
         CharacterDTO dto = new CharacterDTO();
         dto.setId(character.getId());
-        dto.setNome(character.getNome());
+        dto.setNome(character.getName());
         dto.setXp(character.getXp());
         dto.setGold(character.getGold());
         dto.setHp(character.getHp());
@@ -47,7 +47,7 @@ public class CharacterMapper {
         // Informações do usuário sem incluir a entidade completa
         if (character.getUser() != null) {
             dto.setUserId(character.getUser().getId());
-            dto.setUserName(character.getUser().getNomeUsuario());
+            dto.setUserName(character.getUser().getUsername());
         }
 
         // Informações da classe sem incluir a entidade completa
@@ -76,7 +76,7 @@ public class CharacterMapper {
 
         CharacterListDTO dto = new CharacterListDTO();
         dto.setId(character.getId());
-        dto.setNome(character.getNome());
+        dto.setNome(character.getName());
         dto.setXp(character.getXp());
         dto.setGold(character.getGold());
         dto.setHp(character.getHp());

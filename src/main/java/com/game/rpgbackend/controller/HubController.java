@@ -72,12 +72,12 @@ public class HubController {
     // === SEBO DA LINGUÍSTICA (LOJA) ===
 
     @GetMapping("/store/shops")
-    public ResponseEntity<List<Loja>> getStores() {
+    public ResponseEntity<List<Store>> getStores() {
         return ResponseEntity.ok(storeService.getStores());
     }
 
     @GetMapping("/store/{lojaId}/items")
-    public ResponseEntity<List<ItemLoja>> getStoreItems(@PathVariable Integer lojaId) {
+    public ResponseEntity<List<ItemStore>> getStoreItems(@PathVariable Integer lojaId) {
         return ResponseEntity.ok(storeService.getStoreItems(lojaId));
     }
 

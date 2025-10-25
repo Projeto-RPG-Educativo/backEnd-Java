@@ -8,7 +8,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemLojaId implements Serializable {
-    private Integer lojaId;
+public class ItemStoreId implements Serializable {
+    private Integer storeId;
     private Integer itemId;
 }

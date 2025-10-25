@@ -39,15 +39,15 @@ public class Dialog {
 
     /** Texto do diálogo em português */
     @Column(nullable = false)
-    private String portugues;
+    private String ptDialogue;
 
     /** Texto do diálogo em inglês */
     @Column(nullable = false)
-    private String ingles;
+    private String enDialogue;
 
     /** Nível mínimo necessário para acessar este diálogo */
     @Column(name = "level_minimo", nullable = false)
-    private Integer levelMinimo = 1;
+    private Integer minLevel = 1;
 
     /**
      * Palavras-chave importantes presentes neste diálogo.

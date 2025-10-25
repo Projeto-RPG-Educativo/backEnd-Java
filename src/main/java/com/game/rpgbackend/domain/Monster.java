@@ -30,7 +30,7 @@ public class Monster {
 
     /** Nome do monstro */
     @Column(nullable = false)
-    private String nome;
+    private String monsterName;
 
     /** Pontos de vida do monstro */
     @Column(nullable = false)
@@ -38,5 +38,5 @@ public class Monster {
 
     /** Quantidade de dano que o monstro causa por ataque */
     @Column(nullable = false)
-    private Integer dano;
+    private Integer monsterDamage;
 }

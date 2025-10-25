@@ -68,7 +68,7 @@ public class SaveService {
                 save.getSlotName(),
                 save.getSavedAt(),
                 save.getCharacter().getId(),
-                save.getCharacter().getNome(),
+                save.getCharacter().getName(),
                 save.getCharacter().getGameClass().getName()
             ))
             .toList();

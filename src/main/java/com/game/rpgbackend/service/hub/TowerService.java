@@ -44,9 +44,9 @@ public class TowerService {
         return contents.stream()
             .map(content -> new ContentWithProgress(
                 content.getId(),
-                content.getNome(),
-                content.getDescricao(),
-                content.getLevelMinimo(),
+                content.getContentName(),
+                content.getDescription(),
+                content.getMinLevel(),
                 false, // completed
                 0      // progress
             ))
@@ -63,9 +63,9 @@ public class TowerService {
         // TODO: Implementar cálculo de progresso real
         return new ContentWithProgress(
             content.getId(),
-            content.getNome(),
-            content.getDescricao(),
-            content.getLevelMinimo(),
+            content.getContentName(),
+            content.getDescription(),
+            content.getMinLevel(),
             false,
             0
         );
@@ -78,7 +78,7 @@ public class TowerService {
         Content content = contentRepository.findById(contentId)
             .orElseThrow(() -> new NotFoundException("Conteúdo não encontrado"));
 
-        return playerLevel >= content.getLevelMinimo();
+        return playerLevel >= content.getMinLevel();
     }
 
     /**

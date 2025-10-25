@@ -37,7 +37,7 @@ public class User {
      * Nome de usuário único para login e identificação no sistema.
      */
     @Column(name = "nome_usuario", unique = true, nullable = false)
-    private String nomeUsuario;
+    private String username;
 
     /**
      * Email único do usuário para comunicação e recuperação de conta.
@@ -49,13 +49,13 @@ public class User {
      * Hash da senha do usuário criptografada (nunca armazenar senha em texto plano).
      */
     @Column(name = "senha_hash", nullable = false)
-    private String senhaHash;
+    private String hashedPassword;
 
     /**
      * Data e hora de criação da conta do usuário.
      */
     @Column(name = "criado_em", nullable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     /**
      * Lista de personagens que pertencem a este usuário.

@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 /**
  * Entidade que representa itens disponíveis em uma loja.
  * <p>
@@ -23,13 +21,13 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(ItemLojaId.class)
-public class ItemLoja {
+@IdClass(ItemStoreId.class)
+public class ItemStore {
 
     /** ID da loja (parte da chave composta) */
     @Id
     @Column(name = "loja_id")
-    private Integer lojaId;
+    private Integer storeId;
 
     /** ID do item (parte da chave composta) */
     @Id
@@ -42,7 +40,7 @@ public class ItemLoja {
      */
     @ManyToOne
     @JoinColumn(name = "loja_id", insertable = false, updatable = false)
-    private Loja loja;
+    private Store store;
 
     /**
      * Item sendo vendido.
@@ -54,10 +52,10 @@ public class ItemLoja {
 
     /** Preço de venda do item em ouro */
     @Column(nullable = false)
-    private Integer preco;
+    private Integer price;
 
     /** Quantidade disponível em estoque */
     @Column(nullable = false)
-    private Integer quantidade;
+    private Integer quantity;
 
 }

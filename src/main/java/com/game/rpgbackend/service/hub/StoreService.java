@@ -1,12 +1,12 @@
 package com.game.rpgbackend.service.hub;
 
-import com.game.rpgbackend.domain.ItemLoja;
-import com.game.rpgbackend.domain.Loja;
+import com.game.rpgbackend.domain.ItemStore;
+import com.game.rpgbackend.domain.Store;
 import com.game.rpgbackend.domain.PlayerStats;
 import com.game.rpgbackend.exception.BadRequestException;
 import com.game.rpgbackend.exception.NotFoundException;
 import com.game.rpgbackend.repository.ItemLojaRepository;
-import com.game.rpgbackend.repository.LojaRepository;
+import com.game.rpgbackend.repository.StoreRepository;
 import com.game.rpgbackend.repository.PlayerStatsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,21 +22,21 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class StoreService {
 
-    private final LojaRepository lojaRepository;
+    private final StoreRepository storeRepository;
     private final ItemLojaRepository itemLojaRepository;
     private final PlayerStatsRepository playerStatsRepository;
 
     /**
      * Busca todas as lojas disponíveis.
      */
-    public List<Loja> getStores() {
-        return lojaRepository.findAll();
+    public List<Store> getStores() {
+        return storeRepository.findAll();
     }
 
     /**
      * Busca os itens de uma loja específica.
      */
-    public List<ItemLoja> getStoreItems(Integer lojaId) {
+    public List<ItemStore> getStoreItems(Integer lojaId) {
         return itemLojaRepository.findByLojaId(lojaId);
     }
 
@@ -50,30 +50,30 @@ public class StoreService {
             .orElseThrow(() -> new NotFoundException("Jogador não encontrado"));
 
         // Busca o item na loja
-        ItemLoja itemLoja = itemLojaRepository.findByLojaId(lojaId).stream()
+        ItemStore itemStore = itemLojaRepository.findByLojaId(lojaId).stream()
             .filter(il -> il.getItemId().equals(itemId))
             .findFirst()
             .orElseThrow(() -> new NotFoundException("Item não encontrado na loja"));
 
         // Verifica se o jogador tem ouro suficiente
-        if (player.getTotalOuroGanho() < itemLoja.getPreco()) {
+        if (player.getTotalGoldEarned() < itemStore.getPrice()) {
             throw new BadRequestException("Ouro insuficiente para comprar este item");
         }
 
         // Verifica se há estoque
-        if (itemLoja.getQuantidade() <= 0) {
+        if (itemStore.getQuantity() <= 0) {
             throw new BadRequestException("Item sem estoque");
         }
 
         // Deduz o ouro do jogador
-        player.setTotalOuroGanho(player.getTotalOuroGanho() - itemLoja.getPreco());
+        player.setTotalGoldEarned(player.getTotalGoldEarned() - itemStore.getPrice());
         playerStatsRepository.save(player);
 
         // Reduz o estoque (opcional, dependendo da lógica do jogo)
-        itemLoja.setQuantidade(itemLoja.getQuantidade() - 1);
-        itemLojaRepository.save(itemLoja);
+        itemStore.setQuantity(itemStore.getQuantity() - 1);
+        itemLojaRepository.save(itemStore);
 
-        return new PurchaseResult(itemLoja.getItem(), itemLoja.getPreco(), player.getTotalOuroGanho());
+        return new PurchaseResult(itemStore.getItem(), itemStore.getPrice(), player.getTotalGoldEarned());
     }
 
     // Classe interna para resultado de compra

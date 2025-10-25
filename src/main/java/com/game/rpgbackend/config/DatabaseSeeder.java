@@ -22,7 +22,7 @@ public class DatabaseSeeder {
             QuestionRepository questionRepository,
             MonsterRepository monsterRepository,
             ItemRepository itemRepository,
-            LojaRepository lojaRepository,
+            StoreRepository storeRepository,
             ItemLojaRepository itemLojaRepository
     ) {
         return args -> {
@@ -34,7 +34,7 @@ public class DatabaseSeeder {
             seedQuestions(questionRepository, contentMap);
             seedMonsters(monsterRepository);
             Map<String, Item> itemMap = seedItems(itemRepository);
-            seedLoja(lojaRepository, itemLojaRepository, itemMap);
+            seedLoja(storeRepository, itemLojaRepository, itemMap);
 
             System.out.println("--- DATABASE SEEDER FINALIZADO ---");
         };
@@ -114,42 +114,42 @@ public class DatabaseSeeder {
     // Método para popular a tabela de Conteúdos
     private Map<String, Content> seedContent(ContentRepository contentRepository) {
         Map<String, Content> existingContent = contentRepository.findAll().stream()
-                .collect(Collectors.toMap(Content::getNome, Function.identity()));
+                .collect(Collectors.toMap(Content::getContentName, Function.identity()));
 
         List<Content> desiredContent = new ArrayList<>();
         if (!existingContent.containsKey("Verbo To Be")) {
             Content verboToBe = new Content();
-            verboToBe.setNome("Verbo To Be");
-            verboToBe.setDescricao("O verbo mais básico e importante do inglês");
-            verboToBe.setLevelMinimo(1);
+            verboToBe.setContentName("Verbo To Be");
+            verboToBe.setDescription("O verbo mais básico e importante do inglês");
+            verboToBe.setMinLevel(1);
             desiredContent.add(verboToBe);
         }
         if (!existingContent.containsKey("Presente Simples")) {
             Content presenteSimples = new Content();
-            presenteSimples.setNome("Presente Simples");
-            presenteSimples.setDescricao("Usado para falar de rotinas e verdades universais");
-            presenteSimples.setLevelMinimo(2);
+            presenteSimples.setContentName("Presente Simples");
+            presenteSimples.setDescription("Usado para falar de rotinas e verdades universais");
+            presenteSimples.setMinLevel(2);
             desiredContent.add(presenteSimples);
         }
         if (!existingContent.containsKey("Vocabulário Básico")) {
             Content vocabularioBasico = new Content();
-            vocabularioBasico.setNome("Vocabulário Básico");
-            vocabularioBasico.setDescricao("Palavras essenciais do dia a dia");
-            vocabularioBasico.setLevelMinimo(1);
+            vocabularioBasico.setContentName("Vocabulário Básico");
+            vocabularioBasico.setDescription("Palavras essenciais do dia a dia");
+            vocabularioBasico.setMinLevel(1);
             desiredContent.add(vocabularioBasico);
         }
         if (!existingContent.containsKey("Presente Perfeito")) {
             Content presentePerfeito = new Content();
-            presentePerfeito.setNome("Presente Perfeito");
-            presentePerfeito.setDescricao("Usado para conectar o passado com o presente");
-            presentePerfeito.setLevelMinimo(5);
+            presentePerfeito.setContentName("Presente Perfeito");
+            presentePerfeito.setDescription("Usado para conectar o passado com o presente");
+            presentePerfeito.setMinLevel(5);
             desiredContent.add(presentePerfeito);
         }
         if (!existingContent.containsKey("Expressões Idiomáticas")) {
             Content expressoesIdiomaticas = new Content();
-            expressoesIdiomaticas.setNome("Expressões Idiomáticas");
-            expressoesIdiomaticas.setDescricao("Frases com significados especiais na cultura");
-            expressoesIdiomaticas.setLevelMinimo(7);
+            expressoesIdiomaticas.setContentName("Expressões Idiomáticas");
+            expressoesIdiomaticas.setDescription("Frases com significados especiais na cultura");
+            expressoesIdiomaticas.setMinLevel(7);
             desiredContent.add(expressoesIdiomaticas);
         }
 
@@ -161,62 +161,62 @@ public class DatabaseSeeder {
         }
         // Retorna todos os conteúdos (antigos e novos) para uso posterior
         return contentRepository.findAll().stream()
-                .collect(Collectors.toMap(Content::getNome, Function.identity()));
+                .collect(Collectors.toMap(Content::getContentName, Function.identity()));
     }
 
     // Método para popular a tabela de Monstros
     private void seedMonsters(MonsterRepository monsterRepository) {
         Map<String, Monster> existingMonsters = monsterRepository.findAll().stream()
-                .collect(Collectors.toMap(Monster::getNome, Function.identity()));
+                .collect(Collectors.toMap(Monster::getMonsterName, Function.identity()));
 
         List<Monster> desiredMonsters = new ArrayList<>();
         if (!existingMonsters.containsKey("Diabrete Errôneo")) {
             Monster diabrete = new Monster();
-            diabrete.setNome("Diabrete Errôneo");
+            diabrete.setMonsterName("Diabrete Errôneo");
             diabrete.setHp(150);
-            diabrete.setDano(10);
+            diabrete.setMonsterDamage(10);
             desiredMonsters.add(diabrete);
         }
         if (!existingMonsters.containsKey("Harpia Indagada")) {
             Monster harpia = new Monster();
-            harpia.setNome("Harpia Indagada");
+            harpia.setMonsterName("Harpia Indagada");
             harpia.setHp(120);
-            harpia.setDano(15);
+            harpia.setMonsterDamage(15);
             desiredMonsters.add(harpia);
         }
         if (!existingMonsters.containsKey("Zumbi Demente")) {
             Monster zumbi = new Monster();
-            zumbi.setNome("Zumbi Demente");
+            zumbi.setMonsterName("Zumbi Demente");
             zumbi.setHp(250);
-            zumbi.setDano(8);
+            zumbi.setMonsterDamage(8);
             desiredMonsters.add(zumbi);
         }
         if (!existingMonsters.containsKey("Centauro Questionador")) {
             Monster centauro = new Monster();
-            centauro.setNome("Centauro Questionador");
+            centauro.setMonsterName("Centauro Questionador");
             centauro.setHp(200);
-            centauro.setDano(12);
+            centauro.setMonsterDamage(12);
             desiredMonsters.add(centauro);
         }
         if (!existingMonsters.containsKey("Esqueleto da Sintaxe")) {
             Monster esqueleto = new Monster();
-            esqueleto.setNome("Esqueleto da Sintaxe");
+            esqueleto.setMonsterName("Esqueleto da Sintaxe");
             esqueleto.setHp(500);
-            esqueleto.setDano(20);
+            esqueleto.setMonsterDamage(20);
             desiredMonsters.add(esqueleto);
         }
         if (!existingMonsters.containsKey("Lexicógrafo, o Guardião do Vazio")) {
             Monster lexicografo = new Monster();
-            lexicografo.setNome("Lexicógrafo, o Guardião do Vazio");
+            lexicografo.setMonsterName("Lexicógrafo, o Guardião do Vazio");
             lexicografo.setHp(1500);
-            lexicografo.setDano(40);
+            lexicografo.setMonsterDamage(40);
             desiredMonsters.add(lexicografo);
         }
         if (!existingMonsters.containsKey("Malak, O Silenciador")) {
             Monster malak = new Monster();
-            malak.setNome("Malak, O Silenciador");
+            malak.setMonsterName("Malak, O Silenciador");
             malak.setHp(5000);
-            malak.setDano(100);
+            malak.setMonsterDamage(100);
             desiredMonsters.add(malak);
         }
 
@@ -337,7 +337,7 @@ public class DatabaseSeeder {
     // Método para popular a tabela de Questões
     private void seedQuestions(QuestionRepository questionRepository, Map<String, Content> contentMap) {
         Map<String, Question> existingQuestions = questionRepository.findAll().stream()
-                .collect(Collectors.toMap(Question::getTextoPergunta, Function.identity()));
+                .collect(Collectors.toMap(Question::getQuestionText, Function.identity()));
 
         List<Question> desiredQuestions = new ArrayList<>();
 
@@ -677,21 +677,21 @@ public class DatabaseSeeder {
     }
 
     // Método para popular a Loja e seus itens
-    private void seedLoja(LojaRepository lojaRepository, ItemLojaRepository itemLojaRepository, Map<String, Item> itemMap) {
+    private void seedLoja(StoreRepository storeRepository, ItemLojaRepository itemLojaRepository, Map<String, Item> itemMap) {
         // Garante que exista pelo menos uma loja
-        Loja loja;
-        if (lojaRepository.count() == 0) {
+        Store store;
+        if (storeRepository.count() == 0) {
             System.out.println("Criando a loja principal...");
-            loja = lojaRepository.save(new Loja());
+            store = storeRepository.save(new Store());
         } else {
-            loja = lojaRepository.findAll().get(0); // Pega a primeira loja que encontrar
+            store = storeRepository.findAll().get(0); // Pega a primeira loja que encontrar
         }
 
         // Busca os itens que já estão na loja para não duplicar
-        Map<Integer, ItemLoja> existingShopItems = itemLojaRepository.findByLojaId(loja.getId()).stream()
-                .collect(Collectors.toMap(ItemLoja::getItemId, Function.identity()));
+        Map<Integer, ItemStore> existingShopItems = itemLojaRepository.findByLojaId(store.getId()).stream()
+                .collect(Collectors.toMap(ItemStore::getItemId, Function.identity()));
 
-        List<ItemLoja> newShopItems = new ArrayList<>();
+        List<ItemStore> newShopItems = new ArrayList<>();
         for (Item item : itemMap.values()) {
             // Pula itens sem id (não persistidos)
             if (item.getId() == null) {
@@ -701,15 +701,15 @@ public class DatabaseSeeder {
 
             // Se o item NÃO está na lista de exceções E NÃO está na loja ainda...
             if (!item.getName().equals("Gema Bruta") && !item.getName().equals("Moeda de Ouro") && !existingShopItems.containsKey(item.getId())) {
-                ItemLoja itemLoja = new ItemLoja();
+                ItemStore itemStore = new ItemStore();
                 // Preencher as chaves compostas explicitamente para evitar ids nulos
-                itemLoja.setLojaId(loja.getId());
-                itemLoja.setItemId(item.getId());
-                itemLoja.setLoja(loja);
-                itemLoja.setItem(item);
-                itemLoja.setPreco((int) Math.round((item.getValue() != null ? item.getValue() : 0) * 1.20));
-                itemLoja.setQuantidade(10);
-                newShopItems.add(itemLoja);
+                itemStore.setStoreId(store.getId());
+                itemStore.setItemId(item.getId());
+                itemStore.setStore(store);
+                itemStore.setItem(item);
+                itemStore.setPrice((int) Math.round((item.getValue() != null ? item.getValue() : 0) * 1.20));
+                itemStore.setQuantity(10);
+                newShopItems.add(itemStore);
             }
         }
 
@@ -730,15 +730,15 @@ public class DatabaseSeeder {
         }
         if (!existingQuestions.containsKey(texto)) {
             Question q = new Question();
-            q.setTextoPergunta(texto);
-            q.setOpcaoA(opcaoA);
-            q.setOpcaoB(opcaoB);
-            q.setOpcaoC(opcaoC);
-            q.setRespostaCorreta(resposta);
-            q.setDificuldade(dificuldade);
-            q.setConteudo(content.getNome().toLowerCase().replace(" ", "_"));
+            q.setQuestionText(texto);
+            q.setOptionA(opcaoA);
+            q.setOptionB(opcaoB);
+            q.setOptionC(opcaoC);
+            q.setCorrectAnswer(resposta);
+            q.setDifficulty(dificuldade);
+            q.setQuestionContent(content.getContentName().toLowerCase().replace(" ", "_"));
             q.setContent(content);
-            q.setLevelMinimo(levelMinimo);
+            q.setMinLevel(levelMinimo);
             desiredQuestions.add(q);
         }
     }

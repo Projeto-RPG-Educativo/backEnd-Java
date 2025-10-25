@@ -57,7 +57,7 @@ public class Item {
      * Relacionamento OneToMany através de ItemLoja.
      */
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-    private List<ItemLoja> lojas;
+    private List<ItemStore> stores;
 
     /**
      * Quests que dão este item como recompensa.

@@ -39,11 +39,11 @@ public class Quest {
 
     /** Quantidade de XP ganha ao completar a quest */
     @Column(name = "xp_ganho")
-    private Integer xpGanho;
+    private Integer xpReward;
 
     /** Quantidade de ouro ganha ao completar a quest */
     @Column(name = "ouro_ganho")
-    private Integer ouroGanho;
+    private Integer goldReward;
 
     /**
      * Personagens que estão realizando ou completaram esta quest.

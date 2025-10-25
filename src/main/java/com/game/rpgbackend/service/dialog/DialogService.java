@@ -1,7 +1,6 @@
 package com.game.rpgbackend.service.dialog;
 
 import com.game.rpgbackend.domain.Dialog;
-import com.game.rpgbackend.domain.DialogKeyword;
 import com.game.rpgbackend.exception.NotFoundException;
 import com.game.rpgbackend.repository.DialogRepository;
 import lombok.RequiredArgsConstructor;
@@ -62,12 +61,12 @@ public class DialogService {
     private DialogResponse mapToDialogResponse(Dialog dialog) {
         DialogResponse response = new DialogResponse();
         response.setId(dialog.getId());
-        response.setPortugues(dialog.getPortugues());
-        response.setIngles(dialog.getIngles());
+        response.setPortugues(dialog.getPtDialogue());
+        response.setIngles(dialog.getEnDialogue());
 
         if (dialog.getKeywords() != null) {
             List<KeywordResponse> keywords = dialog.getKeywords().stream()
-                .map(k -> new KeywordResponse(k.getPalavra(), k.getTraducao(), k.getDestaque()))
+                .map(k -> new KeywordResponse(k.getLanguageWord(), k.getTranslate(), k.getHighlight()))
                 .collect(Collectors.toList());
             response.setKeywords(keywords);
         }

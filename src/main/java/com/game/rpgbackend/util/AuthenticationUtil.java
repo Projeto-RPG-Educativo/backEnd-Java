@@ -43,7 +43,7 @@ public class AuthenticationUtil {
 
         if (principal instanceof UserDetails) {
             String username = ((UserDetails) principal).getUsername();
-            return userRepository.findByNomeUsuario(username)
+            return userRepository.findByUsername(username)
                     .orElseThrow(() -> new UnauthorizedException("Usuário não encontrado"));
         }
 
@@ -71,7 +71,7 @@ public class AuthenticationUtil {
      * @throws UnauthorizedException se o usuário não for encontrado
      */
     public Integer getUserIdFromUsername(String username) {
-        return userRepository.findByNomeUsuario(username)
+        return userRepository.findByUsername(username)
                 .map(User::getId)
                 .orElseThrow(() -> new UnauthorizedException("Usuário não encontrado"));
     }

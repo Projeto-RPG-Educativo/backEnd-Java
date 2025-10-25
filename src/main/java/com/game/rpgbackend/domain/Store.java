@@ -22,7 +22,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Loja {
+public class Store {
 
     /** Identificador único da loja */
     @Id
@@ -33,6 +33,6 @@ public class Loja {
      * Itens disponíveis para compra nesta loja.
      * Relacionamento OneToMany através de ItemLoja.
      */
-    @OneToMany(mappedBy = "loja", cascade = CascadeType.ALL)
-    private List<ItemLoja> items;
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+    private List<ItemStore> items;
 }

@@ -49,7 +49,7 @@ public class AuthController {
 
         User user = userService.registerUser(registerRequest);
 
-        UserDto userDto = new UserDto(user.getId(), user.getNomeUsuario(), user.getEmail(), user.getCriadoEm());
+        UserDto userDto = new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt());
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }
 
@@ -65,7 +65,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginUserDto request) {
-        LoginResponseDto response = userService.loginUser(request.getNomeUsuario(), request.getSenha());
+        LoginResponseDto response = userService.loginUser(request.getUsername(), request.getPassword());
         return ResponseEntity.ok(response);
     }
 }

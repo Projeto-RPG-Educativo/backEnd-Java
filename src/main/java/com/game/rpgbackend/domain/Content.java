@@ -32,15 +32,15 @@ public class Content {
 
     /** Nome único do conteúdo educacional */
     @Column(nullable = false, unique = true)
-    private String nome;
+    private String contentName;
 
     /** Descrição detalhada do conteúdo e temas abordados */
     @Column(nullable = false)
-    private String descricao;
+    private String description;
 
     /** Nível mínimo necessário para acessar este conteúdo */
     @Column(name = "level_minimo", nullable = false)
-    private Integer levelMinimo = 1;
+    private Integer minLevel = 1;
 
     /**
      * Questões relacionadas a este conteúdo.

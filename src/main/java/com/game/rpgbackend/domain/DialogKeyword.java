@@ -38,13 +38,13 @@ public class DialogKeyword {
 
     /** Palavra em um dos idiomas (português ou inglês) */
     @Column(nullable = false)
-    private String palavra;
+    private String languageWord;
 
     /** Tradução da palavra para o outro idioma */
     @Column(nullable = false)
-    private String traducao;
+    private String translate;
 
     /** Se a palavra deve ser destacada visualmente no texto */
     @Column(nullable = false)
-    private Boolean destaque = true;
+    private Boolean highlight = true;
 }

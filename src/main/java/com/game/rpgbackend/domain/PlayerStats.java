@@ -44,11 +44,11 @@ public class PlayerStats {
 
     /** Total de pontos de experiência ganhos */
     @Column(name = "total_xp_ganhos", nullable = false)
-    private Integer totalXpGanhos = 0;
+    private Integer totalXpEarned = 0;
 
     /** Total de ouro ganho ao longo do jogo */
     @Column(name = "total_ouro_ganho", nullable = false)
-    private Integer totalOuroGanho = 0;
+    private Integer totalGoldEarned = 0;
 
     /** Total de batalhas vencidas */
     @Column(name = "battles_won", nullable = false)

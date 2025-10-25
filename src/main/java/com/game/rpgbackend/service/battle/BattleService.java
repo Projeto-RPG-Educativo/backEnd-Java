@@ -133,7 +133,7 @@ public class BattleService {
                     Question question = questionRepository.findById(battle.getCurrentQuestion().getId())
                         .orElse(null);
                     if (question != null) {
-                        String correctAnswer = question.getRespostaCorreta();
+                        String correctAnswer = question.getCorrectAnswer();
                         List<String> opcoes = new ArrayList<>(battle.getCurrentQuestion().getOpcoes());
 
                         // Remove primeira opção incorreta
@@ -150,7 +150,7 @@ public class BattleService {
                         .orElse(null);
                     if (hintQuestion != null) {
                         String hint = String.format(" Dica: A resposta começa com a letra '%s'.",
-                            hintQuestion.getRespostaCorreta().charAt(0));
+                            hintQuestion.getCorrectAnswer().charAt(0));
                         turnResult += hint;
                     }
                     break;
@@ -166,11 +166,11 @@ public class BattleService {
                     if (challengeQuestion != null) {
                         BattleStateResponse.QuestionInfo questionInfo = new BattleStateResponse.QuestionInfo();
                         questionInfo.setId(challengeQuestion.getId());
-                        questionInfo.setTexto(challengeQuestion.getTextoPergunta());
+                        questionInfo.setTexto(challengeQuestion.getQuestionText());
                         List<String> options = List.of(
-                            challengeQuestion.getOpcaoA(),
-                            challengeQuestion.getOpcaoB(),
-                            challengeQuestion.getOpcaoC()
+                            challengeQuestion.getOptionA(),
+                            challengeQuestion.getOptionB(),
+                            challengeQuestion.getOptionC()
                         );
                         questionInfo.setOpcoes(options);
                         battle.setCurrentQuestion(questionInfo);
@@ -235,19 +235,19 @@ public class BattleService {
         BattleStateResponse.MonsterBattleInfo monsterInfo = new BattleStateResponse.MonsterBattleInfo();
         monsterInfo.setId(monster.getId());
         monsterInfo.setHp(monster.getHp());
-        monsterInfo.setDano(monster.getDano());
-        monsterInfo.setNome(monster.getNome());
+        monsterInfo.setDano(monster.getMonsterDamage());
+        monsterInfo.setNome(monster.getMonsterName());
         battleState.setMonster(monsterInfo);
 
         BattleStateResponse.QuestionInfo questionInfo = new BattleStateResponse.QuestionInfo();
         questionInfo.setId(firstQuestion.getId());
-        questionInfo.setTexto(firstQuestion.getTextoPergunta());
-        questionInfo.setNivelMinimo(firstQuestion.getLevelMinimo());
-        questionInfo.setDifficulty(firstQuestion.getDificuldade());
+        questionInfo.setTexto(firstQuestion.getQuestionText());
+        questionInfo.setNivelMinimo(firstQuestion.getMinLevel());
+        questionInfo.setDifficulty(firstQuestion.getDifficulty());
         List<String> options = List.of(
-            firstQuestion.getOpcaoA(),
-            firstQuestion.getOpcaoB(),
-            firstQuestion.getOpcaoC()
+            firstQuestion.getOptionA(),
+            firstQuestion.getOptionB(),
+            firstQuestion.getOptionC()
         );
         questionInfo.setOpcoes(options);
         battleState.setCurrentQuestion(questionInfo);
@@ -275,7 +275,7 @@ public class BattleService {
         Question question = questionRepository.findById(questionId)
             .orElseThrow(() -> new NotFoundException("Pergunta não encontrada."));
 
-        boolean isCorrect = answer.trim().equalsIgnoreCase(question.getRespostaCorreta().trim());
+        boolean isCorrect = answer.trim().equalsIgnoreCase(question.getCorrectAnswer().trim());
 
         // 2.1. Busca as estatísticas do jogador
         Character character = characterRepository.findById(battle.getCharacter().getId())
@@ -292,7 +292,7 @@ public class BattleService {
                 // Atualiza estatísticas do Bardo (vitória + questão correta)
                 stats.setQuestionsRight(stats.getQuestionsRight() + 1);
                 stats.setBattlesWon(stats.getBattlesWon() + 1);
-                stats.setTotalXpGanhos(stats.getTotalXpGanhos() + xpReward);
+                stats.setTotalXpEarned(stats.getTotalXpEarned() + xpReward);
                 playerStatsRepository.save(stats);
 
                 characterRepository.findById(battle.getCharacter().getId()).ifPresent(ch -> {
@@ -337,7 +337,7 @@ public class BattleService {
 
             // Incrementar batalhas vencidas e XP total
             stats.setBattlesWon(stats.getBattlesWon() + 1);
-            stats.setTotalXpGanhos(stats.getTotalXpGanhos() + gameConfig.getBattle().getXpWinReward());
+            stats.setTotalXpEarned(stats.getTotalXpEarned() + gameConfig.getBattle().getXpWinReward());
             playerStatsRepository.save(stats);
 
             characterRepository.findById(updatedBattle.getCharacter().getId()).ifPresent(ch -> {
@@ -380,13 +380,13 @@ public class BattleService {
 
             BattleStateResponse.QuestionInfo questionInfo = new BattleStateResponse.QuestionInfo();
             questionInfo.setId(nextQuestion.getId());
-            questionInfo.setTexto(nextQuestion.getTextoPergunta());
-            questionInfo.setNivelMinimo(nextQuestion.getLevelMinimo());
-            questionInfo.setDifficulty(nextQuestion.getDificuldade());
+            questionInfo.setTexto(nextQuestion.getQuestionText());
+            questionInfo.setNivelMinimo(nextQuestion.getMinLevel());
+            questionInfo.setDifficulty(nextQuestion.getDifficulty());
             List<String> options = List.of(
-                nextQuestion.getOpcaoA(),
-                nextQuestion.getOpcaoB(),
-                nextQuestion.getOpcaoC()
+                nextQuestion.getOptionA(),
+                nextQuestion.getOptionB(),
+                nextQuestion.getOptionC()
             );
             questionInfo.setOpcoes(options);
             updatedBattle.setCurrentQuestion(questionInfo);

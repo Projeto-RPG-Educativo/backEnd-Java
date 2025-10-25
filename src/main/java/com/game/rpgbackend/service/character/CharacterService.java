@@ -121,7 +121,7 @@ public class CharacterService {
         Character newCharacter = new Character();
         newCharacter.setUser(userRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException("Usuário não encontrado")));
-        newCharacter.setNome("Herói " + characterClass.getName());
+        newCharacter.setName("Herói " + characterClass.getName());
         newCharacter.setHp(characterClass.getHp());
         newCharacter.setXp(0);
         newCharacter.setGold(0);
@@ -147,8 +147,8 @@ public class CharacterService {
         Character existing = characterRepository.findById(id)
             .orElseThrow(() -> new NotFoundException("Personagem não encontrado"));
 
-        if (characterData.getNome() != null) {
-            existing.setNome(characterData.getNome());
+        if (characterData.getName() != null) {
+            existing.setName(characterData.getName());
         }
         if (characterData.getHp() != null) {
             existing.setHp(characterData.getHp());

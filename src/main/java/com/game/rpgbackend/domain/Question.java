@@ -31,35 +31,35 @@ public class Question {
 
     /** Texto da pergunta a ser apresentada ao jogador */
     @Column(name = "texto_pergunta", nullable = false)
-    private String textoPergunta;
+    private String questionText;
 
     /** Primeira opção de resposta */
     @Column(name = "opcao_a", nullable = false)
-    private String opcaoA;
+    private String optionA;
 
     /** Segunda opção de resposta */
     @Column(name = "opcao_b", nullable = false)
-    private String opcaoB;
+    private String optionB;
 
     /** Terceira opção de resposta */
     @Column(name = "opcao_c", nullable = false)
-    private String opcaoC;
+    private String optionC;
 
     /** Letra da resposta correta (A, B ou C) */
     @Column(name = "resposta_correta", nullable = false)
-    private String respostaCorreta;
+    private String correctAnswer;
 
     /** Nível de dificuldade da questão (easy, medium, hard) */
     @Column(nullable = false)
-    private String dificuldade;
+    private String difficulty;
 
     /** Categoria do conteúdo da questão */
     @Column(nullable = false)
-    private String conteudo;
+    private String questionContent;
 
     /** Nível mínimo do personagem para acessar esta questão */
     @Column(name = "level_minimo", nullable = false)
-    private Integer levelMinimo = 1;
+    private Integer minLevel = 1;
 
     /**
      * Conteúdo educacional associado a esta questão.

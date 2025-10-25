@@ -43,7 +43,7 @@ public class UserService {
         }
 
         // Verifica se o usuário já existe
-        if (userRepository.findByNomeUsuario(request.getNomeUsuario()).isPresent()) {
+        if (userRepository.findByUsername(request.getNomeUsuario()).isPresent()) {
             throw new BadRequestException("Este nome de usuário já está em uso.");
         }
 
@@ -53,10 +53,10 @@ public class UserService {
 
         // Cria o novo usuário
         User newUser = new User();
-        newUser.setNomeUsuario(request.getNomeUsuario());
+        newUser.setUsername(request.getNomeUsuario());
         newUser.setEmail(request.getEmail());
-        newUser.setSenhaHash(passwordEncoder.encode(request.getSenha()));
-        newUser.setCriadoEm(LocalDateTime.now());
+        newUser.setHashedPassword(passwordEncoder.encode(request.getSenha()));
+        newUser.setCreatedAt(LocalDateTime.now());
 
         User savedUser = userRepository.save(newUser);
 
@@ -64,8 +64,8 @@ public class UserService {
         PlayerStats stats = new PlayerStats();
         stats.setUser(savedUser);
         stats.setLevel(1);
-        stats.setTotalXpGanhos(0);
-        stats.setTotalOuroGanho(0);
+        stats.setTotalXpEarned(0);
+        stats.setTotalGoldEarned(0);
         stats.setBattlesWon(0);
         stats.setBattlesLost(0);
         stats.setQuestionsRight(0);
@@ -79,19 +79,19 @@ public class UserService {
     /**
      * Autentica um usuário e retorna um token JWT.
      */
-    public LoginResponseDto loginUser(String nomeUsuario, String senha) {
-        User user = userRepository.findByNomeUsuario(nomeUsuario)
+    public LoginResponseDto loginUser(String username, String password) {
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UnauthorizedException("Credenciais inválidas."));
 
-        if (!passwordEncoder.matches(senha, user.getSenhaHash())) {
+        if (!passwordEncoder.matches(password, user.getHashedPassword())) {
             throw new UnauthorizedException("Credenciais inválidas.");
         }
 
         // 3. Gera o token JWT
-        String token = jwtUtil.generateToken(user.getNomeUsuario());
+        String token = jwtUtil.generateToken(user.getUsername());
 
         // 4. Retorna a resposta usando o DTO do pacote dto.response
-        UserDto userDto = new UserDto(user.getId(), user.getNomeUsuario(), user.getEmail(), user.getCriadoEm());
+        UserDto userDto = new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt());
         return new LoginResponseDto("Login bem-sucedido!", userDto, token);
     }
 
@@ -105,8 +105,8 @@ public class UserService {
     /**
      * Busca um usuário por nome de usuário.
      */
-    public Optional<User> findByNomeUsuario(String nomeUsuario) {
-        return userRepository.findByNomeUsuario(nomeUsuario);
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     /**
@@ -124,15 +124,15 @@ public class UserService {
         User existing = userRepository.findById(id)
             .orElseThrow(() -> new BadRequestException("Usuário não encontrado"));
 
-        if (userData.getNomeUsuario() != null) {
+        if (userData.getUsername() != null) {
             // Verifica se o novo nome já está em uso por outro usuário
-            userRepository.findByNomeUsuario(userData.getNomeUsuario())
+            userRepository.findByUsername(userData.getUsername())
                 .ifPresent(user -> {
                     if (!user.getId().equals(id)) {
                         throw new BadRequestException("Nome de usuário já está em uso");
                     }
                 });
-            existing.setNomeUsuario(userData.getNomeUsuario());
+            existing.setUsername(userData.getUsername());
         }
 
         if (userData.getEmail() != null) {
@@ -157,22 +157,22 @@ public class UserService {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new BadRequestException("Usuário não encontrado"));
 
-        user.setSenhaHash(passwordEncoder.encode(novaSenha));
+        user.setHashedPassword(passwordEncoder.encode(novaSenha));
         userRepository.save(user);
     }
 
     /**
      * Retorna o perfil completo do usuário.
      */
-    public UserProfileResponse getUserProfile(String nomeUsuario) {
-        User user = userRepository.findByNomeUsuario(nomeUsuario)
+    public UserProfileResponse getUserProfile(String username) {
+        User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new BadRequestException("Usuário não encontrado"));
 
         UserProfileResponse response = new UserProfileResponse();
         response.setId(user.getId());
-        response.setNome(user.getNomeUsuario());
+        response.setNome(user.getUsername());
         response.setEmail(user.getEmail());
-        response.setDataCriacao(user.getCriadoEm());
+        response.setDataCriacao(user.getCreatedAt());
         response.setTotalPersonagens(0); // TODO: Implementar contagem de personagens quando houver o repository necessário
 
         return response;
@@ -181,8 +181,8 @@ public class UserService {
     /**
      * Retorna as estatísticas do usuário.
      */
-    public UserStatsResponse getUserStats(String nomeUsuario) {
-        User user = userRepository.findByNomeUsuario(nomeUsuario)
+    public UserStatsResponse getUserStats(String username) {
+        User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new BadRequestException("Usuário não encontrado"));
 
         PlayerStats stats = playerStatsRepository.findByUserId(user.getId())
@@ -194,7 +194,7 @@ public class UserService {
         response.setTotalBatalhasPerdidas(stats.getBattlesLost());
         response.setTotalQuestoesCorretas(stats.getQuestionsRight());
         response.setTotalQuestoesErradas(stats.getQuestionsWrong());
-        response.setXpTotal(stats.getTotalXpGanhos());
+        response.setXpTotal(stats.getTotalXpEarned());
 
         int totalQuestoes = stats.getQuestionsRight() + stats.getQuestionsWrong();
         response.setTaxaAcerto(totalQuestoes > 0 ? (stats.getQuestionsRight() * 100.0) / totalQuestoes : 0.0);
@@ -206,16 +206,16 @@ public class UserService {
      * Atualiza o perfil do usuário.
      */
     @Transactional
-    public UserProfileResponse updateProfile(String nomeUsuario, UpdateProfileRequest request) {
-        User user = userRepository.findByNomeUsuario(nomeUsuario)
+    public UserProfileResponse updateProfile(String username, UpdateProfileRequest request) {
+        User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new BadRequestException("Usuário não encontrado"));
 
         // Atualiza o nome de usuário se fornecido
-        if (request.getNome() != null && !request.getNome().equals(user.getNomeUsuario())) {
-            if (userRepository.findByNomeUsuario(request.getNome()).isPresent()) {
+        if (request.getNome() != null && !request.getNome().equals(user.getUsername())) {
+            if (userRepository.findByUsername(request.getNome()).isPresent()) {
                 throw new BadRequestException("Nome de usuário já está em uso");
             }
-            user.setNomeUsuario(request.getNome());
+            user.setUsername(request.getNome());
         }
 
         // Atualiza o email se fornecido
@@ -229,14 +229,14 @@ public class UserService {
         // Atualiza a senha se fornecida
         if (request.getNovaSenha() != null) {
             if (request.getSenhaAtual() == null ||
-                !passwordEncoder.matches(request.getSenhaAtual(), user.getSenhaHash())) {
+                !passwordEncoder.matches(request.getSenhaAtual(), user.getHashedPassword())) {
                 throw new BadRequestException("Senha atual incorreta");
             }
-            user.setSenhaHash(passwordEncoder.encode(request.getNovaSenha()));
+            user.setHashedPassword(passwordEncoder.encode(request.getNovaSenha()));
         }
 
         userRepository.save(user);
-        return getUserProfile(user.getNomeUsuario());
+        return getUserProfile(user.getUsername());
     }
 
     // Classe interna para Request de registro

@@ -47,7 +47,7 @@ public class BattleHistory {
 
     /** Quantidade de experiência ganha na batalha */
     @Column(nullable = false)
-    private Integer experience;
+    private Integer xpEarned;
 
     /** Data e hora em que a batalha ocorreu */
     @Column(nullable = false)

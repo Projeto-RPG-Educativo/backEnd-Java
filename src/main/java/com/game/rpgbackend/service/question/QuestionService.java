@@ -57,8 +57,8 @@ public class QuestionService {
         System.out.println(String.format(
                 "Pergunta selecionada: ID=%d, Dificuldade=%s, NivelMinimo=%d, PlayerLevel=%d",
                 randomQuestion.getId(),
-                randomQuestion.getDificuldade(),
-                randomQuestion.getLevelMinimo(),
+                randomQuestion.getDifficulty(),
+                randomQuestion.getMinLevel(),
                 playerLevel
         ));
 
@@ -112,6 +112,6 @@ public class QuestionService {
      */
     public boolean checkAnswer(Integer questionId, String answer) {
         Question question = getQuestionById(questionId);
-        return question.getRespostaCorreta().trim().equalsIgnoreCase(answer.trim());
+        return question.getCorrectAnswer().trim().equalsIgnoreCase(answer.trim());
     }
 }

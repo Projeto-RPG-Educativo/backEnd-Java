@@ -1,7 +1,6 @@
 package com.game.rpgbackend.service.hub;
 
 import com.game.rpgbackend.domain.Achievement;
-import com.game.rpgbackend.domain.BattleHistory;
 import com.game.rpgbackend.domain.PlayerStats;
 import com.game.rpgbackend.domain.User;
 import com.game.rpgbackend.exception.NotFoundException;
@@ -44,8 +43,8 @@ public class PlayerService {
                 PlayerStats newStats = new PlayerStats();
                 newStats.setUser(user);
                 newStats.setLevel(1);
-                newStats.setTotalXpGanhos(0);
-                newStats.setTotalOuroGanho(0);
+                newStats.setTotalXpEarned(0);
+                newStats.setTotalGoldEarned(0);
                 newStats.setBattlesWon(0);
                 newStats.setBattlesLost(0);
                 newStats.setQuestionsRight(0);
@@ -72,7 +71,7 @@ public class PlayerService {
             .map(bh -> new BattleHistoryResponse(
                 bh.getResult(),
                 bh.getEnemyName(),
-                bh.getExperience(),
+                bh.getXpEarned(),
                 bh.getDate()
             ))
             .collect(Collectors.toList());
@@ -90,9 +89,9 @@ public class PlayerService {
         return playerStatsRepository.findAll(sort).stream()
             .limit(10)
             .map(stats -> new RankingResponse(
-                stats.getUser().getNomeUsuario(),
+                stats.getUser().getUsername(),
                 stats.getLevel(),
-                stats.getTotalXpGanhos()
+                stats.getTotalXpEarned()
             ))
             .collect(Collectors.toList());
     }
@@ -109,10 +108,10 @@ public class PlayerService {
             stats.setLevel(update.getLevel());
         }
         if (update.getTotalXpGanhos() != null) {
-            stats.setTotalXpGanhos(update.getTotalXpGanhos());
+            stats.setTotalXpEarned(update.getTotalXpGanhos());
         }
         if (update.getTotalOuroGanho() != null) {
-            stats.setTotalOuroGanho(update.getTotalOuroGanho());
+            stats.setTotalGoldEarned(update.getTotalOuroGanho());
         }
         if (update.getBattlesWon() != null) {
             stats.setBattlesWon(update.getBattlesWon());

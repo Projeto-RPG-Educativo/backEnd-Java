@@ -1,6 +1,5 @@
 package com.game.rpgbackend.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -20,17 +19,13 @@ public class LoginUserDto {
 
     /**
      * Nome de usuário para autenticação.
-     * <p>
-     * Aceita o formato snake_case do frontend através da anotação JsonProperty.
-     * </p>
      */
     @NotBlank(message = "O nome de usuário é obrigatório")
-    @JsonProperty("nome_usuario") // Aceita snake_case do frontend
-    private String nomeUsuario;
+    private String username;
 
     /**
      * Senha do usuário para autenticação.
      */
     @NotBlank(message = "A senha é obrigatória")
-    private String senha;
+    private String password;
 }

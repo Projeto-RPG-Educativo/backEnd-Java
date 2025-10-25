@@ -31,7 +31,7 @@ public class Character {
 
     /** Nome do personagem escolhido pelo jogador */
     @Column(nullable = false)
-    private String nome;
+    private String name;
 
     /** Pontos de experiência atuais para progressão de nível */
     @Column(nullable = false)
