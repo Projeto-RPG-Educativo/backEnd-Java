@@ -18,7 +18,7 @@ import java.util.List;
  * @since 1.0
  */
 @Entity
-@Table(name = "loja")
+@Table(name = "store")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

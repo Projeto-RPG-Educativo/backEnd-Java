@@ -61,6 +61,9 @@ public class Question {
     @Column(name = "level_minimo", nullable = false)
     private Integer minLevel = 1;
 
+    @Column (name="hint", nullable = false)
+    private String hint;
+
     /**
      * Conteúdo educacional associado a esta questão.
      * Relacionamento ManyToOne - várias questões podem ter o mesmo conteúdo.

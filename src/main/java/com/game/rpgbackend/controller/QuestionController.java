@@ -5,6 +5,9 @@ import com.game.rpgbackend.service.question.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.game.rpgbackend.exception.NotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Map;
@@ -52,5 +55,33 @@ public class QuestionController {
         boolean isCorrect = questionService.checkAnswer(questionId, answer);
         return ResponseEntity.ok(Map.of("correct", isCorrect));
     }
+    @GetMapping("/{id}/hint")
+    @PreAuthorize("isAuthenticated()") // Garante que apenas usuarios logados acessem
+    public ResponseEntity<String> getQuestionHint(@PathVariable Integer id) {
+        // TODO: Implementar lógica de segurança adicional:
+        // 1. Obter o personagem atual do usuário logado.
+        // 2. Verificar se a classe do personagem é "Ladino".
+        // 3. Verificar se a habilidade não está em cooldown ou se tem custo (mana/energia).
+        // 4. Se não for Ladino ou a habilidade não puder ser usada, retornar erro 403 Forbidden.
+
+        try {
+            String hint = questionService.getHintForQuestion(id);
+            // Retorna a dica ou uma mensagem padrão se a dica for nula/vazia
+            return ResponseEntity.ok(hint != null && !hint.isEmpty() ? hint : "Nenhuma dica disponível para esta pergunta.");
+        } catch (NotFoundException e) {
+            // Se a pergunta com o ID fornecido não existir
+            return ResponseEntity.notFound().build();
+        }
+        // catch (AccessDeniedException e) { // Se a lógica de Ladino falhar
+        //     return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Apenas Ladinos podem usar esta habilidade.");
+        // }
+        catch (Exception e) {
+            // Captura qualquer outro erro inesperado
+            System.err.println("Erro ao buscar dica para questão ID " + id + ": " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao processar a solicitação da dica.");
+        }
+    }
+    // --- FIM DO NOVO MÉTODO ---
 }
+
 

@@ -41,6 +41,7 @@ project/metals.sbt
 **/application-dev.properties
 **/application-prod.properties
 **/application-local.properties
+application.properties
 
 # Maven específicos adicionais
 dependency-reduced-pom.xml

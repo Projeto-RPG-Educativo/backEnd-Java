@@ -114,4 +114,23 @@ public class QuestionService {
         Question question = getQuestionById(questionId);
         return question.getCorrectAnswer().trim().equalsIgnoreCase(answer.trim());
     }
+
+    // --- NOVO MÉTODO ADICIONADO ---
+    /**
+     * Busca a dica para uma questão específica pelo seu ID.
+     * @param questionId O ID da questão.
+     * @return A string contendo a dica, ou null se não houver dica.
+     * @throws NotFoundException Se a questão não for encontrada.
+     */
+    public String getHintForQuestion(Integer questionId) {
+        Question question = getQuestionById(questionId); // Reutiliza o método que já busca e lança exceção
+
+        // TODO: Aqui pode ser adicionada lógica futura, como:
+        // - Verificar se o personagem atual (obtido do contexto de segurança) é Ladino.
+        // - Verificar cooldown da habilidade.
+        // - Descontar custo de mana/energia do personagem.
+        // - Lançar uma exceção customizada (ex: SkillNotAvailableException) se não puder usar.
+
+        return question.getHint(); // Retorna o valor do campo hint (pode ser null)
+    }
 }
