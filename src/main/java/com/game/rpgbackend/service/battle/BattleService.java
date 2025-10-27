@@ -146,12 +146,40 @@ public class BattleService {
                     break;
 
                 case "PROVIDE_HINT": // Efeito do Ladino
-                    Question hintQuestion = questionRepository.findById(battle.getCurrentQuestion().getId())
-                        .orElse(null);
-                    if (hintQuestion != null) {
-                        String hint = String.format(" Dica: A resposta começa com a letra '%s'.",
-                            hintQuestion.getCorrectAnswer().charAt(0));
-                        turnResult += hint;
+                    // First, get the ID of the current question.
+                    // Ensure battle.getCurrentQuestion() is not null and has an ID.
+                    if (battle.getCurrentQuestion() != null && battle.getCurrentQuestion().getId() != null) {
+                        Integer currentQuestionId = battle.getCurrentQuestion().getId();
+                        try {
+                            // Call QuestionService to get the real hint from the database
+                            String hint = questionService.getHintForQuestion(currentQuestionId); // Assuming questionService is injected
+
+                            if (hint != null && !hint.isEmpty()) {
+                                // Add the fetched hint to the turn result
+                                turnResult += " Dica: " + hint;
+                            } else {
+                                // Handle cases where the question exists but has no hint
+                                turnResult += " Nenhuma dica disponível para esta pergunta.";
+                                // Optional: Consider refunding the skill cost here if no hint was provided
+                                // attacker.setEnergy(attacker.getEnergy() + skill.getCost());
+                            }
+                        } catch (NotFoundException e) {
+                            // Handle case where the question ID is somehow invalid (shouldn't normally happen here)
+                            turnResult += " Erro: Pergunta atual não encontrada para obter dica.";
+                            // Optional: Refund skill cost
+                            // attacker.setEnergy(attacker.getEnergy() + skill.getCost());
+                        } catch (Exception e) {
+                            // Catch any other unexpected errors during the hint fetching
+                            turnResult += " Erro inesperado ao obter a dica.";
+                            System.err.println("Erro em PROVIDE_HINT: " + e.getMessage());
+                            // Optional: Refund skill cost
+                            // attacker.setEnergy(attacker.getEnergy() + skill.getCost());
+                        }
+                    } else {
+                        // Handle case where there's no current question in the battle state
+                        turnResult += " Não há pergunta ativa para obter dica.";
+                        // Optional: Refund skill cost
+                        // attacker.setEnergy(attacker.getEnergy() + skill.getCost());
                     }
                     break;
 
