@@ -43,9 +43,9 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@Valid @RequestBody RegisterUserDto request) {
         UserService.RegisterRequest registerRequest = new UserService.RegisterRequest();
-        registerRequest.setNomeUsuario(request.getNomeUsuario());
+        registerRequest.setNomeUsuario(request.getUsername());
         registerRequest.setEmail(request.getEmail());
-        registerRequest.setSenha(request.getSenha());
+        registerRequest.setSenha(request.getPassword());
 
         User user = userService.registerUser(registerRequest);
 

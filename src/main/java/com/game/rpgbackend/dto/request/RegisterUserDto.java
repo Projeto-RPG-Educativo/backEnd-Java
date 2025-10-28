@@ -25,7 +25,7 @@ public class RegisterUserDto {
      */
     @NotBlank(message = "O nome de usuário é obrigatório")
     @Size(min = 3, max = 50, message = "O nome de usuário deve ter entre 3 e 50 caracteres")
-    private String nomeUsuario;
+    private String username;
 
     /**
      * Endereço de email válido do usuário.
@@ -41,5 +41,5 @@ public class RegisterUserDto {
      */
     @NotBlank(message = "A senha é obrigatória")
     @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
-    private String senha;
+    private String password;
 }
