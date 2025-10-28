@@ -1,6 +1,9 @@
 package com.game.rpgbackend.controller.tutorial;
 
 import com.game.rpgbackend.domain.Dialogue;
+import com.game.rpgbackend.domain.NPC;
+import com.game.rpgbackend.dto.response.DialogueResponseDto;
+import com.game.rpgbackend.dto.response.NpcResponseDto;
 import com.game.rpgbackend.service.tutorial.TutorialDialogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +30,35 @@ public class TutorialDialogController {
      * @return ResponseEntity contendo o TutorialDialog
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Dialogue> getById(@PathVariable Integer id) {
+    public ResponseEntity<DialogueResponseDto> getById(@PathVariable Integer id) {
         Dialogue tutorialDialog = service.findById(id);
-        return ResponseEntity.ok(tutorialDialog);
+        if (tutorialDialog == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        NPC npc = tutorialDialog.getNpc();
+        NpcResponseDto npcDto = null;
+        if (npc != null) {
+            // converte Integer -> Long se necessário, com checagem nula
+            Long npcId = npc.getId() != null ? npc.getId().longValue() : null;
+            npcDto = new NpcResponseDto(
+                    npcId,
+                    npc.getName(),
+                    npc.getDescription(),
+                    npc.getType(),
+                    npc.getLocation()
+            );
+        }
+
+        // converte id do dialogue também para Long para casar com o DTO
+        Long dialogueId = tutorialDialog.getId() != null ? tutorialDialog.getId().longValue() : null;
+        DialogueResponseDto dto = new DialogueResponseDto(
+                dialogueId,
+                tutorialDialog.getContent(),
+                tutorialDialog.getResponse(),
+                npcDto
+        );
+
+        return ResponseEntity.ok(dto);
     }
 }
