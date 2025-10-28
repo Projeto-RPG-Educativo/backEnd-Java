@@ -1,4 +1,4 @@
-package com.game.rpgbackend.controller;
+package com.game.rpgbackend.controller.question;
 
 import com.game.rpgbackend.domain.Question;
 import com.game.rpgbackend.service.question.QuestionService;

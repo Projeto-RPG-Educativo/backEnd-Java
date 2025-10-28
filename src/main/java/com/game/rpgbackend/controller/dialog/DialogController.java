@@ -1,4 +1,4 @@
-package com.game.rpgbackend.controller;
+package com.game.rpgbackend.controller.dialog;
 
 import com.game.rpgbackend.service.dialog.DialogService;
 import lombok.RequiredArgsConstructor;

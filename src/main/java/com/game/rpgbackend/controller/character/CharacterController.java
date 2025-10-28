@@ -1,4 +1,4 @@
-package com.game.rpgbackend.controller;
+package com.game.rpgbackend.controller.character;
 
 import com.game.rpgbackend.domain.Character;
 import com.game.rpgbackend.dto.response.CharacterDTO;
@@ -90,6 +90,29 @@ public class CharacterController {
         if (className == null || className.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
+
+        Character newCharacter = characterService.createCharacter(userId, className);
+        return ResponseEntity.status(HttpStatus.CREATED).body(characterMapper.toDTO(newCharacter));
+    }
+
+    /**
+     * Cria um novo personagem para o tutorial, fixando a classe como Guerreiro.
+     * <p>
+     * O personagem é inicializado com atributos base da classe Guerreiro.
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @param request mapa (ignorado, classe sempre Guerreiro)
+     * @return DTO do personagem criado com status 201 Created
+     */
+    @PostMapping("/tutorial")
+    public ResponseEntity<CharacterDTO> createTutorialCharacter(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody Map<String, String> request) {
+
+        Integer userId = authenticationUtil.getUserIdFromUsername(userDetails.getUsername());
+        // Fixa a classe como Guerreiro para o tutorial
+        String className = "lutador";
 
         Character newCharacter = characterService.createCharacter(userId, className);
         return ResponseEntity.status(HttpStatus.CREATED).body(characterMapper.toDTO(newCharacter));

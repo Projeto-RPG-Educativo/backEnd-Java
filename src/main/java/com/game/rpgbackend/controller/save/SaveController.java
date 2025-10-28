@@ -1,4 +1,4 @@
-package com.game.rpgbackend.controller;
+package com.game.rpgbackend.controller.save;
 
 import com.game.rpgbackend.domain.GameSave;
 import com.game.rpgbackend.service.save.SaveService;

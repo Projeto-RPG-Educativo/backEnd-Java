@@ -1,4 +1,4 @@
-package com.game.rpgbackend.controller;
+package com.game.rpgbackend.controller.auth;
 
 import com.game.rpgbackend.dto.request.LoginUserDto;
 import com.game.rpgbackend.dto.request.RegisterUserDto;

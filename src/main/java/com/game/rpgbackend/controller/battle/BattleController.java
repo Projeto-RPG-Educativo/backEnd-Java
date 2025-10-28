@@ -1,4 +1,4 @@
-package com.game.rpgbackend.controller;
+package com.game.rpgbackend.controller.battle;
 
 import com.game.rpgbackend.dto.request.BattleActionRequest;
 import com.game.rpgbackend.dto.request.StartBattleRequest;
