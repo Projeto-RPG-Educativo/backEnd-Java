@@ -1,4 +1,4 @@
-package com.game.rpgbackend.controller;
+package com.game.rpgbackend.controller.user;
 
 import com.game.rpgbackend.dto.request.UpdateProfileRequest;
 import com.game.rpgbackend.dto.response.UserProfileResponse;

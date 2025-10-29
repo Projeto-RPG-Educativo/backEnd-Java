@@ -1,4 +1,4 @@
-package com.game.rpgbackend.controller;
+package com.game.rpgbackend.controller.hub;
 
 import com.game.rpgbackend.domain.*;
 import com.game.rpgbackend.service.hub.*;

@@ -1,4 +1,4 @@
-package com.game.rpgbackend.controller;
+package com.game.rpgbackend.controller.gameClass;
 
 import com.game.rpgbackend.domain.GameClass;
 import com.game.rpgbackend.dto.response.GameClassDTO;

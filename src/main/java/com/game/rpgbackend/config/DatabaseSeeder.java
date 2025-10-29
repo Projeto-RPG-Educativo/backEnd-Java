@@ -23,7 +23,9 @@ public class DatabaseSeeder {
             MonsterRepository monsterRepository,
             ItemRepository itemRepository,
             StoreRepository storeRepository,
-            ItemLojaRepository itemLojaRepository
+            ItemLojaRepository itemLojaRepository,
+            NPCRepository npcRepository,
+            DialogueRepository dialogueRepository
     ) {
         return args -> {
             System.out.println("--- INICIANDO O DATABASE SEEDER INTELIGENTE ---");
@@ -35,6 +37,8 @@ public class DatabaseSeeder {
             seedMonsters(monsterRepository);
             Map<String, Item> itemMap = seedItems(itemRepository);
             seedLoja(storeRepository, itemLojaRepository, itemMap);
+            seedNpc(npcRepository);
+            seedDialogue(dialogueRepository, npcRepository);
 
             System.out.println("--- DATABASE SEEDER FINALIZADO ---");
         };
@@ -743,5 +747,85 @@ public class DatabaseSeeder {
             desiredQuestions.add(q);
         }
     }
+
+    // Método para popular NPCs iniciais
+
+    private void seedNpc(NPCRepository npcRepository) {
+
+        Map<String, NPC> existingNpcs = npcRepository.findAll().stream()
+                .collect(Collectors.toMap(NPC::getName, Function.identity()));
+
+        List<NPC> desiredNpcs = new ArrayList<>();
+
+        if (!existingNpcs.containsKey("Goblin da Gramática")) {
+            NPC goblinGramatica = new NPC();
+            goblinGramatica.setName("Goblin da Gramática");
+            goblinGramatica.setDescription("Um guia excêntrico que ajuda os aventureiros a dominar as regras gramaticais do inglês enquanto exploram o mundo do RPG.");
+            goblinGramatica.setType("info");
+            goblinGramatica.setLocation("Cidade Principal");
+            desiredNpcs.add(goblinGramatica);
+        }
+
+        if (!desiredNpcs.isEmpty()) { // <-- CORRIGIDO AQUI
+            System.out.println("Inserindo " + desiredNpcs.size() + " novos NPCs...");
+            npcRepository.saveAll(desiredNpcs);
+        } else {
+            System.out.println("Tabela 'npc' já está atualizada.");
+        }
+    }
+
+    private void seedDialogue(DialogueRepository dialogueRepository, NPCRepository npcRepository){
+        System.out.println("Verificando/adicionando diálogos...");
+
+        Map<String, Dialogue> existingDialogue = dialogueRepository.findAll().stream()
+                .collect(Collectors.toMap(Dialogue::getContent, Function.identity()));
+
+        List<Dialogue> desiredDialogue = new ArrayList<>();
+
+        NPC goblinGramatica = npcRepository.findByName("Goblin da Gramática").orElse(null);
+        // Diálogos do Goblin da Gramática
+        if (goblinGramatica != null) { // Adiciona diálogos apenas se o NPC foi encontrado
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Ora, ora... Vejam só! Um 'Outworlder'! Bem-vindo, ou melhor, *welcome* a Aetheria! Ou seria 'Bem-vindo A Aetheria'? Ah, as preposições...", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Você deve estar confuso, não é? Este lugar, Aetheria, era um mundo vibrante, tecido pelas Palavras... até *Ele* chegar.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Malak, O Silenciador. Um ser terrível que odeia a comunicação! Ele espalhou o 'Silêncio Crescente', uma praga que apaga as palavras, tornando tudo... *mudo* e sem sentido. Os livros estão em branco, as canções esquecidas...", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Mas há esperança! A sua língua, a 'Língua Arcana' vinda do seu mundo... Malak não pode tocá-la! É por isso que você foi invocado! Cada palavra que você conhece, cada regra gramatical... *isso* é poder aqui!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Você é a nossa única chance de restaurar Aetheria. Aprenda, use a Língua Arcana, e ajude-nos a derrotar o Silenciador! Mas preste atenção na conjugação, por favor!", null);
+        } else {
+            System.err.println("### AVISO: NPC 'Goblin da Gramática' não encontrado. Seus diálogos não foram adicionados. ###");
+        }
+
+        if (!desiredDialogue.isEmpty()) {
+            System.out.println("Inserindo " + desiredDialogue.size() + " novos diálogos...");
+            dialogueRepository.saveAll(desiredDialogue);
+        } else {
+            System.out.println("Tabela 'dialogue' já está atualizada.");
+        }
+
+    }
+
+    private void addDialogueIfNotExists(List<Dialogue> desiredDialogues,
+                                          Map<String, Dialogue> existingDialogues,
+                                          NPC npc, String content, String response) {
+        // Verifica se o NPC é válido antes de prosseguir
+        if (npc == null) {
+            System.err.println("### ERRO: Tentativa de adicionar diálogo para NPC nulo. Conteúdo: '" + content + "' ###");
+            return;
+        }
+        // Verifica se o diálogo já existe pelo conteúdo
+        if (!existingDialogues.containsKey(content)) {
+            Dialogue newDialogue = new Dialogue();
+            newDialogue.setNpc(npc);
+            newDialogue.setContent(content);
+            newDialogue.setResponse(response); // Define a resposta (pode ser null)
+            desiredDialogues.add(newDialogue);
+        }
+    }
 }
+
+
 
