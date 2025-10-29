@@ -1,7 +1,7 @@
 package com.game.rpgbackend.util;
 
 import com.game.rpgbackend.domain.GameClass;
-import com.game.rpgbackend.dto.response.GameClassDTO;
+import com.game.rpgbackend.dto.response.gameClass.GameClassDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

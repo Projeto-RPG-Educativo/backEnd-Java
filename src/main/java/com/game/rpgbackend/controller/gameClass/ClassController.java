@@ -1,7 +1,7 @@
 package com.game.rpgbackend.controller.gameClass;
 
 import com.game.rpgbackend.domain.GameClass;
-import com.game.rpgbackend.dto.response.GameClassDTO;
+import com.game.rpgbackend.dto.response.gameClass.GameClassDTO;
 import com.game.rpgbackend.service.classe.ClassService;
 import com.game.rpgbackend.util.GameClassMapper;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,8 @@
 package com.game.rpgbackend.controller.user;
 
-import com.game.rpgbackend.dto.request.UpdateProfileRequest;
-import com.game.rpgbackend.dto.response.UserProfileResponse;
-import com.game.rpgbackend.dto.response.UserStatsResponse;
+import com.game.rpgbackend.dto.request.user.UpdateProfileRequest;
+import com.game.rpgbackend.dto.response.user.UserProfileResponse;
+import com.game.rpgbackend.dto.response.user.UserStatsResponse;
 import com.game.rpgbackend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

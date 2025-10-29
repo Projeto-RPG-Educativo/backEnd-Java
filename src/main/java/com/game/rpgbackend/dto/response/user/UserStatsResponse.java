@@ -1,4 +1,4 @@
-package com.game.rpgbackend.dto.response;
+package com.game.rpgbackend.dto.response.user;
 
 import lombok.Data;
 

@@ -5,7 +5,7 @@ import com.game.rpgbackend.domain.Character;
 import com.game.rpgbackend.domain.Monster;
 import com.game.rpgbackend.domain.PlayerStats;
 import com.game.rpgbackend.domain.Question;
-import com.game.rpgbackend.dto.response.BattleStateResponse;
+import com.game.rpgbackend.dto.response.battle.BattleStateResponse;
 import com.game.rpgbackend.exception.BadRequestException;
 import com.game.rpgbackend.exception.NotFoundException;
 import com.game.rpgbackend.repository.CharacterRepository;
@@ -252,6 +252,7 @@ public class BattleService {
         BattleStateResponse.CharacterBattleInfo charInfo = new BattleStateResponse.CharacterBattleInfo();
         charInfo.setId(character.getId());
         charInfo.setHp(character.getHp());
+        charInfo.setMaxHp(character.getHp());
         charInfo.setEnergy(character.getEnergy());
         charInfo.setClassName(character.getGameClass().getName());
         charInfo.setStrength(character.getGameClass().getStrength());
@@ -263,6 +264,7 @@ public class BattleService {
         BattleStateResponse.MonsterBattleInfo monsterInfo = new BattleStateResponse.MonsterBattleInfo();
         monsterInfo.setId(monster.getId());
         monsterInfo.setHp(monster.getHp());
+        monsterInfo.setMaxHp(monster.getHp());
         monsterInfo.setDano(monster.getMonsterDamage());
         monsterInfo.setNome(monster.getMonsterName());
         battleState.setMonster(monsterInfo);

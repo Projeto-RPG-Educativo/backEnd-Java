@@ -1,9 +1,8 @@
-package com.game.rpgbackend.dto.response;
+package com.game.rpgbackend.dto.response.character;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
 
 /**
  * DTO de resposta simplificado para listagem de personagens.

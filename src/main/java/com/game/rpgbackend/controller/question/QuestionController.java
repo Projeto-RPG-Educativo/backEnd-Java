@@ -10,7 +10,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
-import java.util.Map;
+
+import com.game.rpgbackend.dto.request.question.CheckAnswerRequest;
+import com.game.rpgbackend.dto.response.question.CheckAnswerResponse;
+import com.game.rpgbackend.dto.response.question.QuestionDto;
+import jakarta.validation.Valid;
+import java.util.stream.Collectors;
 
 /**
  * Controller responsável pelas operações de questões educacionais.
@@ -26,34 +31,64 @@ public class QuestionController {
      * Busca uma questão aleatória baseada na dificuldade e nível do jogador.
      */
     @GetMapping("/random")
-    public ResponseEntity<Question> getRandomQuestion(
+    public ResponseEntity<QuestionDto> getRandomQuestion(
             @RequestParam String difficulty,
             @RequestParam Integer playerLevel,
             @RequestParam(required = false) Integer contentId) {
 
         Question question = questionService.getRandomQuestion(difficulty, playerLevel, contentId);
-        return ResponseEntity.ok(question);
+        QuestionDto dto = new QuestionDto();
+        dto.setId(question.getId());
+        dto.setQuestionText(question.getQuestionText());
+        dto.setOptionA(question.getOptionA());
+        dto.setOptionB(question.getOptionB());
+        dto.setOptionC(question.getOptionC());
+        dto.setCorrectAnswer(question.getCorrectAnswer());
+        dto.setDifficulty(question.getDifficulty());
+        dto.setQuestionContent(question.getQuestionContent());
+        dto.setMinLevel(question.getMinLevel());
+        dto.setHint(question.getHint());
+        dto.setContentId(question.getContent().getId());
+        return ResponseEntity.ok(dto);
     }
 
     /**
      * Busca questões por conteúdo.
      */
     @GetMapping("/content/{contentId}")
-    public ResponseEntity<List<Question>> getQuestionsByContent(@PathVariable Integer contentId) {
+    public ResponseEntity<List<QuestionDto>> getQuestionsByContent(@PathVariable Integer contentId) {
         List<Question> questions = questionService.getQuestionsByContent(contentId);
-        return ResponseEntity.ok(questions);
+        List<QuestionDto> dtos = questions.stream().map(this::mapToDto).collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
+    private QuestionDto mapToDto(Question question) {
+        QuestionDto dto = new QuestionDto();
+        dto.setId(question.getId());
+        dto.setQuestionText(question.getQuestionText());
+        dto.setOptionA(question.getOptionA());
+        dto.setOptionB(question.getOptionB());
+        dto.setOptionC(question.getOptionC());
+        dto.setCorrectAnswer(question.getCorrectAnswer());
+        dto.setDifficulty(question.getDifficulty());
+        dto.setQuestionContent(question.getQuestionContent());
+        dto.setMinLevel(question.getMinLevel());
+        dto.setHint(question.getHint());
+        dto.setContentId(question.getContent().getId());
+        return dto;
     }
 
     /**
      * Verifica se uma resposta está correta.
      */
     @PostMapping("/check")
-    public ResponseEntity<Map<String, Boolean>> checkAnswer(@RequestBody Map<String, Object> request) {
-        Integer questionId = (Integer) request.get("questionId");
-        String answer = (String) request.get("answer");
+    public ResponseEntity<CheckAnswerResponse> checkAnswer(@Valid @RequestBody CheckAnswerRequest request) {
+        Integer questionId = request.getQuestionId();
+        String answer = request.getAnswer();
 
         boolean isCorrect = questionService.checkAnswer(questionId, answer);
-        return ResponseEntity.ok(Map.of("correct", isCorrect));
+        CheckAnswerResponse response = new CheckAnswerResponse(isCorrect);
+        return ResponseEntity.ok(response);
     }
     @GetMapping("/{id}/hint")
     @PreAuthorize("isAuthenticated()") // Garante que apenas usuarios logados acessem
@@ -81,7 +116,4 @@ public class QuestionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao processar a solicitação da dica.");
         }
     }
-    // --- FIM DO NOVO MÉTODO ---
 }
-
-

@@ -1,4 +1,4 @@
-package com.game.rpgbackend.dto.response;
+package com.game.rpgbackend.dto.response.battle;
 
 import lombok.Data;
 import java.util.List;
@@ -54,6 +54,9 @@ public class BattleStateResponse {
         /** Pontos de vida atuais */
         private Integer hp;
 
+        /** Pontos de vida máximos */
+        private Integer maxHp;
+
         /** Energia atual */
         private Integer energy;
 
@@ -89,6 +92,9 @@ public class BattleStateResponse {
 
         /** Pontos de vida atuais */
         private Integer hp;
+
+        /** Pontos de vida máximos */
+        private Integer maxHp;
 
         /** Dano base do monstro */
         private Integer dano;

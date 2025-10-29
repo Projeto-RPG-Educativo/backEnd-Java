@@ -1,4 +1,4 @@
-package com.game.rpgbackend.dto.request;
+package com.game.rpgbackend.dto.request.battle;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

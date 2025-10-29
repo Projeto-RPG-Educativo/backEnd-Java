@@ -1,9 +1,9 @@
 package com.game.rpgbackend.controller.auth;
 
-import com.game.rpgbackend.dto.request.LoginUserDto;
-import com.game.rpgbackend.dto.request.RegisterUserDto;
-import com.game.rpgbackend.dto.response.LoginResponseDto;
-import com.game.rpgbackend.dto.response.UserDto;
+import com.game.rpgbackend.dto.request.auth.LoginUserDto;
+import com.game.rpgbackend.dto.request.auth.RegisterUserDto;
+import com.game.rpgbackend.dto.response.auth.LoginResponseDto;
+import com.game.rpgbackend.dto.response.auth.UserDto;
 import com.game.rpgbackend.domain.User;
 import com.game.rpgbackend.service.user.UserService;
 import jakarta.validation.Valid;

@@ -2,11 +2,11 @@ package com.game.rpgbackend.service.user;
 
 import com.game.rpgbackend.domain.PlayerStats;
 import com.game.rpgbackend.domain.User;
-import com.game.rpgbackend.dto.request.UpdateProfileRequest;
-import com.game.rpgbackend.dto.response.LoginResponseDto;
-import com.game.rpgbackend.dto.response.UserDto;
-import com.game.rpgbackend.dto.response.UserProfileResponse;
-import com.game.rpgbackend.dto.response.UserStatsResponse;
+import com.game.rpgbackend.dto.request.user.UpdateProfileRequest;
+import com.game.rpgbackend.dto.response.auth.LoginResponseDto;
+import com.game.rpgbackend.dto.response.auth.UserDto;
+import com.game.rpgbackend.dto.response.user.UserProfileResponse;
+import com.game.rpgbackend.dto.response.user.UserStatsResponse;
 import com.game.rpgbackend.exception.BadRequestException;
 import com.game.rpgbackend.exception.UnauthorizedException;
 import com.game.rpgbackend.repository.PlayerStatsRepository;

@@ -1,4 +1,4 @@
-package com.game.rpgbackend.dto.request;
+package com.game.rpgbackend.dto.request.save;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

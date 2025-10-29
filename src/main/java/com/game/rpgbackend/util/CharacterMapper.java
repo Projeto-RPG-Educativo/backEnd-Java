@@ -1,8 +1,8 @@
 package com.game.rpgbackend.util;
 
 import com.game.rpgbackend.domain.Character;
-import com.game.rpgbackend.dto.response.CharacterDTO;
-import com.game.rpgbackend.dto.response.CharacterListDTO;
+import com.game.rpgbackend.dto.response.character.CharacterDTO;
+import com.game.rpgbackend.dto.response.character.CharacterListDTO;
 import org.springframework.stereotype.Component;
 
 /**

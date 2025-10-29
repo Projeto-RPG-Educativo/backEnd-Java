@@ -1,6 +1,6 @@
 package com.game.rpgbackend.service.battle;
 
-import com.game.rpgbackend.dto.response.BattleStateResponse;
+import com.game.rpgbackend.dto.response.battle.BattleStateResponse;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

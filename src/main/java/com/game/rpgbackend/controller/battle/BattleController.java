@@ -1,9 +1,9 @@
 package com.game.rpgbackend.controller.battle;
 
-import com.game.rpgbackend.dto.request.BattleActionRequest;
-import com.game.rpgbackend.dto.request.StartBattleRequest;
-import com.game.rpgbackend.dto.request.SubmitAnswerRequest;
-import com.game.rpgbackend.dto.response.BattleStateResponse;
+import com.game.rpgbackend.dto.request.battle.BattleActionRequest;
+import com.game.rpgbackend.dto.request.battle.StartBattleRequest;
+import com.game.rpgbackend.dto.request.battle.SubmitAnswerRequest;
+import com.game.rpgbackend.dto.response.battle.BattleStateResponse;
 import com.game.rpgbackend.service.battle.BattleService;
 import com.game.rpgbackend.util.AuthenticationUtil;
 import jakarta.validation.Valid;

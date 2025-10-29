@@ -1,8 +1,11 @@
 package com.game.rpgbackend.controller.character;
 
 import com.game.rpgbackend.domain.Character;
-import com.game.rpgbackend.dto.response.CharacterDTO;
-import com.game.rpgbackend.dto.response.CharacterListDTO;
+import com.game.rpgbackend.dto.request.character.CreateCharacterRequest;
+import com.game.rpgbackend.dto.request.character.SaveProgressRequest;
+import com.game.rpgbackend.dto.request.character.UpdateCharacterRequest;
+import com.game.rpgbackend.dto.response.character.CharacterDTO;
+import com.game.rpgbackend.dto.response.character.CharacterListDTO;
 import com.game.rpgbackend.service.character.CharacterService;
 import com.game.rpgbackend.util.AuthenticationUtil;
 import com.game.rpgbackend.util.CharacterMapper;
@@ -13,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,10 +86,10 @@ public class CharacterController {
     @PostMapping
     public ResponseEntity<CharacterDTO> createCharacter(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody Map<String, String> request) {
+            @Valid @RequestBody CreateCharacterRequest request) {
 
         Integer userId = authenticationUtil.getUserIdFromUsername(userDetails.getUsername());
-        String className = request.get("classe");
+        String className = request.getClasse();
 
         if (className == null || className.isBlank()) {
             return ResponseEntity.badRequest().build();
@@ -128,10 +132,10 @@ public class CharacterController {
      * @return DTO do personagem atualizado
      */
     @PutMapping("/progress")
-    public ResponseEntity<CharacterDTO> saveProgress(@RequestBody Map<String, Integer> request) {
-        Integer characterId = request.get("characterId");
-        Integer xp = request.get("xp");
-        Integer hp = request.get("hp");
+    public ResponseEntity<CharacterDTO> saveProgress(@Valid @RequestBody SaveProgressRequest request) {
+        Integer characterId = request.getCharacterId();
+        Integer xp = request.getXp();
+        Integer hp = request.getHp();
 
         if (characterId == null || xp == null || hp == null) {
             return ResponseEntity.badRequest().build();
@@ -145,13 +149,23 @@ public class CharacterController {
      * Atualiza os dados de um personagem.
      *
      * @param id identificador do personagem
-     * @param character objeto com os novos dados do personagem
+     * @param request objeto com os novos dados do personagem
      * @return DTO do personagem atualizado
      */
     @PutMapping("/{id}")
     public ResponseEntity<CharacterDTO> updateCharacter(
             @PathVariable Integer id,
-            @RequestBody Character character) {
+            @Valid @RequestBody UpdateCharacterRequest request) {
+
+        // Mapear request para Character
+        Character character = new Character();
+        character.setName(request.getName());
+        character.setXp(request.getXp());
+        character.setGold(request.getGold());
+        character.setHp(request.getHp());
+        character.setEnergy(request.getEnergy());
+        character.setMaxEnergy(request.getMaxEnergy());
+        character.setLastSavedAt(request.getLastSavedAt());
 
         Character updated = characterService.updateCharacter(id, character);
         return ResponseEntity.ok(characterMapper.toDTO(updated));

@@ -1,6 +1,10 @@
 package com.game.rpgbackend.controller.hub;
 
 import com.game.rpgbackend.domain.*;
+import com.game.rpgbackend.dto.request.hub.PurchaseItemRequest;
+import com.game.rpgbackend.dto.request.hub.PurchaseSkillRequest;
+import com.game.rpgbackend.dto.response.hub.BookDto;
+import com.game.rpgbackend.dto.response.hub.SkillDto;
 import com.game.rpgbackend.service.hub.*;
 import com.game.rpgbackend.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +13,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Controller responsável pelos locais do Hub (Biblioteca, Torre, Loja, etc).
@@ -30,20 +35,26 @@ public class HubController {
     // === BIBLIOTECA SILENCIOSA ===
 
     @GetMapping("/library/books")
-    public ResponseEntity<List<Book>> getBooks() {
-        return ResponseEntity.ok(libraryService.getAvailableBooks());
+    public ResponseEntity<List<BookDto>> getBooks() {
+        List<Book> books = libraryService.getAvailableBooks();
+        List<BookDto> dtos = books.stream().map(this::mapToBookDto).collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/library/books/{id}")
-    public ResponseEntity<Book> getBook(@PathVariable Integer id) {
-        return ResponseEntity.ok(libraryService.getBookById(id));
+    public ResponseEntity<BookDto> getBook(@PathVariable Integer id) {
+        Book book = libraryService.getBookById(id);
+        BookDto dto = mapToBookDto(book);
+        return ResponseEntity.ok(dto);
     }
 
     // === TORRE DO CONHECIMENTO ===
 
     @GetMapping("/tower/skills")
-    public ResponseEntity<List<Skill>> getSkills() {
-        return ResponseEntity.ok(towerService.getAvailableSkills());
+    public ResponseEntity<List<SkillDto>> getSkills() {
+        List<Skill> skills = towerService.getAvailableSkills();
+        List<SkillDto> dtos = skills.stream().map(this::mapToSkillDto).collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/tower/content")
@@ -60,10 +71,10 @@ public class HubController {
     @PostMapping("/tower/skills/purchase")
     public ResponseEntity<Skill> purchaseSkill(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody Map<String, Integer> request) {
+            @Valid @RequestBody PurchaseSkillRequest request) {
 
         Integer userId = authenticationUtil.getUserIdFromUsername(userDetails.getUsername());
-        Integer skillId = request.get("skillId");
+        Integer skillId = request.getSkillId();
 
         Skill skill = towerService.purchaseSkill(userId, skillId);
         return ResponseEntity.ok(skill);
@@ -84,11 +95,11 @@ public class HubController {
     @PostMapping("/store/purchase")
     public ResponseEntity<StoreService.PurchaseResult> purchaseItem(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody Map<String, Integer> request) {
+            @Valid @RequestBody PurchaseItemRequest request) {
 
         Integer userId = authenticationUtil.getUserIdFromUsername(userDetails.getUsername());
-        Integer lojaId = request.get("lojaId");
-        Integer itemId = request.get("itemId");
+        Integer lojaId = request.getLojaId();
+        Integer itemId = request.getItemId();
 
         StoreService.PurchaseResult result = storeService.purchaseStoreItem(userId, lojaId, itemId);
         return ResponseEntity.ok(result);
@@ -135,5 +146,13 @@ public class HubController {
     @GetMapping("/player/rankings")
     public ResponseEntity<List<PlayerService.RankingResponse>> getRankings() {
         return ResponseEntity.ok(playerService.getRankings());
+    }
+
+    private BookDto mapToBookDto(Book book) {
+        return new BookDto(book.getId(), book.getBookTitle(), book.getContent(), book.getType(), book.getDifficulty());
+    }
+
+    private SkillDto mapToSkillDto(Skill skill) {
+        return new SkillDto(skill.getId(), skill.getName(), skill.getDescription(), skill.getCost(), skill.getType(), skill.getEffect());
     }
 }

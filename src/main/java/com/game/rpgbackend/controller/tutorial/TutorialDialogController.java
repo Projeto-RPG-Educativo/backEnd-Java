@@ -2,8 +2,8 @@ package com.game.rpgbackend.controller.tutorial;
 
 import com.game.rpgbackend.domain.Dialogue;
 import com.game.rpgbackend.domain.NPC;
-import com.game.rpgbackend.dto.response.DialogueResponseDto;
-import com.game.rpgbackend.dto.response.NpcResponseDto;
+import com.game.rpgbackend.dto.response.tutorial.DialogueResponseDto;
+import com.game.rpgbackend.dto.response.tutorial.NpcResponseDto;
 import com.game.rpgbackend.service.tutorial.TutorialDialogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

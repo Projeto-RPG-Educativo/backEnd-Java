@@ -1,6 +1,6 @@
 package com.game.rpgbackend.service.battle;
 
-import com.game.rpgbackend.dto.response.BattleStateResponse;
+import com.game.rpgbackend.dto.response.battle.BattleStateResponse;
 import com.game.rpgbackend.config.GameConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
