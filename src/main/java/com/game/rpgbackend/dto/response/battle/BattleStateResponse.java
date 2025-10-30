@@ -60,6 +60,9 @@ public class BattleStateResponse {
         /** Energia atual */
         private Integer energy;
 
+        /** Energia máxima */
+        private Integer maxEnergy;
+
         /** Nome da classe */
         private String className;
 
@@ -74,6 +77,9 @@ public class BattleStateResponse {
 
         /** Experiência acumulada */
         private Integer xp;
+
+        /** Experiência máxima necessária para o próximo nível */
+        private Integer maxXpForLevel;
 
         /** Indica se o personagem está defendendo */
         private Boolean isDefending = false;

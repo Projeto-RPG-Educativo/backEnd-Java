@@ -80,9 +80,16 @@ public class CharacterMapper {
         dto.setXp(character.getXp());
         dto.setGold(character.getGold());
         dto.setHp(character.getHp());
+        dto.setMaxHp(character.getHp());
+        dto.setEnergy(character.getEnergy());
+        dto.setMaxEnergy(character.getMaxEnergy());
 
         if (character.getGameClass() != null) {
             dto.setClassName(character.getGameClass().getName());
+        }
+
+        if (character.getUser() != null && character.getUser().getStats() != null) {
+            dto.setLevel(character.getUser().getStats().getLevel());
         }
 
         return dto;

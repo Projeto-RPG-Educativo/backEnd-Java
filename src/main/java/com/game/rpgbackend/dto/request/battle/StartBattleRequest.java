@@ -30,4 +30,10 @@ public class StartBattleRequest {
      */
     @NotBlank(message = "A dificuldade é obrigatória")
     private String difficulty;
+
+    /**
+     * ID do personagem a ser usado na batalha.
+     */
+    @NotNull(message = "O ID do personagem é obrigatório")
+    private Integer characterId;
 }

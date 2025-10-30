@@ -28,6 +28,7 @@ public class GameConfig {
     public static class Battle {
         private int xpWinReward = 50;
         private int energyRecovery = 1;
+        private int maxEnergy = 12;
     }
 
     @Data

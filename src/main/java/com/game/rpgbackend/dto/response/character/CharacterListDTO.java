@@ -33,7 +33,19 @@ public class CharacterListDTO {
     
     /** Pontos de vida atuais */
     private Integer hp;
-    
+
+    /** Pontos de vida máximos */
+    private Integer maxHp;
+
+    /** Energia atual */
+    private Integer energy;
+
+    /** Energia máxima */
+    private Integer maxEnergy;
+
     /** Nome da classe */
     private String className;
+
+    /** Nível do personagem */
+    private Integer level;
 }

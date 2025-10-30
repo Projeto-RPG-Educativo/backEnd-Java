@@ -56,7 +56,8 @@ public class BattleController {
         BattleStateResponse battleState = battleService.startBattle(
             userId,
             request.getMonsterId(),
-            request.getDifficulty()
+            request.getDifficulty(),
+            request.getCharacterId()
         );
 
         return ResponseEntity.ok(battleState);

@@ -16,7 +16,7 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
-public class UpdateProfileRequest {
+public class    UpdateProfileRequest {
 
     /**
      * Novo nome do usuário (opcional).

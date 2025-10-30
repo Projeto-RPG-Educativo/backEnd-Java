@@ -59,17 +59,58 @@ public class BattleService {
         CombatService.AttackResult result = combatService.performAttack(battle.getCharacter());
         battle.getMonster().setHp(battle.getMonster().getHp() - result.getDamageDealt());
 
-        // 3. Persiste a nova energia no banco de dados
-        characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
-            character.setEnergy(battle.getCharacter().getEnergy());
-            characterRepository.save(character);
-        });
+        // 3. Verifica se a batalha terminou
+        String turnResult = result.getTurnResult();
+        if (battle.getMonster().getHp() <= 0) {
+            battle.setIsFinished(true);
+            turnResult += " Você venceu a batalha!";
 
-        // 4. Atualiza o estado da batalha na memória
-        battleStateService.setActiveBattle(userId, battle);
+            // Busca as estatísticas do jogador
+            PlayerStats stats = playerStatsRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
+            stats.setBattlesWon(stats.getBattlesWon() + 1);
+            stats.setTotalXpEarned(stats.getTotalXpEarned() + gameConfig.getBattle().getXpWinReward());
+            playerStatsRepository.save(stats);
 
-        // 5. Retorna o estado atualizado com a mensagem do turno
-        battle.setTurnResult(result.getTurnResult());
+            // Adiciona XP ao personagem
+            characterRepository.findById(battle.getCharacter().getId()).ifPresent(ch -> {
+                ch.setXp(ch.getXp() + gameConfig.getBattle().getXpWinReward());
+                characterRepository.save(ch);
+            });
+
+            // Verifica level up
+            CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(battle.getCharacter().getId());
+            turnResult += " " + levelUpResult.getMessage();
+
+            battleStateService.removeActiveBattle(userId);
+        } else if (battle.getCharacter().getHp() <= 0) {
+            battle.setIsFinished(true);
+            turnResult += " Você foi derrotado.";
+
+            // Atualiza estatísticas
+            PlayerStats stats = playerStatsRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
+            stats.setBattlesLost(stats.getBattlesLost() + 1);
+            playerStatsRepository.save(stats);
+
+            battleStateService.removeActiveBattle(userId);
+        }
+
+        // 4. Persiste a nova energia no banco de dados (se batalha não terminou)
+        if (!battle.getIsFinished()) {
+            characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
+                character.setEnergy(battle.getCharacter().getEnergy());
+                characterRepository.save(character);
+            });
+        }
+
+        // 5. Atualiza o estado da batalha na memória (se não terminou)
+        if (!battle.getIsFinished()) {
+            battleStateService.setActiveBattle(userId, battle);
+        }
+
+        // 6. Retorna o estado atualizado com a mensagem do turno
+        battle.setTurnResult(turnResult);
         return battle;
     }
 
@@ -93,17 +134,36 @@ public class BattleService {
         CombatService.DefenseResult result = combatService.performDefense(battle.getCharacter());
         battle.setCharacter(result.getUpdatedCharacter());
 
-        // 3. Persiste a nova energia no banco de dados
-        characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
-            character.setEnergy(battle.getCharacter().getEnergy());
-            characterRepository.save(character);
-        });
+        // 3. Verifica se a batalha terminou (se HP do personagem chegou a 0)
+        String turnResult = result.getTurnResult();
+        if (battle.getCharacter().getHp() <= 0) {
+            battle.setIsFinished(true);
+            turnResult += " Você foi derrotado.";
 
-        // 4. Atualiza o estado da batalha na memória
-        battleStateService.setActiveBattle(userId, battle);
+            // Atualiza estatísticas
+            PlayerStats stats = playerStatsRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
+            stats.setBattlesLost(stats.getBattlesLost() + 1);
+            playerStatsRepository.save(stats);
 
-        // 5. Retorna o estado atualizado
-        battle.setTurnResult(result.getTurnResult());
+            battleStateService.removeActiveBattle(userId);
+        }
+
+        // 4. Persiste a nova energia no banco de dados (se batalha não terminou)
+        if (!battle.getIsFinished()) {
+            characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
+                character.setEnergy(battle.getCharacter().getEnergy());
+                characterRepository.save(character);
+            });
+        }
+
+        // 5. Atualiza o estado da batalha na memória (se não terminou)
+        if (!battle.getIsFinished()) {
+            battleStateService.setActiveBattle(userId, battle);
+        }
+
+        // 6. Retorna o estado atualizado
+        battle.setTurnResult(turnResult);
         return battle;
     }
 
@@ -208,14 +268,53 @@ public class BattleService {
             }
         }
 
-        // Persiste as mudanças
-        characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
-            character.setHp(battle.getCharacter().getHp());
-            character.setEnergy(battle.getCharacter().getEnergy());
-            characterRepository.save(character);
-        });
+        // Verifica se a batalha terminou
+        if (battle.getMonster().getHp() <= 0) {
+            battle.setIsFinished(true);
+            turnResult += " Você venceu a batalha!";
 
-        battleStateService.setActiveBattle(userId, battle);
+            // Busca as estatísticas do jogador
+            PlayerStats stats = playerStatsRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
+            stats.setBattlesWon(stats.getBattlesWon() + 1);
+            stats.setTotalXpEarned(stats.getTotalXpEarned() + gameConfig.getBattle().getXpWinReward());
+            playerStatsRepository.save(stats);
+
+            // Adiciona XP ao personagem
+            characterRepository.findById(battle.getCharacter().getId()).ifPresent(ch -> {
+                ch.setXp(ch.getXp() + gameConfig.getBattle().getXpWinReward());
+                characterRepository.save(ch);
+            });
+
+            // Verifica level up
+            CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(battle.getCharacter().getId());
+            turnResult += " " + levelUpResult.getMessage();
+
+            battleStateService.removeActiveBattle(userId);
+        } else if (battle.getCharacter().getHp() <= 0) {
+            battle.setIsFinished(true);
+            turnResult += " Você foi derrotado.";
+
+            // Atualiza estatísticas
+            PlayerStats stats = playerStatsRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
+            stats.setBattlesLost(stats.getBattlesLost() + 1);
+            playerStatsRepository.save(stats);
+
+            battleStateService.removeActiveBattle(userId);
+        }
+
+        // Persiste as mudanças (se batalha não terminou)
+        if (!battle.getIsFinished()) {
+            characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
+                character.setHp(battle.getCharacter().getHp());
+                character.setEnergy(battle.getCharacter().getEnergy());
+                characterRepository.save(character);
+            });
+
+            battleStateService.setActiveBattle(userId, battle);
+        }
+
         battle.setTurnResult(turnResult);
         return battle;
     }
@@ -224,12 +323,11 @@ public class BattleService {
      * Inicia uma nova batalha.
      */
     @Transactional
-    public BattleStateResponse startBattle(Integer userId, Integer monsterId, String difficulty) {
+    public BattleStateResponse startBattle(Integer userId, Integer monsterId, String difficulty, Integer characterId) {
         // 1. Busca dados do banco
-        Character character = characterRepository.findByUserIdOrderByIdDesc(userId)
-            .stream()
-            .findFirst()
-            .orElseThrow(() -> new BadRequestException("Personagem não encontrado"));
+        Character character = characterRepository.findById(characterId)
+            .filter(c -> c.getUser().getId().equals(userId))
+            .orElseThrow(() -> new BadRequestException("Personagem não encontrado ou não pertence ao usuário"));
 
         Monster monster = monsterRepository.findById(monsterId)
             .orElseThrow(() -> new NotFoundException("Monstro não encontrado"));
@@ -253,12 +351,15 @@ public class BattleService {
         charInfo.setId(character.getId());
         charInfo.setHp(character.getHp());
         charInfo.setMaxHp(character.getHp());
-        charInfo.setEnergy(character.getEnergy());
+        charInfo.setEnergy(character.getMaxEnergy());
+        charInfo.setMaxEnergy(character.getMaxEnergy());
         charInfo.setClassName(character.getGameClass().getName());
         charInfo.setStrength(character.getGameClass().getStrength());
         charInfo.setIntelligence(character.getGameClass().getIntelligence());
         charInfo.setLevel(playerLevel);
         charInfo.setXp(character.getXp());
+        int maxXpForLevel = (int) (gameConfig.getLeveling().getBaseXp() * Math.pow(gameConfig.getLeveling().getXpMultiplier(), playerLevel));
+        charInfo.setMaxXpForLevel(maxXpForLevel);
         battleState.setCharacter(charInfo);
 
         BattleStateResponse.MonsterBattleInfo monsterInfo = new BattleStateResponse.MonsterBattleInfo();

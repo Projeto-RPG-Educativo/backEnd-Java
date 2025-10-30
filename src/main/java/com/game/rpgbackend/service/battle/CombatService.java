@@ -53,7 +53,7 @@ public class CombatService {
 
         if (isCorrect) {
             BattleStateResponse.CharacterBattleInfo character = battleState.getCharacter();
-            character.setEnergy(character.getEnergy() + energyRecovered);
+            character.setEnergy(Math.min(character.getEnergy() + energyRecovered, character.getMaxEnergy()));
 
             damageDealt = calculateCharacterDamage(character);
 
@@ -238,4 +238,3 @@ public class CombatService {
         public String getType() { return type; }
     }
 }
-
