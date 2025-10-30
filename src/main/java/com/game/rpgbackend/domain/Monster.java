@@ -39,4 +39,8 @@ public class Monster {
     /** Quantidade de dano que o monstro causa por ataque */
     @Column(nullable = false)
     private Integer monsterDamage;
+
+    /** Defesa do monstro (reduz dano recebido) */
+    @Column(nullable = false)
+    private Integer defense;
 }

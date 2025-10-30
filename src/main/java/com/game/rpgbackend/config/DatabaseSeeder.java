@@ -58,6 +58,7 @@ public class DatabaseSeeder {
             tank.setStamina(12);
             tank.setStrength(15);
             tank.setIntelligence(2);
+            tank.setDefense(20);
             desiredClasses.add(tank);
         }
         if (!existingClasses.containsKey("mago")) {
@@ -67,6 +68,7 @@ public class DatabaseSeeder {
             mago.setStamina(12);
             mago.setStrength(2);
             mago.setIntelligence(25);
+            mago.setDefense(5);
             desiredClasses.add(mago);
         }
         if (!existingClasses.containsKey("lutador")) {
@@ -76,6 +78,7 @@ public class DatabaseSeeder {
             lutador.setStamina(12);
             lutador.setStrength(20);
             lutador.setIntelligence(2);
+            lutador.setDefense(15);
             desiredClasses.add(lutador);
         }
         if (!existingClasses.containsKey("ladino")) {
@@ -85,6 +88,7 @@ public class DatabaseSeeder {
             ladino.setStamina(12);
             ladino.setStrength(20);
             ladino.setIntelligence(9);
+            ladino.setDefense(12);
             desiredClasses.add(ladino);
         }
         if (!existingClasses.containsKey("paladino")) {
@@ -94,6 +98,7 @@ public class DatabaseSeeder {
             paladino.setStamina(12);
             paladino.setStrength(18);
             paladino.setIntelligence(5);
+            paladino.setDefense(10);
             desiredClasses.add(paladino);
         }
         if (!existingClasses.containsKey("bardo")) {
@@ -103,6 +108,7 @@ public class DatabaseSeeder {
             bardo.setStamina(12);
             bardo.setStrength(5);
             bardo.setIntelligence(15);
+            bardo.setDefense(7);
             desiredClasses.add(bardo);
         }
 
@@ -179,6 +185,7 @@ public class DatabaseSeeder {
             diabrete.setMonsterName("Diabrete Errôneo");
             diabrete.setHp(150);
             diabrete.setMonsterDamage(10);
+            diabrete.setDefense(5);
             desiredMonsters.add(diabrete);
         }
         if (!existingMonsters.containsKey("Harpia Indagada")) {
@@ -186,6 +193,7 @@ public class DatabaseSeeder {
             harpia.setMonsterName("Harpia Indagada");
             harpia.setHp(120);
             harpia.setMonsterDamage(15);
+            harpia.setDefense(8);
             desiredMonsters.add(harpia);
         }
         if (!existingMonsters.containsKey("Zumbi Demente")) {
@@ -193,6 +201,7 @@ public class DatabaseSeeder {
             zumbi.setMonsterName("Zumbi Demente");
             zumbi.setHp(250);
             zumbi.setMonsterDamage(8);
+            zumbi.setDefense(12);
             desiredMonsters.add(zumbi);
         }
         if (!existingMonsters.containsKey("Centauro Questionador")) {
@@ -200,6 +209,7 @@ public class DatabaseSeeder {
             centauro.setMonsterName("Centauro Questionador");
             centauro.setHp(200);
             centauro.setMonsterDamage(12);
+            centauro.setDefense(10);
             desiredMonsters.add(centauro);
         }
         if (!existingMonsters.containsKey("Esqueleto da Sintaxe")) {
@@ -207,6 +217,7 @@ public class DatabaseSeeder {
             esqueleto.setMonsterName("Esqueleto da Sintaxe");
             esqueleto.setHp(500);
             esqueleto.setMonsterDamage(20);
+            esqueleto.setDefense(15);
             desiredMonsters.add(esqueleto);
         }
         if (!existingMonsters.containsKey("Lexicógrafo, o Guardião do Vazio")) {
@@ -214,6 +225,7 @@ public class DatabaseSeeder {
             lexicografo.setMonsterName("Lexicógrafo, o Guardião do Vazio");
             lexicografo.setHp(1500);
             lexicografo.setMonsterDamage(40);
+            lexicografo.setDefense(25);
             desiredMonsters.add(lexicografo);
         }
         if (!existingMonsters.containsKey("Malak, O Silenciador")) {
@@ -221,6 +233,7 @@ public class DatabaseSeeder {
             malak.setMonsterName("Malak, O Silenciador");
             malak.setHp(5000);
             malak.setMonsterDamage(100);
+            malak.setDefense(50);
             desiredMonsters.add(malak);
         }
 
@@ -373,7 +386,7 @@ public class DatabaseSeeder {
         // Presente - Negativo
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"I ___ not tired.\"", "is", "are", "am", "am", "Facil", verboToBe, 1, "Forma negativa para 'Eu'.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"She ___ not from Spain.\"", "is", "are", "am", "is", "Facil", verboToBe, 1, "Forma negativa para 'Ela'.");
-        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"They ___ not here.\"", "is", "are", "am", "are", "Facil", verboToBe, 1, "Forma negativa plural.");
+        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete a frase: \"They ___ not here.\"", "is", "are", "am", "are", "Facil", verboToBe, 1, "Forma negativa plural.");
         // Presente - Interrogativo
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"___ you happy?\"", "Is", "Are", "Am", "Are", "Facil", verboToBe, 1, "Inverta a ordem para perguntar com 'you'.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"___ he your brother?\"", "Is", "Are", "Am", "Is", "Facil", verboToBe, 1, "Inverta a ordem para perguntar com 'he'.");
@@ -589,8 +602,8 @@ public class DatabaseSeeder {
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"They have been married ___ 3 months.\"", "for", "since", "ago", "for", "Dificil", presentePerfeito, 6, "'3 months' é uma duração.");
         // Yet vs Already
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"Have you finished ___?\"", "already", "yet", "since", "yet", "Dificil", presentePerfeito, 6, "'Yet' é comum em perguntas e negativas, geralmente no final.");
-        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"I have ___ seen that movie.\"", "already", "yet", "for", "already", "Dificil", presentePerfeito, 6, "'Already' indica que algo aconteceu antes do esperado, comum em afirmativas.");
-        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"The train hasn't arrived ___.\"", "already", "yet", "ago", "yet", "Dificil", presentePerfeito, 6, "'Yet' é comum em negativas, indicando que algo ainda não aconteceu.");
+        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"She has ___ left the company.\"", "already", "yet", "since", "already", "Dificil", presentePerfeito, 6, "'Already' indica que algo aconteceu antes do esperado.");
+        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"I haven't seen that movie ___.\"", "already", "yet", "ago", "yet", "Dificil", presentePerfeito, 6, "'Yet' é comum em negativas, indicando que algo ainda não aconteceu.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"She has ___ left.\"", "already", "yet", "for", "already", "Dificil", presentePerfeito, 6, "'Already' pode indicar surpresa ou que aconteceu cedo.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"He's only 20, but he has ___ started his own company.\"", "already", "yet", "since", "already", "Dificil", presentePerfeito, 6, "'Already' enfatiza que aconteceu cedo para a idade dele.");
         // Past Simple vs Present Perfect
@@ -642,11 +655,11 @@ public class DatabaseSeeder {
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to make matters worse\"?", "Fazer a matéria piorar", "Piorar uma situação que já está ruim", "Melhorar uma situação", "Piorar uma situação que já está ruim", "Medio", expressoesIdiomaticas, 6, "Tornar os assuntos ('matters') piores.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to see eye to eye\"?", "Ver olho no olho", "Concordar completamente com alguém", "Ter boa visão", "Concordar completamente com alguém", "Medio", expressoesIdiomaticas, 6, "Ter a mesma perspectiva.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"when pigs fly\"?", "Quando porcos voarem", "Algo que nunca vai acontecer", "Um milagre", "Algo que nunca vai acontecer", "Medio", expressoesIdiomaticas, 6, "Porcos não voam.");
-        addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"speak of the devil\"?", "Falar do diabo", "Falar de alguém que aparece em seguida", "Estar com problemas", "Falar de alguém que aparece em seguida", "Medio", expressoesIdiomaticas, 6, "Ditado popular: 'Falando no diabo...'");
+        addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"speak of the devil\"?", "Falar do diabo", "Falar de alguém que aparece em seguida", "Estar com problemas", "Falar de alguém que aparece em seguida", "Medio", expressoesIdiomaticas, 6, "Ditado popular: 'Falando no diabo...'" );
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"the elephant in the room\"?", "O elefante na sala", "Um problema óbvio que ninguém quer discutir", "Um animal de estimação grande", "Um problema óbvio que ninguém quer discutir", "Dificil", expressoesIdiomaticas, 7, "Algo tão grande e óbvio que é impossível ignorar, mas todos evitam.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to cut corners\"?", "Cortar cantos", "Fazer algo de forma mais fácil/barata, sacrificando a qualidade", "Ser um bom motorista", "Fazer algo de forma mais fácil/barata, sacrificando a qualidade", "Dificil", expressoesIdiomaticas, 7, "Como cortar caminho em vez de seguir a rota correta.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to add insult to injury\"?", "Adicionar insulto à injúria", "Piorar uma situação ruim com mais uma coisa ruim", "Ser rude com alguém machucado", "Piorar uma situação ruim com mais uma coisa ruim", "Dificil", expressoesIdiomaticas, 7, "Tornar algo já mau ainda pior.");
-        addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"don't cry over spilled milk\"?", "Não chore sobre o leite derramado", "Não adianta lamentar por algo que já aconteceu", "Tenha cuidado com laticínios", "Não adianta lamentar por algo que já aconteceu", "Medio", expressoesIdiomaticas, 6, "Não há o que fazer depois que o leite derramou.");
+        addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"don't cry over spilled milk\"?", "Não chore sobre o leite derramado", "Não adianta lamentar por algo que já aconteceu", "Tenha cuidado ao fazer compras", "Não adianta lamentar por algo que já aconteceu", "Medio", expressoesIdiomaticas, 6, "Não há o que fazer depois que o leite derramou.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"every cloud has a silver lining\"?", "Toda nuvem tem um forro de prata", "Toda situação ruim tem um lado positivo", "O tempo vai melhorar", "Toda situação ruim tem um lado positivo", "Medio", expressoesIdiomaticas, 6, "Mesmo nuvens escuras têm bordas brilhantes pelo sol.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to get cold feet\"?", "Ficar com pés frios", "Ficar nervoso e desistir de algo", "Estar com frio", "Ficar nervoso e desistir de algo", "Medio", expressoesIdiomaticas, 6, "Medo ou nervosismo antes de um evento importante.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to get out of hand\"?", "Sair da mão", "Ficar fora de controle", "Lavar as mãos", "Ficar fora de controle", "Medio", expressoesIdiomaticas, 6, "Algo que não pode mais ser controlado.");
@@ -669,8 +682,6 @@ public class DatabaseSeeder {
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to burn the midnight oil\"?", "Queimar o óleo da meia-noite", "Trabalhar ou estudar até tarde da noite", "Causar um incêndio", "Trabalhar ou estudar até tarde da noite", "Dificil", expressoesIdiomaticas, 7, "Referência às lamparinas a óleo usadas antigamente.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"don't put all your eggs in one basket\"?", "Não coloque todos os ovos em uma cesta", "Não concentre todos os seus recursos ou esperanças em uma só coisa", "Tenha cuidado ao fazer compras", "Não concentre todos os seus recursos ou esperanças em uma só coisa", "Medio", expressoesIdiomaticas, 6, "Diversifique seus riscos.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to face the music\"?", "Encarar a música", "Aceitar as consequências de suas ações", "Ir a um concerto", "Aceitar as consequências de suas ações", "Medio", expressoesIdiomaticas, 6, "Lidar com a realidade de uma situação ruim que você causou.");
-
-        // --- FIM DA ADIÇÃO DE PERGUNTAS ---
 
         if (!desiredQuestions.isEmpty()) {
             System.out.println("Inserindo " + desiredQuestions.size() + " novas questões (com dicas)...");
@@ -728,10 +739,12 @@ public class DatabaseSeeder {
     // Método helper para criar questões, evitando duplicatas
     private void addQuestionIfNotExists(List<Question> desiredQuestions, Map<String, Question> existingQuestions, String texto, String opcaoA, String opcaoB, String opcaoC,
                                         String resposta, String dificuldade, Content content, int levelMinimo, String hint) {
+        // Verifica se o NPC é válido antes de prosseguir
         if (content == null) {
             System.err.println("Atenção: Conteúdo nulo para a pergunta: '" + texto + "'. Pergunta não será adicionada.");
             return;
         }
+        // Verifica se a pergunta já existe pelo texto
         if (!existingQuestions.containsKey(texto)) {
             Question q = new Question();
             q.setQuestionText(texto);
@@ -826,6 +839,4 @@ public class DatabaseSeeder {
         }
     }
 }
-
-
 

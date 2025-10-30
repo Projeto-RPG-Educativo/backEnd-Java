@@ -56,11 +56,17 @@ public class BattleService {
         battle.getCharacter().setEnergy(battle.getCharacter().getEnergy() - gameConfig.getCosts().getAttack());
 
         // 2. Delega o cálculo para o combatService
-        CombatService.AttackResult result = combatService.performAttack(battle.getCharacter());
+        CombatService.AttackResult result = combatService.performAttack(battle.getCharacter(), battle.getMonster());
         battle.getMonster().setHp(battle.getMonster().getHp() - result.getDamageDealt());
+        battle.setCharacterDamageDealt(result.getDamageDealt());
 
-        // 3. Verifica se a batalha terminou
-        String turnResult = result.getTurnResult();
+        // 3. Executa o turno do monstro
+        CombatService.MonsterTurnResult monsterResult = combatService.performMonsterTurn(battle);
+        battle.setMonsterDamageDealt(monsterResult.getDamageDealt());
+        battle.setMonsterAction(monsterResult.getAction());
+        String turnResult = result.getTurnResult() + " " + monsterResult.getTurnResult();
+
+        // 4. Verifica se a batalha terminou
         if (battle.getMonster().getHp() <= 0) {
             battle.setIsFinished(true);
             turnResult += " Você venceu a batalha!";
@@ -133,9 +139,15 @@ public class BattleService {
         // 2. Delega a lógica para o combatService
         CombatService.DefenseResult result = combatService.performDefense(battle.getCharacter());
         battle.setCharacter(result.getUpdatedCharacter());
+        battle.setCharacterDamageDealt(0);
 
-        // 3. Verifica se a batalha terminou (se HP do personagem chegou a 0)
-        String turnResult = result.getTurnResult();
+        // 3. Executa o turno do monstro
+        CombatService.MonsterTurnResult monsterResult = combatService.performMonsterTurn(battle);
+        battle.setMonsterDamageDealt(monsterResult.getDamageDealt());
+        battle.setMonsterAction(monsterResult.getAction());
+        String turnResult = result.getTurnResult() + " " + monsterResult.getTurnResult();
+
+        // 4. Verifica se a batalha terminou
         if (battle.getCharacter().getHp() <= 0) {
             battle.setIsFinished(true);
             turnResult += " Você foi derrotado.";
@@ -184,6 +196,7 @@ public class BattleService {
 
         CombatService.SkillResult result = combatService.performSkill(battle.getCharacter());
         battle.setCharacter(result.getUpdatedCharacter());
+        battle.setCharacterDamageDealt(0);
         String turnResult = result.getTurnResult();
 
         // Orquestração dos Efeitos Especiais
@@ -266,6 +279,14 @@ public class BattleService {
                     }
                     break;
             }
+        }
+
+        // Executa o turno do monstro (exceto para BARD_CHALLENGE que é especial)
+        if (result.getEffect() == null || !"BARD_CHALLENGE".equals(result.getEffect().getType())) {
+            CombatService.MonsterTurnResult monsterResult = combatService.performMonsterTurn(battle);
+            turnResult += " " + monsterResult.getTurnResult();
+            battle.setMonsterDamageDealt(monsterResult.getDamageDealt());
+            battle.setMonsterAction(monsterResult.getAction());
         }
 
         // Verifica se a batalha terminou
@@ -356,6 +377,7 @@ public class BattleService {
         charInfo.setClassName(character.getGameClass().getName());
         charInfo.setStrength(character.getGameClass().getStrength());
         charInfo.setIntelligence(character.getGameClass().getIntelligence());
+        charInfo.setDefense(character.getGameClass().getDefense());
         charInfo.setLevel(playerLevel);
         charInfo.setXp(character.getXp());
         int maxXpForLevel = (int) (gameConfig.getLeveling().getBaseXp() * Math.pow(gameConfig.getLeveling().getXpMultiplier(), playerLevel));
@@ -367,6 +389,7 @@ public class BattleService {
         monsterInfo.setHp(monster.getHp());
         monsterInfo.setMaxHp(monster.getHp());
         monsterInfo.setDano(monster.getMonsterDamage());
+        monsterInfo.setDefense(monster.getDefense());
         monsterInfo.setNome(monster.getMonsterName());
         battleState.setMonster(monsterInfo);
 
@@ -460,6 +483,17 @@ public class BattleService {
         CombatService.TurnResult turn = combatService.processAnswerTurn(battle, isCorrect);
         BattleStateResponse updatedBattle = turn.getUpdatedBattleState();
         String turnResult = turn.getTurnResult();
+        updatedBattle.setCharacterDamageDealt(0);
+        updatedBattle.setMonsterDamageDealt(0);
+        updatedBattle.setMonsterAction(null);
+
+        // Se errou a pergunta, o monstro faz seu turno
+        if (!isCorrect) {
+            CombatService.MonsterTurnResult monsterResult = combatService.performMonsterTurn(updatedBattle);
+            turnResult += " " + monsterResult.getTurnResult();
+            updatedBattle.setMonsterDamageDealt(monsterResult.getDamageDealt());
+            updatedBattle.setMonsterAction(monsterResult.getAction());
+        }
 
         // 4. Verifica se a batalha terminou
         if (updatedBattle.getMonster().getHp() <= 0) {
