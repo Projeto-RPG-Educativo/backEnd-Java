@@ -42,6 +42,15 @@ public class BattleStateResponse {
     /** Resultado do último turno executado */
     private String turnResult;
 
+    /** Dano causado pelo personagem no último turno */
+    private Integer characterDamageDealt;
+
+    /** Dano causado pelo monstro no último turno */
+    private Integer monsterDamageDealt;
+
+    /** Ação tomada pelo monstro no último turno (ex: "attack", "defend", "skill") */
+    private String monsterAction;
+
     /**
      * Classe interna com informações do personagem durante a batalha.
      * Inclui atributos, status e efeitos ativos.
@@ -71,6 +80,9 @@ public class BattleStateResponse {
 
         /** Atributo de inteligência */
         private Integer intelligence;
+
+        /** Atributo de defesa */
+        private Integer defense;
 
         /** Nível do personagem */
         private Integer level;
@@ -104,6 +116,12 @@ public class BattleStateResponse {
 
         /** Dano base do monstro */
         private Integer dano;
+
+        /** Defesa do monstro */
+        private Integer defense;
+
+        /** Indica se o monstro está defendendo */
+        private Boolean isDefending = false;
 
         /** Nome do monstro */
         private String nome;

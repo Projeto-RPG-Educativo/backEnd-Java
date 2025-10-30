@@ -39,6 +39,46 @@ public class CombatService {
     }
 
     /**
+     * Calcula o dano do monstro considerando defesa do personagem.
+     * @param monsterDamage Dano base do monstro.
+     * @param characterDefense Defesa base do personagem.
+     * @param isCharacterDefending Se o personagem está ativamente defendendo.
+     * @return Dano final após defesa.
+     */
+    public int calculateMonsterDamage(int monsterDamage, int characterDefense, boolean isCharacterDefending) {
+        // Reduz 1% de dano por 2 pontos de defesa base
+        int reductionPercent = (characterDefense / 2);
+        int reducedDamage = monsterDamage * (100 - reductionPercent) / 100;
+
+        // Se o personagem está defendendo, reduzir mais 50%
+        if (isCharacterDefending) {
+            reducedDamage = reducedDamage / 2;
+        }
+
+        return Math.max(reducedDamage, 0); // Dano mínimo 0
+    }
+
+    /**
+     * Calcula o dano do personagem considerando defesa do monstro.
+     * @param characterDamage Dano base do personagem.
+     * @param monsterDefense Defesa base do monstro.
+     * @param isMonsterDefending Se o monstro está ativamente defendendo.
+     * @return Dano final após defesa.
+     */
+    public int calculateCharacterDamageWithDefense(int characterDamage, int monsterDefense, boolean isMonsterDefending) {
+        // Reduz 1% de dano por 2 pontos de defesa base do monstro
+        int reductionPercent = (monsterDefense / 2);
+        int reducedDamage = characterDamage * (100 - reductionPercent) / 100;
+
+        // Se o monstro está defendendo, reduzir mais 50%
+        if (isMonsterDefending) {
+            reducedDamage = reducedDamage / 2;
+        }
+
+        return Math.max(reducedDamage, 0); // Dano mínimo 0
+    }
+
+    /**
      * Processa o turno do jogador baseado na resposta a uma pergunta.
      * @param battleState O estado atual da batalha.
      * @param isCorrect Se a resposta do jogador foi correta.
@@ -55,34 +95,10 @@ public class CombatService {
             BattleStateResponse.CharacterBattleInfo character = battleState.getCharacter();
             character.setEnergy(Math.min(character.getEnergy() + energyRecovered, character.getMaxEnergy()));
 
-            damageDealt = calculateCharacterDamage(character);
-
-            BattleStateResponse.MonsterBattleInfo monster = battleState.getMonster();
-            monster.setHp(monster.getHp() - damageDealt);
-
-            turnResult = String.format("Você acertou! O monstro sofreu %d de dano e você recuperou %d de energia.",
-                damageDealt, energyRecovered);
-
-            // LÓGICA DA INVESTIDA DO LUTADOR
-            if (character.getEffects() != null && Boolean.TRUE.equals(character.getEffects().get("investidaActive"))) {
-                int extraHitDamage = calculateCharacterDamage(character);
-                monster.setHp(monster.getHp() - extraHitDamage);
-                turnResult += String.format(" Sua Investida aplica um golpe extra de %d de dano!", extraHitDamage);
-                character.getEffects().remove("investidaActive"); // Consome o efeito
-            }
+            turnResult = String.format("Você acertou! Você recuperou %d de energia.", energyRecovered);
 
         } else {
-            BattleStateResponse.CharacterBattleInfo character = battleState.getCharacter();
-
-            // Se o personagem estava defendendo, não toma dano
-            if (Boolean.TRUE.equals(character.getIsDefending())) {
-                turnResult = "Você errou, mas sua defesa bloqueou o dano do monstro!";
-                character.setIsDefending(false); // Defesa é consumida
-            } else {
-                damageTaken = battleState.getMonster().getDano();
-                character.setHp(character.getHp() - damageTaken);
-                turnResult = String.format("Você errou! O monstro te atacou e causou %d de dano.", damageTaken);
-            }
+            turnResult = "Você errou! Não recuperou energia e perdeu o turno.";
         }
 
         return new TurnResult(battleState, turnResult, damageDealt, damageTaken);
@@ -93,10 +109,15 @@ public class CombatService {
      * @param character O personagem que ataca.
      * @return Um objeto com o dano causado e uma mensagem.
      */
-    public AttackResult performAttack(BattleStateResponse.CharacterBattleInfo character) {
-        int damageDealt = calculateCharacterDamage(character);
-        String turnResult = String.format("Você atacou! O monstro sofreu %d de dano.", damageDealt);
-        return new AttackResult(damageDealt, turnResult);
+    public AttackResult performAttack(BattleStateResponse.CharacterBattleInfo character, BattleStateResponse.MonsterBattleInfo monster) {
+        int baseDamage = calculateCharacterDamage(character);
+        int actualDamage = calculateCharacterDamageWithDefense(baseDamage, monster.getDefense(), monster.getIsDefending());
+        String turnResult = String.format("Você atacou! O monstro sofreu %d de dano.", actualDamage);
+        // Se o monstro estava defendendo, consumir a defesa
+        if (monster.getIsDefending()) {
+            monster.setIsDefending(false);
+        }
+        return new AttackResult(actualDamage, turnResult);
     }
 
     /**
@@ -164,6 +185,50 @@ public class CombatService {
         }
 
         return new SkillResult(character, turnResult, effect);
+    }
+
+    /**
+     * Executa a ação aleatória do monstro no seu turno.
+     * @param battleState O estado atual da batalha.
+     * @return Um objeto com o resultado da ação do monstro.
+     */
+    public MonsterTurnResult performMonsterTurn(BattleStateResponse battleState) {
+        // Escolhe uma ação aleatória: 0 = atacar, 1 = defender, 2 = usar skill
+        int action = (int) (Math.random() * 3);
+        String turnResult = "";
+        int damageDealt = 0;
+        String actionStr = "";
+
+        BattleStateResponse.CharacterBattleInfo character = battleState.getCharacter();
+        BattleStateResponse.MonsterBattleInfo monster = battleState.getMonster();
+
+        switch (action) {
+            case 0: // Atacar
+                actionStr = "attack";
+                int baseDamage = monster.getDano();
+                damageDealt = calculateMonsterDamage(baseDamage, character.getDefense(), character.getIsDefending());
+                character.setHp(character.getHp() - damageDealt);
+                turnResult = String.format("O monstro atacou! Você sofreu %d de dano.", damageDealt);
+                // Se o personagem estava defendendo, consumir a defesa
+                if (character.getIsDefending()) {
+                    character.setIsDefending(false);
+                }
+                break;
+
+            case 1: // Defender
+                actionStr = "defend";
+                monster.setIsDefending(true);
+                turnResult = "O monstro se defendeu e reduziu o dano que receberia no próximo turno.";
+                break;
+
+            case 2: // Usar skill
+                actionStr = "skill";
+                // Por enquanto, skill do monstro não implementada, apenas mensagem
+                turnResult = "O monstro usou uma habilidade especial!";
+                break;
+        }
+
+        return new MonsterTurnResult(battleState, turnResult, damageDealt, actionStr);
     }
 
     // Classes internas para resultados
@@ -236,5 +301,24 @@ public class CombatService {
         }
 
         public String getType() { return type; }
+    }
+
+    public static class MonsterTurnResult {
+        private final BattleStateResponse updatedBattleState;
+        private final String turnResult;
+        private final int damageDealt;
+        private final String action;
+
+        public MonsterTurnResult(BattleStateResponse updatedBattleState, String turnResult, int damageDealt, String action) {
+            this.updatedBattleState = updatedBattleState;
+            this.turnResult = turnResult;
+            this.damageDealt = damageDealt;
+            this.action = action;
+        }
+
+        public BattleStateResponse getUpdatedBattleState() { return updatedBattleState; }
+        public String getTurnResult() { return turnResult; }
+        public int getDamageDealt() { return damageDealt; }
+        public String getAction() { return action; }
     }
 }

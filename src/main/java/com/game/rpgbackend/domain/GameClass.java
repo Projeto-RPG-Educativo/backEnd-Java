@@ -61,6 +61,12 @@ public class GameClass {
     private Integer intelligence;
 
     /**
+     * Defesa base da classe (reduz dano recebido).
+     */
+    @Column
+    private Integer defense;
+
+    /**
      * Lista de personagens que possuem esta classe.
      * Relacionamento OneToMany - uma classe pode ter vários personagens.
      */
