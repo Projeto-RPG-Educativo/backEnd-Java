@@ -218,7 +218,7 @@ public class CombatService {
             case 1: // Defender
                 actionStr = "defend";
                 monster.setIsDefending(true);
-                turnResult = "O monstro se defendeu e reduziu o dano que receberia no próximo turno.";
+                turnResult = "O monstro se defendeu e reduziu o dano que receberia no turno.";
                 break;
 
             case 2: // Usar skill
