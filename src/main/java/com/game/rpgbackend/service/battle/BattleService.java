@@ -66,6 +66,12 @@ public class BattleService {
         battle.setMonsterAction(monsterResult.getAction());
         String turnResult = result.getTurnResult() + " " + monsterResult.getTurnResult();
 
+        // Reseta a defesa se nenhum dano foi causado
+        if (monsterResult.getDamageDealt() == 0) {
+            battle.getCharacter().setIsDefending(false);
+        }
+        battle.getMonster().setIsDefending(false);
+
         // 4. Verifica se a batalha terminou
         if (battle.getMonster().getHp() <= 0) {
             battle.setIsFinished(true);
@@ -146,6 +152,12 @@ public class BattleService {
         battle.setMonsterDamageDealt(monsterResult.getDamageDealt());
         battle.setMonsterAction(monsterResult.getAction());
         String turnResult = result.getTurnResult() + " " + monsterResult.getTurnResult();
+
+        // Reseta a defesa se nenhum dano foi causado
+        if (monsterResult.getDamageDealt() == 0) {
+            battle.getCharacter().setIsDefending(false);
+        }
+        battle.getMonster().setIsDefending(false);
 
         // 4. Verifica se a batalha terminou
         if (battle.getCharacter().getHp() <= 0) {
@@ -287,6 +299,12 @@ public class BattleService {
             turnResult += " " + monsterResult.getTurnResult();
             battle.setMonsterDamageDealt(monsterResult.getDamageDealt());
             battle.setMonsterAction(monsterResult.getAction());
+
+            // Reseta a defesa se nenhum dano foi causado
+            if (monsterResult.getDamageDealt() == 0) {
+                battle.getCharacter().setIsDefending(false);
+            }
+            battle.getMonster().setIsDefending(false);
         }
 
         // Verifica se a batalha terminou
