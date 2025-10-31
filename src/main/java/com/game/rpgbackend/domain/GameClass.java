@@ -67,6 +67,24 @@ public class GameClass {
     private Integer defense;
 
     /**
+     * Agilidade base da classe (influencia velocidade e evasão).
+     */
+    @Column
+    private Integer agility;
+
+    /**
+     * Carisma base da classe (influencia medo, charme e manipulação).
+     */
+    @Column
+    private Integer charisma;
+
+    /**
+     * Sorte base da classe (influencia percepção, acaso e favorecido pela deusa do RNG).
+     */
+    @Column
+    private Integer luck;
+
+    /**
      * Lista de personagens que possuem esta classe.
      * Relacionamento OneToMany - uma classe pode ter vários personagens.
      */
