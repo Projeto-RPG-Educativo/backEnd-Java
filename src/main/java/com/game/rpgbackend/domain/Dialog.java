@@ -18,7 +18,7 @@ import java.util.List;
  * @since 1.0
  */
 @Entity
-@Table(name = "dialog")
+@Table(name = "QuestionDialog")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

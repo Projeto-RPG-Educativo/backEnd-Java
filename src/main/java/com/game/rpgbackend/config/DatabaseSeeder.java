@@ -59,6 +59,9 @@ public class DatabaseSeeder {
             tank.setStrength(15);
             tank.setIntelligence(2);
             tank.setDefense(20);
+            tank.setAgility(5);
+            tank.setCharisma(6);
+            tank.setLuck(5);
             desiredClasses.add(tank);
         }
         if (!existingClasses.containsKey("mago")) {
@@ -69,6 +72,9 @@ public class DatabaseSeeder {
             mago.setStrength(2);
             mago.setIntelligence(25);
             mago.setDefense(5);
+            mago.setAgility(7);
+            mago.setCharisma(5);
+            mago.setLuck(5);
             desiredClasses.add(mago);
         }
         if (!existingClasses.containsKey("lutador")) {
@@ -79,6 +85,9 @@ public class DatabaseSeeder {
             lutador.setStrength(20);
             lutador.setIntelligence(2);
             lutador.setDefense(15);
+            lutador.setAgility(10);
+            lutador.setCharisma(5);
+            lutador.setLuck(5);
             desiredClasses.add(lutador);
         }
         if (!existingClasses.containsKey("ladino")) {
@@ -89,6 +98,9 @@ public class DatabaseSeeder {
             ladino.setStrength(20);
             ladino.setIntelligence(9);
             ladino.setDefense(12);
+            ladino.setAgility(12);
+            ladino.setCharisma(8);
+            ladino.setLuck(7);
             desiredClasses.add(ladino);
         }
         if (!existingClasses.containsKey("paladino")) {
@@ -99,6 +111,9 @@ public class DatabaseSeeder {
             paladino.setStrength(18);
             paladino.setIntelligence(5);
             paladino.setDefense(10);
+            paladino.setAgility(8);
+            paladino.setCharisma(10);
+            paladino.setLuck(5);
             desiredClasses.add(paladino);
         }
         if (!existingClasses.containsKey("bardo")) {
@@ -109,6 +124,9 @@ public class DatabaseSeeder {
             bardo.setStrength(5);
             bardo.setIntelligence(15);
             bardo.setDefense(7);
+            bardo.setAgility(10);
+            bardo.setCharisma(20);
+            bardo.setLuck(12);
             desiredClasses.add(bardo);
         }
 
@@ -779,6 +797,15 @@ public class DatabaseSeeder {
             desiredNpcs.add(goblinGramatica);
         }
 
+        if (!existingNpcs.containsKey("Grukha, A Guardiã dos Verbos Furiosos")) {
+            NPC grukhaGVF = new NPC();
+            grukhaGVF.setName("Grukha, A Guardiã dos Verbos Furiosos");
+            grukhaGVF.setDescription("Uma orc arrojada e carismática que desafia os aventureiros com suas missões repletas de verbos de ação, ajudando-os a aprimorar suas habilidades linguísticas em meio a batalhas épicas.");
+            grukhaGVF.setType("info");
+            grukhaGVF.setLocation("Cidade Principal");
+            desiredNpcs.add(grukhaGVF);
+        }
+
         if (!desiredNpcs.isEmpty()) { // <-- CORRIGIDO AQUI
             System.out.println("Inserindo " + desiredNpcs.size() + " novos NPCs...");
             npcRepository.saveAll(desiredNpcs);
@@ -796,6 +823,7 @@ public class DatabaseSeeder {
         List<Dialogue> desiredDialogue = new ArrayList<>();
 
         NPC goblinGramatica = npcRepository.findByName("Goblin da Gramática").orElse(null);
+        NPC grukhaGVF = npcRepository.findByName("Grukha, A Guardiã dos Verbos Furiosos").orElse(null);
         // Diálogos do Goblin da Gramática
         if (goblinGramatica != null) { // Adiciona diálogos apenas se o NPC foi encontrado
             addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
@@ -808,7 +836,59 @@ public class DatabaseSeeder {
                     "Mas há esperança! A sua língua, a 'Língua Arcana' vinda do seu mundo... Malak não pode tocá-la! É por isso que você foi invocado! Cada palavra que você conhece, cada regra gramatical... *isso* é poder aqui!", null);
             addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
                     "Você é a nossa única chance de restaurar Aetheria. Aprenda, use a Língua Arcana, e ajude-nos a derrotar o Silenciador! Mas preste atenção na conjugação, por favor!", null);
-        } else {
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Certo, *vamos à prática*! Vê aquela criatura ali? É um 'Diabrete Errôneo'! Ele acha que 'I goes' está correto! Vamos ensinar-lhe uma lição!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Vê o botão 'Atacar'? Use-o para um ataque básico. É como o 'simple present' do combate: direto, eficaz, mas consome um pouco de energia.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Se você estiver em apuros, pode 'Defender'. Você não ataca, mas recebe menos dano. É uma boa *estratégia*... uma palavra de origem grega, sabia?", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Ah! A sua Habilidade de Classe! Vê esse botão? É a sua *habilidade especial*. É como o seu 'present perfect' – uma ação única que tem um grande impacto! Mas cuidado, consome *mais* energia!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Reparou na sua barra de energia? *Tudo* o que você faz gasta um pouco. Atacar, defender, usar habilidades... tudo tem um custo! Não se pode ser eloquente de graça, não é?", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Oh, céus! Sua energia está baixa! Rápido! Veja o ícone de 'Pergunta'? É aí que a 'Língua Arcana' entra! Clique nele!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Responda à pergunta corretamente e—*voilà*!—você recupera energia! Aprender é poder, literalmente! Se errar... bem, tente não errar, sim? A sintaxe é importante!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Muito bem! Com o Diabrete corrigido, podemos prosseguir. Veja! Ali estão os portões da cidade principal, um dos últimos refúgios do Conhecimento.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "É aqui que nos separamos, 'Outworlder'. Eu... bem, eu não sou bem-vindo lá. Minha gramática é impecável, mas minha *raça* não é.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Alguns Goblins, tolos e sem apreço pela sintaxe, decidiram servir a Malak. Agora, os habitantes desconfiam de todos nós. Patético, não? *Eles* é que estão a cometer um erro de generalização!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Mas tenho esperança que, com a sua ajuda e a eventual derrota de Malak, isso mude. Que um dia, um Goblin possa discutir semântica na praça principal!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Enfim, preste atenção, vou explicar o que você encontrará lá dentro. A cidade é o seu novo lar, *por assim dizer*.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Vê aquele grande anfiteatro? É o **Palco da Retórica**. Lá você pode enfrentar inimigos para treinar seus conhecimentos. Eles ajustam o desafio às suas limitações atuais, então não se preocupe em enfrentar um 'Past Perfect Continuous' logo de cara!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Aquela loja ali é o **Sebo de Linguística**. Um nome charmoso para um mercado! É onde você poderá comprar itens que o auxiliarão em sua jornada. Poções, pergaminhos... itens, ora!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Aquele prédio imponente e silencioso é a **Biblioteca Silenciosa**. Um nome tristemente literal hoje em dia... Vá até lá se precisar descansar, recuperar seu HP e refrescar as ideias.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "E, finalmente, o prédio mais alto: a **Torre do Conhecimento**. É a guilda da cidade. O seu principal ponto de contato. É lá que você deve ir para conseguir missões e relatar seu progresso.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "A Torre certamente tem outras funções, mas, *honestamente*, elas estão além da minha alçada. Um Goblin sabe das suas limitações!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Agora vá, 'Outworlder'. Sua jornada começa aqui. E não se preocupe, eu estarei por perto, aqui na 'Floresta dos Erros Comuns', caso precise de auxílio... ou de uma correção gramatical urgente! *Good luck!*", null);
+
+        }
+
+        if (grukhaGVF != null){
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, grukhaGVF,
+                    "Saudações, aventureiro! Eu sou Grukha, A Guardiã dos Verbos Furiosos. Aqui é a torre do conhecimento, neste lugar você, poderá realizar nossas quests e também receber recompensas sempre que concluir alguma delas", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, grukhaGVF,
+                    "Gostaria de juntar-se a nós em nossa luta contra o Silenciador e seus asseclas?", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, grukhaGVF,
+                    "Aqui ao lado você encontra o quadro de quests, nele você pode ver todas as missões disponíveis, seus detalhes e recompensas.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, grukhaGVF,
+                    "Lembre-se para não é possível aceitar mais de uma quest por vez, então sempre conclua uma antes de aceitar outra.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, grukhaGVF,
+                    "Bem vindo a torre do conhecimento, aventureiro! Que sua jornada seja repleta de glória e fama!", null);
+        }
+
+        else {
             System.err.println("### AVISO: NPC 'Goblin da Gramática' não encontrado. Seus diálogos não foram adicionados. ###");
         }
 
