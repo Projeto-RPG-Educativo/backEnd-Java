@@ -58,6 +58,10 @@ public class DatabaseSeeder {
             tank.setStamina(12);
             tank.setStrength(15);
             tank.setIntelligence(2);
+            tank.setDefense(20);
+            tank.setAgility(5);
+            tank.setCharisma(6);
+            tank.setLuck(5);
             desiredClasses.add(tank);
         }
         if (!existingClasses.containsKey("mago")) {
@@ -67,6 +71,10 @@ public class DatabaseSeeder {
             mago.setStamina(12);
             mago.setStrength(2);
             mago.setIntelligence(25);
+            mago.setDefense(5);
+            mago.setAgility(7);
+            mago.setCharisma(5);
+            mago.setLuck(5);
             desiredClasses.add(mago);
         }
         if (!existingClasses.containsKey("lutador")) {
@@ -76,6 +84,10 @@ public class DatabaseSeeder {
             lutador.setStamina(12);
             lutador.setStrength(20);
             lutador.setIntelligence(2);
+            lutador.setDefense(15);
+            lutador.setAgility(10);
+            lutador.setCharisma(5);
+            lutador.setLuck(5);
             desiredClasses.add(lutador);
         }
         if (!existingClasses.containsKey("ladino")) {
@@ -85,6 +97,10 @@ public class DatabaseSeeder {
             ladino.setStamina(12);
             ladino.setStrength(20);
             ladino.setIntelligence(9);
+            ladino.setDefense(12);
+            ladino.setAgility(12);
+            ladino.setCharisma(8);
+            ladino.setLuck(7);
             desiredClasses.add(ladino);
         }
         if (!existingClasses.containsKey("paladino")) {
@@ -94,6 +110,10 @@ public class DatabaseSeeder {
             paladino.setStamina(12);
             paladino.setStrength(18);
             paladino.setIntelligence(5);
+            paladino.setDefense(10);
+            paladino.setAgility(8);
+            paladino.setCharisma(10);
+            paladino.setLuck(5);
             desiredClasses.add(paladino);
         }
         if (!existingClasses.containsKey("bardo")) {
@@ -103,6 +123,10 @@ public class DatabaseSeeder {
             bardo.setStamina(12);
             bardo.setStrength(5);
             bardo.setIntelligence(15);
+            bardo.setDefense(7);
+            bardo.setAgility(10);
+            bardo.setCharisma(20);
+            bardo.setLuck(12);
             desiredClasses.add(bardo);
         }
 
@@ -179,6 +203,7 @@ public class DatabaseSeeder {
             diabrete.setMonsterName("Diabrete Errôneo");
             diabrete.setHp(150);
             diabrete.setMonsterDamage(10);
+            diabrete.setDefense(5);
             desiredMonsters.add(diabrete);
         }
         if (!existingMonsters.containsKey("Harpia Indagada")) {
@@ -186,6 +211,7 @@ public class DatabaseSeeder {
             harpia.setMonsterName("Harpia Indagada");
             harpia.setHp(120);
             harpia.setMonsterDamage(15);
+            harpia.setDefense(8);
             desiredMonsters.add(harpia);
         }
         if (!existingMonsters.containsKey("Zumbi Demente")) {
@@ -193,6 +219,7 @@ public class DatabaseSeeder {
             zumbi.setMonsterName("Zumbi Demente");
             zumbi.setHp(250);
             zumbi.setMonsterDamage(8);
+            zumbi.setDefense(12);
             desiredMonsters.add(zumbi);
         }
         if (!existingMonsters.containsKey("Centauro Questionador")) {
@@ -200,6 +227,7 @@ public class DatabaseSeeder {
             centauro.setMonsterName("Centauro Questionador");
             centauro.setHp(200);
             centauro.setMonsterDamage(12);
+            centauro.setDefense(10);
             desiredMonsters.add(centauro);
         }
         if (!existingMonsters.containsKey("Esqueleto da Sintaxe")) {
@@ -207,6 +235,7 @@ public class DatabaseSeeder {
             esqueleto.setMonsterName("Esqueleto da Sintaxe");
             esqueleto.setHp(500);
             esqueleto.setMonsterDamage(20);
+            esqueleto.setDefense(15);
             desiredMonsters.add(esqueleto);
         }
         if (!existingMonsters.containsKey("Lexicógrafo, o Guardião do Vazio")) {
@@ -214,6 +243,7 @@ public class DatabaseSeeder {
             lexicografo.setMonsterName("Lexicógrafo, o Guardião do Vazio");
             lexicografo.setHp(1500);
             lexicografo.setMonsterDamage(40);
+            lexicografo.setDefense(25);
             desiredMonsters.add(lexicografo);
         }
         if (!existingMonsters.containsKey("Malak, O Silenciador")) {
@@ -221,6 +251,7 @@ public class DatabaseSeeder {
             malak.setMonsterName("Malak, O Silenciador");
             malak.setHp(5000);
             malak.setMonsterDamage(100);
+            malak.setDefense(50);
             desiredMonsters.add(malak);
         }
 
@@ -373,7 +404,7 @@ public class DatabaseSeeder {
         // Presente - Negativo
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"I ___ not tired.\"", "is", "are", "am", "am", "Facil", verboToBe, 1, "Forma negativa para 'Eu'.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"She ___ not from Spain.\"", "is", "are", "am", "is", "Facil", verboToBe, 1, "Forma negativa para 'Ela'.");
-        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"They ___ not here.\"", "is", "are", "am", "are", "Facil", verboToBe, 1, "Forma negativa plural.");
+        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete a frase: \"They ___ not here.\"", "is", "are", "am", "are", "Facil", verboToBe, 1, "Forma negativa plural.");
         // Presente - Interrogativo
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"___ you happy?\"", "Is", "Are", "Am", "Are", "Facil", verboToBe, 1, "Inverta a ordem para perguntar com 'you'.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"___ he your brother?\"", "Is", "Are", "Am", "Is", "Facil", verboToBe, 1, "Inverta a ordem para perguntar com 'he'.");
@@ -589,8 +620,8 @@ public class DatabaseSeeder {
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"They have been married ___ 3 months.\"", "for", "since", "ago", "for", "Dificil", presentePerfeito, 6, "'3 months' é uma duração.");
         // Yet vs Already
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"Have you finished ___?\"", "already", "yet", "since", "yet", "Dificil", presentePerfeito, 6, "'Yet' é comum em perguntas e negativas, geralmente no final.");
-        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"I have ___ seen that movie.\"", "already", "yet", "for", "already", "Dificil", presentePerfeito, 6, "'Already' indica que algo aconteceu antes do esperado, comum em afirmativas.");
-        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"The train hasn't arrived ___.\"", "already", "yet", "ago", "yet", "Dificil", presentePerfeito, 6, "'Yet' é comum em negativas, indicando que algo ainda não aconteceu.");
+        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"She has ___ left the company.\"", "already", "yet", "since", "already", "Dificil", presentePerfeito, 6, "'Already' indica que algo aconteceu antes do esperado.");
+        addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"I haven't seen that movie ___.\"", "already", "yet", "ago", "yet", "Dificil", presentePerfeito, 6, "'Yet' é comum em negativas, indicando que algo ainda não aconteceu.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"She has ___ left.\"", "already", "yet", "for", "already", "Dificil", presentePerfeito, 6, "'Already' pode indicar surpresa ou que aconteceu cedo.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "Complete: \"He's only 20, but he has ___ started his own company.\"", "already", "yet", "since", "already", "Dificil", presentePerfeito, 6, "'Already' enfatiza que aconteceu cedo para a idade dele.");
         // Past Simple vs Present Perfect
@@ -642,11 +673,11 @@ public class DatabaseSeeder {
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to make matters worse\"?", "Fazer a matéria piorar", "Piorar uma situação que já está ruim", "Melhorar uma situação", "Piorar uma situação que já está ruim", "Medio", expressoesIdiomaticas, 6, "Tornar os assuntos ('matters') piores.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to see eye to eye\"?", "Ver olho no olho", "Concordar completamente com alguém", "Ter boa visão", "Concordar completamente com alguém", "Medio", expressoesIdiomaticas, 6, "Ter a mesma perspectiva.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"when pigs fly\"?", "Quando porcos voarem", "Algo que nunca vai acontecer", "Um milagre", "Algo que nunca vai acontecer", "Medio", expressoesIdiomaticas, 6, "Porcos não voam.");
-        addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"speak of the devil\"?", "Falar do diabo", "Falar de alguém que aparece em seguida", "Estar com problemas", "Falar de alguém que aparece em seguida", "Medio", expressoesIdiomaticas, 6, "Ditado popular: 'Falando no diabo...'");
+        addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"speak of the devil\"?", "Falar do diabo", "Falar de alguém que aparece em seguida", "Estar com problemas", "Falar de alguém que aparece em seguida", "Medio", expressoesIdiomaticas, 6, "Ditado popular: 'Falando no diabo...'" );
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"the elephant in the room\"?", "O elefante na sala", "Um problema óbvio que ninguém quer discutir", "Um animal de estimação grande", "Um problema óbvio que ninguém quer discutir", "Dificil", expressoesIdiomaticas, 7, "Algo tão grande e óbvio que é impossível ignorar, mas todos evitam.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to cut corners\"?", "Cortar cantos", "Fazer algo de forma mais fácil/barata, sacrificando a qualidade", "Ser um bom motorista", "Fazer algo de forma mais fácil/barata, sacrificando a qualidade", "Dificil", expressoesIdiomaticas, 7, "Como cortar caminho em vez de seguir a rota correta.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to add insult to injury\"?", "Adicionar insulto à injúria", "Piorar uma situação ruim com mais uma coisa ruim", "Ser rude com alguém machucado", "Piorar uma situação ruim com mais uma coisa ruim", "Dificil", expressoesIdiomaticas, 7, "Tornar algo já mau ainda pior.");
-        addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"don't cry over spilled milk\"?", "Não chore sobre o leite derramado", "Não adianta lamentar por algo que já aconteceu", "Tenha cuidado com laticínios", "Não adianta lamentar por algo que já aconteceu", "Medio", expressoesIdiomaticas, 6, "Não há o que fazer depois que o leite derramou.");
+        addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"don't cry over spilled milk\"?", "Não chore sobre o leite derramado", "Não adianta lamentar por algo que já aconteceu", "Tenha cuidado ao fazer compras", "Não adianta lamentar por algo que já aconteceu", "Medio", expressoesIdiomaticas, 6, "Não há o que fazer depois que o leite derramou.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"every cloud has a silver lining\"?", "Toda nuvem tem um forro de prata", "Toda situação ruim tem um lado positivo", "O tempo vai melhorar", "Toda situação ruim tem um lado positivo", "Medio", expressoesIdiomaticas, 6, "Mesmo nuvens escuras têm bordas brilhantes pelo sol.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to get cold feet\"?", "Ficar com pés frios", "Ficar nervoso e desistir de algo", "Estar com frio", "Ficar nervoso e desistir de algo", "Medio", expressoesIdiomaticas, 6, "Medo ou nervosismo antes de um evento importante.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to get out of hand\"?", "Sair da mão", "Ficar fora de controle", "Lavar as mãos", "Ficar fora de controle", "Medio", expressoesIdiomaticas, 6, "Algo que não pode mais ser controlado.");
@@ -669,8 +700,6 @@ public class DatabaseSeeder {
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to burn the midnight oil\"?", "Queimar o óleo da meia-noite", "Trabalhar ou estudar até tarde da noite", "Causar um incêndio", "Trabalhar ou estudar até tarde da noite", "Dificil", expressoesIdiomaticas, 7, "Referência às lamparinas a óleo usadas antigamente.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"don't put all your eggs in one basket\"?", "Não coloque todos os ovos em uma cesta", "Não concentre todos os seus recursos ou esperanças em uma só coisa", "Tenha cuidado ao fazer compras", "Não concentre todos os seus recursos ou esperanças em uma só coisa", "Medio", expressoesIdiomaticas, 6, "Diversifique seus riscos.");
         addQuestionIfNotExists(desiredQuestions, existingQuestions, "O que significa \"to face the music\"?", "Encarar a música", "Aceitar as consequências de suas ações", "Ir a um concerto", "Aceitar as consequências de suas ações", "Medio", expressoesIdiomaticas, 6, "Lidar com a realidade de uma situação ruim que você causou.");
-
-        // --- FIM DA ADIÇÃO DE PERGUNTAS ---
 
         if (!desiredQuestions.isEmpty()) {
             System.out.println("Inserindo " + desiredQuestions.size() + " novas questões (com dicas)...");
@@ -728,10 +757,12 @@ public class DatabaseSeeder {
     // Método helper para criar questões, evitando duplicatas
     private void addQuestionIfNotExists(List<Question> desiredQuestions, Map<String, Question> existingQuestions, String texto, String opcaoA, String opcaoB, String opcaoC,
                                         String resposta, String dificuldade, Content content, int levelMinimo, String hint) {
+        // Verifica se o NPC é válido antes de prosseguir
         if (content == null) {
             System.err.println("Atenção: Conteúdo nulo para a pergunta: '" + texto + "'. Pergunta não será adicionada.");
             return;
         }
+        // Verifica se a pergunta já existe pelo texto
         if (!existingQuestions.containsKey(texto)) {
             Question q = new Question();
             q.setQuestionText(texto);
@@ -766,6 +797,15 @@ public class DatabaseSeeder {
             desiredNpcs.add(goblinGramatica);
         }
 
+        if (!existingNpcs.containsKey("Grukha, A Guardiã dos Verbos Furiosos")) {
+            NPC grukhaGVF = new NPC();
+            grukhaGVF.setName("Grukha, A Guardiã dos Verbos Furiosos");
+            grukhaGVF.setDescription("Uma orc arrojada e carismática que desafia os aventureiros com suas missões repletas de verbos de ação, ajudando-os a aprimorar suas habilidades linguísticas em meio a batalhas épicas.");
+            grukhaGVF.setType("info");
+            grukhaGVF.setLocation("Cidade Principal");
+            desiredNpcs.add(grukhaGVF);
+        }
+
         if (!desiredNpcs.isEmpty()) { // <-- CORRIGIDO AQUI
             System.out.println("Inserindo " + desiredNpcs.size() + " novos NPCs...");
             npcRepository.saveAll(desiredNpcs);
@@ -783,6 +823,7 @@ public class DatabaseSeeder {
         List<Dialogue> desiredDialogue = new ArrayList<>();
 
         NPC goblinGramatica = npcRepository.findByName("Goblin da Gramática").orElse(null);
+        NPC grukhaGVF = npcRepository.findByName("Grukha, A Guardiã dos Verbos Furiosos").orElse(null);
         // Diálogos do Goblin da Gramática
         if (goblinGramatica != null) { // Adiciona diálogos apenas se o NPC foi encontrado
             addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
@@ -795,7 +836,59 @@ public class DatabaseSeeder {
                     "Mas há esperança! A sua língua, a 'Língua Arcana' vinda do seu mundo... Malak não pode tocá-la! É por isso que você foi invocado! Cada palavra que você conhece, cada regra gramatical... *isso* é poder aqui!", null);
             addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
                     "Você é a nossa única chance de restaurar Aetheria. Aprenda, use a Língua Arcana, e ajude-nos a derrotar o Silenciador! Mas preste atenção na conjugação, por favor!", null);
-        } else {
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Certo, *vamos à prática*! Vê aquela criatura ali? É um 'Diabrete Errôneo'! Ele acha que 'I goes' está correto! Vamos ensinar-lhe uma lição!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Vê o botão 'Atacar'? Use-o para um ataque básico. É como o 'simple present' do combate: direto, eficaz, mas consome um pouco de energia.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Se você estiver em apuros, pode 'Defender'. Você não ataca, mas recebe menos dano. É uma boa *estratégia*... uma palavra de origem grega, sabia?", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Ah! A sua Habilidade de Classe! Vê esse botão? É a sua *habilidade especial*. É como o seu 'present perfect' – uma ação única que tem um grande impacto! Mas cuidado, consome *mais* energia!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Reparou na sua barra de energia? *Tudo* o que você faz gasta um pouco. Atacar, defender, usar habilidades... tudo tem um custo! Não se pode ser eloquente de graça, não é?", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Oh, céus! Sua energia está baixa! Rápido! Veja o ícone de 'Pergunta'? É aí que a 'Língua Arcana' entra! Clique nele!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Responda à pergunta corretamente e—*voilà*!—você recupera energia! Aprender é poder, literalmente! Se errar... bem, tente não errar, sim? A sintaxe é importante!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Muito bem! Com o Diabrete corrigido, podemos prosseguir. Veja! Ali estão os portões da cidade principal, um dos últimos refúgios do Conhecimento.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "É aqui que nos separamos, 'Outworlder'. Eu... bem, eu não sou bem-vindo lá. Minha gramática é impecável, mas minha *raça* não é.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Alguns Goblins, tolos e sem apreço pela sintaxe, decidiram servir a Malak. Agora, os habitantes desconfiam de todos nós. Patético, não? *Eles* é que estão a cometer um erro de generalização!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Mas tenho esperança que, com a sua ajuda e a eventual derrota de Malak, isso mude. Que um dia, um Goblin possa discutir semântica na praça principal!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Enfim, preste atenção, vou explicar o que você encontrará lá dentro. A cidade é o seu novo lar, *por assim dizer*.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Vê aquele grande anfiteatro? É o **Palco da Retórica**. Lá você pode enfrentar inimigos para treinar seus conhecimentos. Eles ajustam o desafio às suas limitações atuais, então não se preocupe em enfrentar um 'Past Perfect Continuous' logo de cara!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Aquela loja ali é o **Sebo de Linguística**. Um nome charmoso para um mercado! É onde você poderá comprar itens que o auxiliarão em sua jornada. Poções, pergaminhos... itens, ora!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Aquele prédio imponente e silencioso é a **Biblioteca Silenciosa**. Um nome tristemente literal hoje em dia... Vá até lá se precisar descansar, recuperar seu HP e refrescar as ideias.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "E, finalmente, o prédio mais alto: a **Torre do Conhecimento**. É a guilda da cidade. O seu principal ponto de contato. É lá que você deve ir para conseguir missões e relatar seu progresso.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "A Torre certamente tem outras funções, mas, *honestamente*, elas estão além da minha alçada. Um Goblin sabe das suas limitações!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Agora vá, 'Outworlder'. Sua jornada começa aqui. E não se preocupe, eu estarei por perto, aqui na 'Floresta dos Erros Comuns', caso precise de auxílio... ou de uma correção gramatical urgente! *Good luck!*", null);
+
+        }
+
+        if (grukhaGVF != null){
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, grukhaGVF,
+                    "Saudações, aventureiro! Eu sou Grukha, A Guardiã dos Verbos Furiosos. Aqui é a torre do conhecimento, neste lugar você, poderá realizar nossas quests e também receber recompensas sempre que concluir alguma delas", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, grukhaGVF,
+                    "Gostaria de juntar-se a nós em nossa luta contra o Silenciador e seus asseclas?", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, grukhaGVF,
+                    "Aqui ao lado você encontra o quadro de quests, nele você pode ver todas as missões disponíveis, seus detalhes e recompensas.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, grukhaGVF,
+                    "Lembre-se para não é possível aceitar mais de uma quest por vez, então sempre conclua uma antes de aceitar outra.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, grukhaGVF,
+                    "Bem vindo a torre do conhecimento, aventureiro! Que sua jornada seja repleta de glória e fama!", null);
+        }
+
+        else {
             System.err.println("### AVISO: NPC 'Goblin da Gramática' não encontrado. Seus diálogos não foram adicionados. ###");
         }
 
@@ -826,6 +919,4 @@ public class DatabaseSeeder {
         }
     }
 }
-
-
 

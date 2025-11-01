@@ -49,67 +49,43 @@ public class BattleService {
             throw new NotFoundException("Nenhuma batalha ativa encontrada.");
         }
 
+        // 0. Verificar se é o turno do jogador
+        if (!Boolean.TRUE.equals(battle.getIsPlayerTurn())) {
+            throw new BadRequestException("Não é o seu turno! Aguarde o turno do monstro.");
+        }
+
         // 1. Verificar energia
         if (battle.getCharacter().getEnergy() < gameConfig.getCosts().getAttack()) {
             throw new BadRequestException("Energia insuficiente para atacar!");
         }
         battle.getCharacter().setEnergy(battle.getCharacter().getEnergy() - gameConfig.getCosts().getAttack());
 
-        // 2. Delega o cálculo para o combatService
-        CombatService.AttackResult result = combatService.performAttack(battle.getCharacter());
-        battle.getMonster().setHp(battle.getMonster().getHp() - result.getDamageDealt());
+        // 2. Delega o cálculo para o combatService (mas NÃO aplica o dano ainda)
+        CombatService.AttackResult result = combatService.performAttack(battle.getCharacter(), battle.getMonster());
 
-        // 3. Verifica se a batalha terminou
+        // Armazena o dano como pendente (será aplicado após a ação do monstro)
+        battle.setPendingDamageToMonster(result.getDamageDealt());
+        // NÃO mostra o dano ainda, pois não foi aplicado
+        battle.setCharacterDamageDealt(0);
+        battle.setMonsterDamageDealt(0);
+        battle.setMonsterAction(null);
+
         String turnResult = result.getTurnResult();
-        if (battle.getMonster().getHp() <= 0) {
-            battle.setIsFinished(true);
-            turnResult += " Você venceu a batalha!";
 
-            // Busca as estatísticas do jogador
-            PlayerStats stats = playerStatsRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
-            stats.setBattlesWon(stats.getBattlesWon() + 1);
-            stats.setTotalXpEarned(stats.getTotalXpEarned() + gameConfig.getBattle().getXpWinReward());
-            playerStatsRepository.save(stats);
+        // 3. Batalha continua - marca que está aguardando turno do monstro e consome o turno do jogador
+        battle.setWaitingForMonsterTurn(true);
+        battle.setIsPlayerTurn(false); // Turno consumido
 
-            // Adiciona XP ao personagem
-            characterRepository.findById(battle.getCharacter().getId()).ifPresent(ch -> {
-                ch.setXp(ch.getXp() + gameConfig.getBattle().getXpWinReward());
-                characterRepository.save(ch);
-            });
+        // Persiste a nova energia no banco de dados
+        characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
+            character.setEnergy(battle.getCharacter().getEnergy());
+            characterRepository.save(character);
+        });
 
-            // Verifica level up
-            CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(battle.getCharacter().getId());
-            turnResult += " " + levelUpResult.getMessage();
+        // Atualiza o estado da batalha na memória
+        battleStateService.setActiveBattle(userId, battle);
 
-            battleStateService.removeActiveBattle(userId);
-        } else if (battle.getCharacter().getHp() <= 0) {
-            battle.setIsFinished(true);
-            turnResult += " Você foi derrotado.";
-
-            // Atualiza estatísticas
-            PlayerStats stats = playerStatsRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
-            stats.setBattlesLost(stats.getBattlesLost() + 1);
-            playerStatsRepository.save(stats);
-
-            battleStateService.removeActiveBattle(userId);
-        }
-
-        // 4. Persiste a nova energia no banco de dados (se batalha não terminou)
-        if (!battle.getIsFinished()) {
-            characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
-                character.setEnergy(battle.getCharacter().getEnergy());
-                characterRepository.save(character);
-            });
-        }
-
-        // 5. Atualiza o estado da batalha na memória (se não terminou)
-        if (!battle.getIsFinished()) {
-            battleStateService.setActiveBattle(userId, battle);
-        }
-
-        // 6. Retorna o estado atualizado com a mensagem do turno
+        // 4. Retorna o estado atualizado com a mensagem do turno
         battle.setTurnResult(turnResult);
         return battle;
     }
@@ -124,6 +100,11 @@ public class BattleService {
             throw new NotFoundException("Nenhuma batalha ativa encontrada.");
         }
 
+        // 0. Verificar se é o turno do jogador
+        if (!Boolean.TRUE.equals(battle.getIsPlayerTurn())) {
+            throw new BadRequestException("Não é o seu turno! Aguarde o turno do monstro.");
+        }
+
         // 1. Verificar energia
         if (battle.getCharacter().getEnergy() < gameConfig.getCosts().getDefend()) {
             throw new BadRequestException("Energia insuficiente para defender!");
@@ -133,34 +114,26 @@ public class BattleService {
         // 2. Delega a lógica para o combatService
         CombatService.DefenseResult result = combatService.performDefense(battle.getCharacter());
         battle.setCharacter(result.getUpdatedCharacter());
+        // Limpa os danos (ainda não houve combate)
+        battle.setCharacterDamageDealt(0);
+        battle.setMonsterDamageDealt(0);
+        battle.setMonsterAction(null);
+        battle.setPendingDamageToMonster(0);
 
-        // 3. Verifica se a batalha terminou (se HP do personagem chegou a 0)
         String turnResult = result.getTurnResult();
-        if (battle.getCharacter().getHp() <= 0) {
-            battle.setIsFinished(true);
-            turnResult += " Você foi derrotado.";
 
-            // Atualiza estatísticas
-            PlayerStats stats = playerStatsRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
-            stats.setBattlesLost(stats.getBattlesLost() + 1);
-            playerStatsRepository.save(stats);
+        // 3. Marca que está aguardando turno do monstro e consome o turno do jogador
+        battle.setWaitingForMonsterTurn(true);
+        battle.setIsPlayerTurn(false); // Turno consumido
 
-            battleStateService.removeActiveBattle(userId);
-        }
+        // 4. Persiste a nova energia no banco de dados
+        characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
+            character.setEnergy(battle.getCharacter().getEnergy());
+            characterRepository.save(character);
+        });
 
-        // 4. Persiste a nova energia no banco de dados (se batalha não terminou)
-        if (!battle.getIsFinished()) {
-            characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
-                character.setEnergy(battle.getCharacter().getEnergy());
-                characterRepository.save(character);
-            });
-        }
-
-        // 5. Atualiza o estado da batalha na memória (se não terminou)
-        if (!battle.getIsFinished()) {
-            battleStateService.setActiveBattle(userId, battle);
-        }
+        // 5. Atualiza o estado da batalha na memória
+        battleStateService.setActiveBattle(userId, battle);
 
         // 6. Retorna o estado atualizado
         battle.setTurnResult(turnResult);
@@ -177,6 +150,11 @@ public class BattleService {
             throw new NotFoundException("Nenhuma batalha ativa encontrada.");
         }
 
+        // 0. Verificar se é o turno do jogador
+        if (!Boolean.TRUE.equals(battle.getIsPlayerTurn())) {
+            throw new BadRequestException("Não é o seu turno! Aguarde o turno do monstro.");
+        }
+
         if (battle.getCharacter().getEnergy() < gameConfig.getCosts().getAbility()) {
             throw new BadRequestException("Energia insuficiente para usar a habilidade!");
         }
@@ -184,6 +162,11 @@ public class BattleService {
 
         CombatService.SkillResult result = combatService.performSkill(battle.getCharacter());
         battle.setCharacter(result.getUpdatedCharacter());
+        // Limpa os danos (ainda não houve combate)
+        battle.setCharacterDamageDealt(0);
+        battle.setMonsterDamageDealt(0);
+        battle.setMonsterAction(null);
+        battle.setPendingDamageToMonster(0);
         String turnResult = result.getTurnResult();
 
         // Orquestração dos Efeitos Especiais
@@ -268,7 +251,18 @@ public class BattleService {
             }
         }
 
-        // Verifica se a batalha terminou
+        // Marca que está aguardando turno do monstro (exceto para BARD_CHALLENGE que é especial)
+        if (result.getEffect() != null && "BARD_CHALLENGE".equals(result.getEffect().getType())) {
+            // Bardo: não executa turno do monstro, aguarda resposta do desafio (não consome turno)
+            battle.setWaitingForMonsterTurn(false);
+            battle.setIsPlayerTurn(true); // Mantém o turno do jogador
+        } else {
+            // Outras skills: aguarda chamada do endpoint de turno do monstro (consome turno)
+            battle.setWaitingForMonsterTurn(true);
+            battle.setIsPlayerTurn(false); // Turno consumido
+        }
+
+        // Verifica se a batalha terminou após a skill
         if (battle.getMonster().getHp() <= 0) {
             battle.setIsFinished(true);
             turnResult += " Você venceu a batalha!";
@@ -291,21 +285,8 @@ public class BattleService {
             turnResult += " " + levelUpResult.getMessage();
 
             battleStateService.removeActiveBattle(userId);
-        } else if (battle.getCharacter().getHp() <= 0) {
-            battle.setIsFinished(true);
-            turnResult += " Você foi derrotado.";
-
-            // Atualiza estatísticas
-            PlayerStats stats = playerStatsRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
-            stats.setBattlesLost(stats.getBattlesLost() + 1);
-            playerStatsRepository.save(stats);
-
-            battleStateService.removeActiveBattle(userId);
-        }
-
-        // Persiste as mudanças (se batalha não terminou)
-        if (!battle.getIsFinished()) {
+        } else {
+            // Batalha continua - persiste as mudanças
             characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
                 character.setHp(battle.getCharacter().getHp());
                 character.setEnergy(battle.getCharacter().getEnergy());
@@ -356,6 +337,7 @@ public class BattleService {
         charInfo.setClassName(character.getGameClass().getName());
         charInfo.setStrength(character.getGameClass().getStrength());
         charInfo.setIntelligence(character.getGameClass().getIntelligence());
+        charInfo.setDefense(character.getGameClass().getDefense());
         charInfo.setLevel(playerLevel);
         charInfo.setXp(character.getXp());
         int maxXpForLevel = (int) (gameConfig.getLeveling().getBaseXp() * Math.pow(gameConfig.getLeveling().getXpMultiplier(), playerLevel));
@@ -367,6 +349,7 @@ public class BattleService {
         monsterInfo.setHp(monster.getHp());
         monsterInfo.setMaxHp(monster.getHp());
         monsterInfo.setDano(monster.getMonsterDamage());
+        monsterInfo.setDefense(monster.getDefense());
         monsterInfo.setNome(monster.getMonsterName());
         battleState.setMonster(monsterInfo);
 
@@ -460,6 +443,22 @@ public class BattleService {
         CombatService.TurnResult turn = combatService.processAnswerTurn(battle, isCorrect);
         BattleStateResponse updatedBattle = turn.getUpdatedBattleState();
         String turnResult = turn.getTurnResult();
+        updatedBattle.setCharacterDamageDealt(0);
+        updatedBattle.setMonsterDamageDealt(0);
+        updatedBattle.setMonsterAction(null);
+
+        // Se errou a pergunta, o monstro faz seu turno e consome o turno do jogador
+        if (!isCorrect) {
+            CombatService.MonsterTurnResult monsterResult = combatService.performMonsterTurn(updatedBattle);
+            turnResult += " " + monsterResult.getTurnResult();
+            updatedBattle.setMonsterDamageDealt(monsterResult.getDamageDealt());
+            updatedBattle.setMonsterAction(monsterResult.getAction());
+            // Turno foi consumido (monstro atacou), mas devolve ao jogador
+            updatedBattle.setIsPlayerTurn(true);
+        } else {
+            // Se acertou, recupera energia mas mantém o turno
+            updatedBattle.setIsPlayerTurn(true);
+        }
 
         // 4. Verifica se a batalha terminou
         if (updatedBattle.getMonster().getHp() <= 0) {
@@ -534,6 +533,120 @@ public class BattleService {
      */
     public BattleStateResponse getActiveBattle(Integer userId) {
         return battleStateService.getActiveBattle(userId);
+    }
+
+    /**
+     * Executa apenas o turno do monstro.
+     */
+    @Transactional
+    public BattleStateResponse executeMonsterTurn(Integer userId) {
+        BattleStateResponse battle = battleStateService.getActiveBattle(userId);
+        if (battle == null) {
+            throw new NotFoundException("Nenhuma batalha ativa encontrada.");
+        }
+
+        if (battle.getIsFinished()) {
+            throw new BadRequestException("A batalha já foi finalizada.");
+        }
+
+        if (!Boolean.TRUE.equals(battle.getWaitingForMonsterTurn())) {
+            throw new BadRequestException("Não está aguardando o turno do monstro.");
+        }
+
+        // 1. Executa o turno do monstro (ataque, defesa ou skill)
+        CombatService.MonsterTurnResult monsterResult = combatService.performMonsterTurn(battle);
+        battle.setMonsterDamageDealt(monsterResult.getDamageDealt());
+        battle.setMonsterAction(monsterResult.getAction());
+        String turnResult = monsterResult.getTurnResult();
+
+        // 2. Aplica o dano pendente do jogador APÓS a ação do monstro
+        if (battle.getPendingDamageToMonster() != null && battle.getPendingDamageToMonster() > 0) {
+            int pendingDamage = battle.getPendingDamageToMonster();
+
+            // Recalcula o dano considerando se o monstro defendeu
+            int finalDamage = combatService.calculateCharacterDamageWithDefense(
+                pendingDamage,
+                battle.getMonster().getDefense(),
+                battle.getMonster().getIsDefending()
+            );
+
+            // Aplica o dano final ao monstro
+            battle.getMonster().setHp(battle.getMonster().getHp() - finalDamage);
+            battle.setCharacterDamageDealt(finalDamage); // Atualiza com o dano real aplicado
+
+            // Limpa o dano pendente
+            battle.setPendingDamageToMonster(0);
+
+            // Adiciona informação no resultado se o dano foi mitigado
+            if (finalDamage < pendingDamage) {
+                String mitigationInfo = String.format("Seu ataque causou %d de dano (de %d) devido à defesa do monstro! ",
+                    finalDamage, pendingDamage);
+                turnResult = mitigationInfo + turnResult;
+            } else {
+                String damageInfo = String.format("Seu ataque causou %d de dano! ", finalDamage);
+                turnResult = damageInfo + turnResult;
+            }
+        }
+
+        // 3. Reseta a defesa se nenhum dano foi causado
+        if (monsterResult.getDamageDealt() == 0) {
+            battle.getCharacter().setIsDefending(false);
+        }
+        battle.getMonster().setIsDefending(false);
+
+        // 4. Não está mais aguardando turno do monstro e devolve o turno ao jogador
+        battle.setWaitingForMonsterTurn(false);
+        battle.setIsPlayerTurn(true); // Devolve o turno ao jogador
+
+        // 5. Verifica se o monstro foi derrotado (após aplicar o dano pendente)
+        if (battle.getMonster().getHp() <= 0) {
+            battle.setIsFinished(true);
+            turnResult += " Você venceu a batalha!";
+
+            // Busca as estatísticas do jogador
+            PlayerStats stats = playerStatsRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
+            stats.setBattlesWon(stats.getBattlesWon() + 1);
+            stats.setTotalXpEarned(stats.getTotalXpEarned() + gameConfig.getBattle().getXpWinReward());
+            playerStatsRepository.save(stats);
+
+            // Adiciona XP ao personagem
+            characterRepository.findById(battle.getCharacter().getId()).ifPresent(ch -> {
+                ch.setXp(ch.getXp() + gameConfig.getBattle().getXpWinReward());
+                characterRepository.save(ch);
+            });
+
+            // Verifica level up
+            CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(battle.getCharacter().getId());
+            turnResult += " " + levelUpResult.getMessage();
+
+            battleStateService.removeActiveBattle(userId);
+        }
+        // 6. Verifica se o personagem foi derrotado
+        else if (battle.getCharacter().getHp() <= 0) {
+            battle.setIsFinished(true);
+            turnResult += " Você foi derrotado.";
+
+            // Atualiza estatísticas
+            PlayerStats stats = playerStatsRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
+            stats.setBattlesLost(stats.getBattlesLost() + 1);
+            playerStatsRepository.save(stats);
+
+            battleStateService.removeActiveBattle(userId);
+        } else {
+            // Batalha continua - persiste HP do personagem se foi alterado
+            characterRepository.findById(battle.getCharacter().getId()).ifPresent(character -> {
+                character.setHp(battle.getCharacter().getHp());
+                characterRepository.save(character);
+            });
+
+            // Atualiza o estado da batalha na memória
+            battleStateService.setActiveBattle(userId, battle);
+        }
+
+        battle.setTurnResult(turnResult);
+        return battle;
     }
 }
 
