@@ -49,6 +49,11 @@ public class BattleService {
             throw new NotFoundException("Nenhuma batalha ativa encontrada.");
         }
 
+        // Verifica se o jogador está atordoado
+        if (combatService.hasCharacterEffect(battle, "STUN")) {
+            throw new BadRequestException("Você está atordoado e não pode agir neste turno!");
+        }
+
         // 0. Verificar se é o turno do jogador
         if (!Boolean.TRUE.equals(battle.getIsPlayerTurn())) {
             throw new BadRequestException("Não é o seu turno! Aguarde o turno do monstro.");
@@ -61,7 +66,7 @@ public class BattleService {
         battle.getCharacter().setEnergy(battle.getCharacter().getEnergy() - gameConfig.getCosts().getAttack());
 
         // 2. Delega o cálculo para o combatService (mas NÃO aplica o dano ainda)
-        CombatService.AttackResult result = combatService.performAttack(battle.getCharacter(), battle.getMonster());
+        CombatService.AttackResult result = combatService.performAttack(battle.getCharacter());
 
         // Armazena o dano como pendente (será aplicado após a ação do monstro)
         battle.setPendingDamageToMonster(result.getDamageDealt());
@@ -103,6 +108,11 @@ public class BattleService {
         // 0. Verificar se é o turno do jogador
         if (!Boolean.TRUE.equals(battle.getIsPlayerTurn())) {
             throw new BadRequestException("Não é o seu turno! Aguarde o turno do monstro.");
+        }
+
+        // Verifica se o jogador está atordoado
+        if (combatService.hasCharacterEffect(battle, "STUN")) {
+            throw new BadRequestException("Você está atordoado e não pode agir neste turno!");
         }
 
         // 1. Verificar energia
@@ -155,6 +165,16 @@ public class BattleService {
             throw new BadRequestException("Não é o seu turno! Aguarde o turno do monstro.");
         }
 
+        // Verifica se o jogador está atordoado
+        if (combatService.hasCharacterEffect(battle, "STUN")) {
+            throw new BadRequestException("Você está atordoado e não pode agir neste turno!");
+        }
+
+        // Verifica se as habilidades estão desabilitadas (Amnesia Blast do Malak)
+        if (combatService.hasCharacterEffect(battle, "DISABLE_SKILL")) {
+            throw new BadRequestException("Suas habilidades de classe estão bloqueadas! Você não pode usá-las neste turno.");
+        }
+
         if (battle.getCharacter().getEnergy() < gameConfig.getCosts().getAbility()) {
             throw new BadRequestException("Energia insuficiente para usar a habilidade!");
         }
@@ -166,8 +186,19 @@ public class BattleService {
         battle.setCharacterDamageDealt(0);
         battle.setMonsterDamageDealt(0);
         battle.setMonsterAction(null);
-        battle.setPendingDamageToMonster(0);
+
         String turnResult = result.getTurnResult();
+
+        // Verifica se é a Investida do Lutador (dano pendente)
+        if (battle.getCharacter().getEffects() != null &&
+            battle.getCharacter().getEffects().containsKey("isChargeActive")) {
+
+            Integer baseDamage = (Integer) battle.getCharacter().getEffects().get("chargeBaseDamage");
+            // Define dano pendente como se fosse um ataque normal
+            battle.setPendingDamageToMonster(baseDamage);
+        } else {
+            battle.setPendingDamageToMonster(0);
+        }
 
         // Orquestração dos Efeitos Especiais
         if (result.getEffect() != null) {
@@ -385,6 +416,11 @@ public class BattleService {
             throw new BadRequestException("Batalha inválida ou já finalizada.");
         }
 
+        // 1.1. Verifica se é o turno do jogador
+        if (!Boolean.TRUE.equals(battle.getIsPlayerTurn())) {
+            throw new BadRequestException("Não é o seu turno! Aguarde o turno do monstro.");
+        }
+
         // 2. Busca a resposta correta
         Question question = questionRepository.findById(questionId)
             .orElseThrow(() -> new NotFoundException("Pergunta não encontrada."));
@@ -562,30 +598,74 @@ public class BattleService {
         // 2. Aplica o dano pendente do jogador APÓS a ação do monstro
         if (battle.getPendingDamageToMonster() != null && battle.getPendingDamageToMonster() > 0) {
             int pendingDamage = battle.getPendingDamageToMonster();
+            int finalDamage;
 
-            // Recalcula o dano considerando se o monstro defendeu
-            int finalDamage = combatService.calculateCharacterDamageWithDefense(
-                pendingDamage,
-                battle.getMonster().getDefense(),
-                battle.getMonster().getIsDefending()
-            );
+            // Verifica se é a Investida do Lutador
+            boolean isCharge = battle.getCharacter().getEffects() != null &&
+                             Boolean.TRUE.equals(battle.getCharacter().getEffects().get("isChargeActive"));
+
+            if (isCharge) {
+                // Investida: 125% se monstro NÃO defender, 115% se defender
+                int amplifiedDamage;
+
+                if (battle.getMonster().getIsDefending()) {
+                    // Monstro defendendo: 115% de dano
+                    amplifiedDamage = (pendingDamage * 115) / 100;
+
+                    // Aplica considerando APENAS defesa base (não aplica bônus de 50% da defesa ativa)
+                    finalDamage = combatService.calculateCharacterDamageWithDefenseAndEffects(
+                        battle,
+                        amplifiedDamage,
+                        battle.getMonster().getDefense(),
+                        false // NÃO aplica bônus de defesa ativa (Investida ignora)
+                    );
+
+                    turnResult = String.format("Sua Investida causou %d de dano mesmo através da defesa do monstro! ", finalDamage) + turnResult;
+                } else {
+                    // Monstro NÃO defendendo: 125% de dano
+                    amplifiedDamage = (pendingDamage * 125) / 100;
+
+                    // Aplica considerando apenas defesa base
+                    finalDamage = combatService.calculateCharacterDamageWithDefenseAndEffects(
+                        battle,
+                        amplifiedDamage,
+                        battle.getMonster().getDefense(),
+                        false // Monstro não está defendendo
+                    );
+
+                    turnResult = String.format("Sua Investida causou %d de dano devastador! ", finalDamage) + turnResult;
+                }
+
+                // Remove efeito da Investida
+                battle.getCharacter().getEffects().remove("isChargeActive");
+                battle.getCharacter().getEffects().remove("chargeBaseDamage");
+
+            } else {
+                // Ataque normal
+                finalDamage = combatService.calculateCharacterDamageWithDefenseAndEffects(
+                    battle,
+                    pendingDamage,
+                    battle.getMonster().getDefense(),
+                    battle.getMonster().getIsDefending()
+                );
+
+                // Adiciona informação no resultado
+                if (finalDamage < pendingDamage) {
+                    String mitigationInfo = String.format("Seu ataque causou %d de dano (de %d) devido à defesa do monstro! ",
+                        finalDamage, pendingDamage);
+                    turnResult = mitigationInfo + turnResult;
+                } else {
+                    String damageInfo = String.format("Seu ataque causou %d de dano! ", finalDamage);
+                    turnResult = damageInfo + turnResult;
+                }
+            }
 
             // Aplica o dano final ao monstro
             battle.getMonster().setHp(battle.getMonster().getHp() - finalDamage);
-            battle.setCharacterDamageDealt(finalDamage); // Atualiza com o dano real aplicado
+            battle.setCharacterDamageDealt(finalDamage);
 
             // Limpa o dano pendente
             battle.setPendingDamageToMonster(0);
-
-            // Adiciona informação no resultado se o dano foi mitigado
-            if (finalDamage < pendingDamage) {
-                String mitigationInfo = String.format("Seu ataque causou %d de dano (de %d) devido à defesa do monstro! ",
-                    finalDamage, pendingDamage);
-                turnResult = mitigationInfo + turnResult;
-            } else {
-                String damageInfo = String.format("Seu ataque causou %d de dano! ", finalDamage);
-                turnResult = damageInfo + turnResult;
-            }
         }
 
         // 3. Reseta a defesa se nenhum dano foi causado
@@ -593,6 +673,9 @@ public class BattleService {
             battle.getCharacter().setIsDefending(false);
         }
         battle.getMonster().setIsDefending(false);
+
+        // 3.5. Atualiza os efeitos ativos (decrementa duração e remove expirados)
+        combatService.updateActiveEffects(battle);
 
         // 4. Não está mais aguardando turno do monstro e devolve o turno ao jogador
         battle.setWaitingForMonsterTurn(false);
@@ -646,6 +729,47 @@ public class BattleService {
         }
 
         battle.setTurnResult(turnResult);
+        return battle;
+    }
+
+    /**
+     * Permite que o jogador passe o turno quando está incapacitado (atordoado/STUN).
+     * O monstro executa seu turno normalmente e os efeitos são atualizados.
+     */
+    @Transactional
+    public BattleStateResponse skipTurn(Integer userId) {
+        BattleStateResponse battle = battleStateService.getActiveBattle(userId);
+        if (battle == null) {
+            throw new NotFoundException("Nenhuma batalha ativa encontrada.");
+        }
+
+        if (battle.getIsFinished()) {
+            throw new BadRequestException("A batalha já foi finalizada.");
+        }
+
+        if (!Boolean.TRUE.equals(battle.getIsPlayerTurn())) {
+            throw new BadRequestException("Não é o seu turno!");
+        }
+
+        // Verifica se o jogador realmente está atordoado
+        boolean isStunned = combatService.hasCharacterEffect(battle, "STUN");
+
+        if (!isStunned) {
+            throw new BadRequestException("Você só pode pular o turno quando estiver atordoado!");
+        }
+
+        // Marca que está aguardando turno do monstro
+        battle.setWaitingForMonsterTurn(true);
+        battle.setIsPlayerTurn(false);
+        battle.setCharacterDamageDealt(0);
+        battle.setMonsterDamageDealt(0);
+        battle.setPendingDamageToMonster(0);
+
+        String turnResult = "Você está atordoado e não consegue agir! O turno passou para o monstro.";
+        battle.setTurnResult(turnResult);
+
+        battleStateService.setActiveBattle(userId, battle);
+
         return battle;
     }
 }

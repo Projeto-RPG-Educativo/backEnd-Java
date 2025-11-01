@@ -176,4 +176,25 @@ public class BattleController {
 
         return ResponseEntity.ok(battleState);
     }
+
+    /**
+     * Passa o turno do jogador quando está incapacitado (atordoado/STUN).
+     * <p>
+     * Este endpoint permite que o jogador passe o turno quando não pode
+     * realizar nenhuma ação devido a efeitos como atordoamento.
+     * O monstro executa seu turno e os efeitos são atualizados.
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @return estado atualizado da batalha após passar o turno
+     */
+    @PostMapping("/skip-turn")
+    public ResponseEntity<BattleStateResponse> skipTurn(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Integer userId = authenticationUtil.getUserIdFromUsername(userDetails.getUsername());
+        BattleStateResponse battleState = battleService.skipTurn(userId);
+
+        return ResponseEntity.ok(battleState);
+    }
 }
