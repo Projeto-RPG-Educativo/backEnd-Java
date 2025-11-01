@@ -52,3 +52,6 @@ buildNumber.properties
 # Spring Boot específicos
 spring-boot-devtools.properties
 Services/
+
+# Documentação temporária - não commitar
+BATTLE_SYSTEM_FRONTEND_GUIDE.md
