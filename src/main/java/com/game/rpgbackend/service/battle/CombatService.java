@@ -111,13 +111,9 @@ public class CombatService {
      */
     public AttackResult performAttack(BattleStateResponse.CharacterBattleInfo character, BattleStateResponse.MonsterBattleInfo monster) {
         int baseDamage = calculateCharacterDamage(character);
-        int actualDamage = calculateCharacterDamageWithDefense(baseDamage, monster.getDefense(), monster.getIsDefending());
-        String turnResult = String.format("Você atacou! O monstro sofreu %d de dano.", actualDamage);
-        // Se o monstro estava defendendo, consumir a defesa
-        if (monster.getIsDefending()) {
-            monster.setIsDefending(false);
-        }
-        return new AttackResult(actualDamage, turnResult);
+        // Nota: o dano será aplicado APÓS o turno do monstro, então não verificamos defesa aqui ainda
+        String turnResult = "Você preparou um ataque! Aguardando resposta do monstro...";
+        return new AttackResult(baseDamage, turnResult);
     }
 
     /**
@@ -127,7 +123,7 @@ public class CombatService {
      */
     public DefenseResult performDefense(BattleStateResponse.CharacterBattleInfo character) {
         character.setIsDefending(true);
-        String turnResult = "Você se prepara para o próximo ataque, bloqueando o dano.";
+        String turnResult = "Você assumiu uma postura defensiva! O dano recebido será reduzido em 50%.";
         return new DefenseResult(character, turnResult);
     }
 
@@ -208,17 +204,22 @@ public class CombatService {
                 int baseDamage = monster.getDano();
                 damageDealt = calculateMonsterDamage(baseDamage, character.getDefense(), character.getIsDefending());
                 character.setHp(character.getHp() - damageDealt);
-                turnResult = String.format("O monstro atacou! Você sofreu %d de dano.", damageDealt);
-                // Se o personagem estava defendendo, consumir a defesa
+
+                // Mensagem com informações sobre mitigação
                 if (character.getIsDefending()) {
+                    int damageWithoutDefense = calculateMonsterDamage(baseDamage, character.getDefense(), false);
+                    turnResult = String.format("O monstro atacou! Você bloqueou parte do ataque e sofreu apenas %d de dano (de %d).",
+                        damageDealt, damageWithoutDefense);
                     character.setIsDefending(false);
+                } else {
+                    turnResult = String.format("O monstro atacou! Você sofreu %d de dano.", damageDealt);
                 }
                 break;
 
             case 1: // Defender
                 actionStr = "defend";
                 monster.setIsDefending(true);
-                turnResult = "O monstro se defendeu e reduziu o dano que receberia no turno.";
+                turnResult = "O monstro assumiu postura defensiva! O próximo dano será reduzido em 50%.";
                 break;
 
             case 2: // Usar skill

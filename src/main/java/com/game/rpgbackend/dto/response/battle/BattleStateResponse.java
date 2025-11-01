@@ -51,6 +51,15 @@ public class BattleStateResponse {
     /** Ação tomada pelo monstro no último turno (ex: "attack", "defend", "skill") */
     private String monsterAction;
 
+    /** Indica se está aguardando o turno do monstro ser processado */
+    private Boolean waitingForMonsterTurn = false;
+
+    /** Dano pendente do personagem que será aplicado ao monstro após sua ação */
+    private Integer pendingDamageToMonster = 0;
+
+    /** Indica se é o turno do jogador (true) ou do monstro (false) */
+    private Boolean isPlayerTurn = true;
+
     /**
      * Classe interna com informações do personagem durante a batalha.
      * Inclui atributos, status e efeitos ativos.

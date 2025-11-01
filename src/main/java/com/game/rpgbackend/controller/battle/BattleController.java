@@ -156,4 +156,24 @@ public class BattleController {
 
         return ResponseEntity.ok(battleState);
     }
+
+    /**
+     * Executa o turno do monstro após a ação do jogador.
+     * <p>
+     * Este endpoint deve ser chamado após o jogador realizar uma ação
+     * (atacar, defender, usar skill) para processar a resposta do monstro.
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @return estado atualizado da batalha após o turno do monstro
+     */
+    @PostMapping("/monster-turn")
+    public ResponseEntity<BattleStateResponse> executeMonsterTurn(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Integer userId = authenticationUtil.getUserIdFromUsername(userDetails.getUsername());
+        BattleStateResponse battleState = battleService.executeMonsterTurn(userId);
+
+        return ResponseEntity.ok(battleState);
+    }
 }
