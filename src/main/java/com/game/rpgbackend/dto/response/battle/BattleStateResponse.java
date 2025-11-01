@@ -1,5 +1,6 @@
 package com.game.rpgbackend.dto.response.battle;
 
+import com.game.rpgbackend.dto.battle.BattleEffect;
 import lombok.Data;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,15 @@ public class BattleStateResponse {
 
     /** Indica se é o turno do jogador (true) ou do monstro (false) */
     private Boolean isPlayerTurn = true;
+
+    /** Efeitos ativos no personagem durante a batalha */
+    private List<BattleEffect> characterActiveEffects;
+
+    /** Efeitos ativos no monstro durante a batalha */
+    private List<BattleEffect> monsterActiveEffects;
+
+    /** Número de ataques garantidos que o monstro deve realizar (usado por skills como Singular Strike do Diabrete) */
+    private Integer monsterGuaranteedAttacks = 0;
 
     /**
      * Classe interna com informações do personagem durante a batalha.

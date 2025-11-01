@@ -1,7 +1,10 @@
 package com.game.rpgbackend.service.battle;
 
 import com.game.rpgbackend.dto.response.battle.BattleStateResponse;
+import com.game.rpgbackend.dto.battle.BattleEffect;
 import com.game.rpgbackend.config.GameConfig;
+import com.game.rpgbackend.enums.CharacterSkillType;
+import com.game.rpgbackend.enums.MonsterSkillType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -79,6 +82,30 @@ public class CombatService {
     }
 
     /**
+     * Calcula o dano do personagem considerando defesa do monstro E efeitos ativos.
+     * @param battleState Estado da batalha com efeitos ativos.
+     * @param characterDamage Dano base do personagem.
+     * @param monsterDefense Defesa base do monstro.
+     * @param isMonsterDefending Se o monstro está ativamente defendendo.
+     * @return Dano final após defesa e efeitos.
+     */
+    public int calculateCharacterDamageWithDefenseAndEffects(BattleStateResponse battleState, int characterDamage, int monsterDefense, boolean isMonsterDefending) {
+        int reducedDamage = calculateCharacterDamageWithDefense(characterDamage, monsterDefense, isMonsterDefending);
+
+        // Verifica se o monstro tem redução de dano ativa (ex: Ignorance do Zumbi)
+        if (hasMonsterEffect(battleState, "DAMAGE_REDUCTION")) {
+            for (BattleEffect effect : battleState.getMonsterActiveEffects()) {
+                if ("DAMAGE_REDUCTION".equals(effect.getType()) && effect.isActive()) {
+                    reducedDamage = reducedDamage * (100 - effect.getMagnitude()) / 100;
+                    break;
+                }
+            }
+        }
+
+        return Math.max(reducedDamage, 0); // Dano mínimo 0
+    }
+
+    /**
      * Processa o turno do jogador baseado na resposta a uma pergunta.
      * @param battleState O estado atual da batalha.
      * @param isCorrect Se a resposta do jogador foi correta.
@@ -93,12 +120,35 @@ public class CombatService {
 
         if (isCorrect) {
             BattleStateResponse.CharacterBattleInfo character = battleState.getCharacter();
-            character.setEnergy(Math.min(character.getEnergy() + energyRecovered, character.getMaxEnergy()));
 
-            turnResult = String.format("Você acertou! Você recuperou %d de energia.", energyRecovered);
+            // Verifica se a recuperação de energia está bloqueada (Syllable Scramble do Malak)
+            if (hasCharacterEffect(battleState, "BLOCK_ENERGY_RECOVERY")) {
+                turnResult = "Você acertou, mas a habilidade do monstro impede a recuperação de energia!";
+            } else {
+                character.setEnergy(Math.min(character.getEnergy() + energyRecovered, character.getMaxEnergy()));
+                turnResult = String.format("Você acertou! Você recuperou %d de energia.", energyRecovered);
+            }
 
         } else {
-            turnResult = "Você errou! Não recuperou energia e perdeu o turno.";
+            // Verifica se há efeito de drenagem de vida (Semantic Drain do Lexicógrafo)
+            if (hasCharacterEffect(battleState, "CORRUPTION")) {
+                // Pega a magnitude do efeito
+                int lifeDrain = 0;
+                if (battleState.getCharacterActiveEffects() != null) {
+                    for (BattleEffect effect : battleState.getCharacterActiveEffects()) {
+                        if ("CORRUPTION".equals(effect.getType()) && effect.isActive()) {
+                            lifeDrain = effect.getMagnitude();
+                            break;
+                        }
+                    }
+                }
+
+                BattleStateResponse.CharacterBattleInfo character = battleState.getCharacter();
+                character.setHp(character.getHp() - lifeDrain);
+                turnResult = String.format("Você errou! O efeito de corrupção drena %d de vida. Não recuperou energia e perdeu o turno.", lifeDrain);
+            } else {
+                turnResult = "Você errou! Não recuperou energia e perdeu o turno.";
+            }
         }
 
         return new TurnResult(battleState, turnResult, damageDealt, damageTaken);
@@ -109,7 +159,7 @@ public class CombatService {
      * @param character O personagem que ataca.
      * @return Um objeto com o dano causado e uma mensagem.
      */
-    public AttackResult performAttack(BattleStateResponse.CharacterBattleInfo character, BattleStateResponse.MonsterBattleInfo monster) {
+    public AttackResult performAttack(BattleStateResponse.CharacterBattleInfo character) {
         int baseDamage = calculateCharacterDamage(character);
         // Nota: o dano será aplicado APÓS o turno do monstro, então não verificamos defesa aqui ainda
         String turnResult = "Você preparou um ataque! Aguardando resposta do monstro...";
@@ -128,55 +178,66 @@ public class CombatService {
     }
 
     /**
-     * Aplica o efeito da habilidade especial de uma classe.
+     * Aplica o efeito da habilidade especial de uma classe usando o enum CharacterSkillType.
      * @param character O personagem que usa a habilidade.
      * @return Um objeto com os estados atualizados e uma mensagem do turno.
      */
     public SkillResult performSkill(BattleStateResponse.CharacterBattleInfo character) {
         String turnResult = "";
         SkillEffect effect = null;
-        String className = character.getClassName().toLowerCase();
 
-        switch (className) {
-            case "paladino":
+        CharacterSkillType skillType = CharacterSkillType.getByClassName(character.getClassName());
+
+        if (skillType == null) {
+            turnResult = String.format("Sua classe (%s) não possui uma habilidade especial implementada.",
+                character.getClassName());
+            return new SkillResult(character, turnResult, effect);
+        }
+
+        switch (skillType) {
+            case PALADIN_HEAL:
                 int healAmount = gameConfig.getSkills().getPaladino() != null
                     ? gameConfig.getSkills().getPaladino().getHealAmount()
                     : 20;
-                character.setHp(character.getHp() + healAmount);
-                turnResult = String.format("Você usa Cura e recupera %d de vida!", healAmount);
+                int newHp = Math.min(character.getHp() + healAmount, character.getMaxHp());
+                character.setHp(newHp);
+                turnResult = String.format(skillType.getDescription(), healAmount);
                 break;
 
-            case "tank":
+            case TANK_BLOCK:
                 character.setIsDefending(true);
-                turnResult = "Você usa 'Eu Aguento!' e se prepara para bloquear o próximo dano caso erre a resposta.";
+                turnResult = skillType.getDescription();
                 break;
 
-            case "lutador":
+            case FIGHTER_CHARGE:
+                // Investida funciona como um ataque, mas com dano variável:
+                // 125% se monstro NÃO estiver defendendo
+                // 115% se monstro estiver defendendo
+                int baseDamage = calculateCharacterDamage(character);
+
+                // Marca que há dano pendente (será aplicado após turno do monstro)
                 if (character.getEffects() == null) {
                     character.setEffects(new java.util.HashMap<>());
                 }
-                character.getEffects().put("investidaActive", true);
-                turnResult = "Você ativa Investida! Seu próximo acerto causará um golpe extra.";
+                character.getEffects().put("chargeBaseDamage", baseDamage);
+                character.getEffects().put("isChargeActive", true);
+
+                turnResult = "Você ativa Investida e se prepara para avançar contra o monstro!";
                 break;
 
-            case "mago":
-                turnResult = "Você usa Clarividência para prever o futuro...";
-                effect = new SkillEffect("REMOVE_WRONG_ANSWER");
+            case MAGE_CLAIRVOYANCE:
+                turnResult = skillType.getDescription();
+                effect = new SkillEffect(skillType.getEffectType());
                 break;
 
-            case "ladino":
-                turnResult = "Você tenta encontrar uma fraqueza na pergunta do monstro...";
-                effect = new SkillEffect("PROVIDE_HINT");
+            case ROGUE_WEAKNESS:
+                turnResult = skillType.getDescription();
+                effect = new SkillEffect(skillType.getEffectType());
                 break;
 
-            case "bardo":
-                turnResult = "Você usa Lábia, preparando uma pergunta de tudo ou nada para terminar o combate!";
-                effect = new SkillEffect("BARD_CHALLENGE");
-                break;
-
-            default:
-                turnResult = String.format("Sua classe (%s) não possui uma habilidade especial implementada.",
-                    character.getClassName());
+            case BARD_CHALLENGE:
+                turnResult = skillType.getDescription();
+                effect = new SkillEffect(skillType.getEffectType());
                 break;
         }
 
@@ -189,8 +250,6 @@ public class CombatService {
      * @return Um objeto com o resultado da ação do monstro.
      */
     public MonsterTurnResult performMonsterTurn(BattleStateResponse battleState) {
-        // Escolhe uma ação aleatória: 0 = atacar, 1 = defender, 2 = usar skill
-        int action = (int) (Math.random() * 3);
         String turnResult = "";
         int damageDealt = 0;
         String actionStr = "";
@@ -198,21 +257,44 @@ public class CombatService {
         BattleStateResponse.CharacterBattleInfo character = battleState.getCharacter();
         BattleStateResponse.MonsterBattleInfo monster = battleState.getMonster();
 
+        // Verifica se o monstro tem ataques garantidos (ex: após usar Singular Strike)
+        int action;
+        if (battleState.getMonsterGuaranteedAttacks() != null && battleState.getMonsterGuaranteedAttacks() > 0) {
+            // Força ataque e decrementa o contador
+            action = 0; // 0 = atacar
+            battleState.setMonsterGuaranteedAttacks(battleState.getMonsterGuaranteedAttacks() - 1);
+        } else {
+            // Escolhe uma ação aleatória: 0 = atacar, 1 = defender, 2 = usar skill
+            action = (int) (Math.random() * 3);
+        }
+
         switch (action) {
             case 0: // Atacar
                 actionStr = "attack";
                 int baseDamage = monster.getDano();
+
+                // Verifica se o monstro tem buff de dano ativo (ex: Singular Strike do Diabrete)
+                if (battleState.getMonsterActiveEffects() != null) {
+                    for (BattleEffect effect : battleState.getMonsterActiveEffects()) {
+                        if ("DAMAGE_BUFF".equals(effect.getType()) && effect.isActive()) {
+                            baseDamage = baseDamage + (baseDamage * effect.getMagnitude() / 100);
+                            turnResult = "O monstro ataca com força aumentada! ";
+                            break;
+                        }
+                    }
+                }
+
                 damageDealt = calculateMonsterDamage(baseDamage, character.getDefense(), character.getIsDefending());
                 character.setHp(character.getHp() - damageDealt);
 
                 // Mensagem com informações sobre mitigação
                 if (character.getIsDefending()) {
                     int damageWithoutDefense = calculateMonsterDamage(baseDamage, character.getDefense(), false);
-                    turnResult = String.format("O monstro atacou! Você bloqueou parte do ataque e sofreu apenas %d de dano (de %d).",
+                    turnResult += String.format("O monstro atacou! Você bloqueou parte do ataque e sofreu apenas %d de dano (de %d).",
                         damageDealt, damageWithoutDefense);
                     character.setIsDefending(false);
                 } else {
-                    turnResult = String.format("O monstro atacou! Você sofreu %d de dano.", damageDealt);
+                    turnResult += String.format("O monstro atacou! Você sofreu %d de dano.", damageDealt);
                 }
                 break;
 
@@ -224,12 +306,210 @@ public class CombatService {
 
             case 2: // Usar skill
                 actionStr = "skill";
-                // Por enquanto, skill do monstro não implementada, apenas mensagem
-                turnResult = "O monstro usou uma habilidade especial!";
+                MonsterSkillResult skillResult = performMonsterSkill(battleState);
+                if (skillResult != null) {
+                    turnResult = skillResult.getTurnResult();
+                    // O efeito foi adicionado à lista de efeitos ativos no método performMonsterSkill
+                } else {
+                    turnResult = "O monstro tentou usar uma habilidade, mas falhou!";
+                }
                 break;
         }
 
         return new MonsterTurnResult(battleState, turnResult, damageDealt, actionStr);
+    }
+
+    /**
+     * Executa a habilidade especial de um monstro baseado no seu nome.
+     * @param battleState O estado atual da batalha.
+     * @return Um objeto com o resultado da skill do monstro.
+     */
+    public MonsterSkillResult performMonsterSkill(BattleStateResponse battleState) {
+        BattleStateResponse.MonsterBattleInfo monster = battleState.getMonster();
+
+        MonsterSkillType skillType = MonsterSkillType.getSkillByMonsterName(monster.getNome());
+
+        if (skillType == null) {
+            return new MonsterSkillResult("O monstro não possui habilidade especial!", null);
+        }
+
+        String turnResult = skillType.getDescription();
+        BattleEffect effect = null;
+
+        switch (skillType) {
+            case DIABRETE_SINGULAR_STRIKE:
+                // Adiciona buff de dano por 2 turnos
+                effect = new BattleEffect(
+                    skillType.getEffectType(),
+                    skillType.getMagnitude(),
+                    skillType.getDuration(),
+                    "Dano aumentado em " + skillType.getMagnitude() + "%"
+                );
+                addEffectToMonster(battleState, effect);
+                // Garante que as próximas 2 ações sejam ataques para maximizar o uso do buff
+                battleState.setMonsterGuaranteedAttacks(2);
+                break;
+
+            case HARPIA_WHIRLWIND_QUESTION:
+                // 50% de chance de embaralhar a próxima pergunta
+                boolean scrambled = Math.random() < 0.5;
+                if (scrambled) {
+                    effect = new BattleEffect(
+                        skillType.getEffectType(),
+                        skillType.getMagnitude(),
+                        skillType.getDuration(),
+                        "As palavras da próxima pergunta estão em desordem!"
+                    );
+                    addEffectToCharacter(battleState, effect);
+                    turnResult = String.format(skillType.getDescription(), "As palavras da próxima pergunta estão em desordem! Reordene-as para encontrar a resposta correta.");
+                } else {
+                    turnResult = String.format(skillType.getDescription(), "Você conseguiu resistir ao efeito!");
+                }
+                break;
+
+            case ZUMBI_IGNORANCE:
+                // Reduz dano recebido do próximo ataque em 50%
+                effect = new BattleEffect(
+                    skillType.getEffectType(),
+                    skillType.getMagnitude(),
+                    skillType.getDuration(),
+                    "Dano recebido reduzido em " + skillType.getMagnitude() + "%"
+                );
+                addEffectToMonster(battleState, effect);
+                break;
+
+            case ESQUELETO_SYNTAX_COLLAPSE:
+                // Atordoa o jogador por 1 turno
+                effect = new BattleEffect(
+                    skillType.getEffectType(),
+                    skillType.getMagnitude(),
+                    skillType.getDuration(),
+                    "Você está atordoado!"
+                );
+                addEffectToCharacter(battleState, effect);
+                break;
+
+            case CENTAURO_WH_QUESTION_VOLLEY:
+                // Marca para lançar uma pergunta extra em tempo limitado
+                effect = new BattleEffect(
+                    skillType.getEffectType(),
+                    skillType.getMagnitude(),
+                    skillType.getDuration(),
+                    "Pergunta extra em tempo limitado!"
+                );
+                addEffectToCharacter(battleState, effect);
+                break;
+
+            case LEXICOGRAFO_SEMANTIC_DRAIN:
+                // Corrompe significados - erros drenam vida
+                effect = new BattleEffect(
+                    skillType.getEffectType(),
+                    skillType.getMagnitude(),
+                    skillType.getDuration(),
+                    "Erros nas respostas drenarão sua vida!"
+                );
+                addEffectToCharacter(battleState, effect);
+                break;
+
+            case MALAK_AMNESIA_BLAST:
+                // Impede uso de habilidades de classe
+                effect = new BattleEffect(
+                    skillType.getEffectType(),
+                    skillType.getMagnitude(),
+                    skillType.getDuration(),
+                    "Habilidades de classe desabilitadas!"
+                );
+                addEffectToCharacter(battleState, effect);
+                break;
+
+            case MALAK_SYLLABLE_SCRAMBLE:
+                // Impede recuperação de energia via perguntas
+                effect = new BattleEffect(
+                    skillType.getEffectType(),
+                    skillType.getMagnitude(),
+                    skillType.getDuration(),
+                    "Recuperação de energia bloqueada!"
+                );
+                addEffectToCharacter(battleState, effect);
+                break;
+
+            case MALAK_LEXICAL_BLINDNESS:
+                // Esconde a próxima pergunta
+                effect = new BattleEffect(
+                    skillType.getEffectType(),
+                    skillType.getMagnitude(),
+                    skillType.getDuration(),
+                    "A próxima pergunta será ocultada!"
+                );
+                addEffectToCharacter(battleState, effect);
+                break;
+        }
+
+        return new MonsterSkillResult(turnResult, effect);
+    }
+
+    /**
+     * Adiciona um efeito à lista de efeitos ativos do personagem.
+     */
+    private void addEffectToCharacter(BattleStateResponse battleState, BattleEffect effect) {
+        if (battleState.getCharacterActiveEffects() == null) {
+            battleState.setCharacterActiveEffects(new java.util.ArrayList<>());
+        }
+        battleState.getCharacterActiveEffects().add(effect);
+    }
+
+    /**
+     * Adiciona um efeito à lista de efeitos ativos do monstro.
+     */
+    private void addEffectToMonster(BattleStateResponse battleState, BattleEffect effect) {
+        if (battleState.getMonsterActiveEffects() == null) {
+            battleState.setMonsterActiveEffects(new java.util.ArrayList<>());
+        }
+        battleState.getMonsterActiveEffects().add(effect);
+    }
+
+    /**
+     * Decrementa a duração de todos os efeitos ativos e remove os expirados.
+     */
+    public void updateActiveEffects(BattleStateResponse battleState) {
+        // Atualiza efeitos do personagem
+        if (battleState.getCharacterActiveEffects() != null) {
+            battleState.getCharacterActiveEffects().removeIf(effect -> !effect.decrementDuration());
+        }
+
+        // Atualiza efeitos do monstro
+        if (battleState.getMonsterActiveEffects() != null) {
+            // Para o buff de dano do Diabrete (DAMAGE_BUFF), só decrementa se não houver mais ataques garantidos
+            // Isso garante que o buff dure exatamente 2 ataques
+            battleState.getMonsterActiveEffects().removeIf(effect -> {
+                // Se for buff de dano e ainda houver ataques garantidos, não decrementa
+                if ("DAMAGE_BUFF".equals(effect.getType()) &&
+                    battleState.getMonsterGuaranteedAttacks() != null &&
+                    battleState.getMonsterGuaranteedAttacks() > 0) {
+                    return false; // Mantém o efeito sem decrementar
+                }
+                // Para outros efeitos, decrementa normalmente
+                return !effect.decrementDuration();
+            });
+        }
+    }
+
+    /**
+     * Verifica se um efeito específico está ativo no personagem.
+     */
+    public boolean hasCharacterEffect(BattleStateResponse battleState, String effectType) {
+        if (battleState.getCharacterActiveEffects() == null) return false;
+        return battleState.getCharacterActiveEffects().stream()
+            .anyMatch(effect -> effectType.equals(effect.getType()) && effect.isActive());
+    }
+
+    /**
+     * Verifica se um efeito específico está ativo no monstro.
+     */
+    public boolean hasMonsterEffect(BattleStateResponse battleState, String effectType) {
+        if (battleState.getMonsterActiveEffects() == null) return false;
+        return battleState.getMonsterActiveEffects().stream()
+            .anyMatch(effect -> effectType.equals(effect.getType()) && effect.isActive());
     }
 
     // Classes internas para resultados
@@ -321,5 +601,18 @@ public class CombatService {
         public String getTurnResult() { return turnResult; }
         public int getDamageDealt() { return damageDealt; }
         public String getAction() { return action; }
+    }
+
+    public static class MonsterSkillResult {
+        private final String turnResult;
+        private final BattleEffect effect;
+
+        public MonsterSkillResult(String turnResult, BattleEffect effect) {
+            this.turnResult = turnResult;
+            this.effect = effect;
+        }
+
+        public String getTurnResult() { return turnResult; }
+        public BattleEffect getEffect() { return effect; }
     }
 }
