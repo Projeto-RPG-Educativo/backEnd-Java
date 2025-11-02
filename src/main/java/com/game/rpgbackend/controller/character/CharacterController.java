@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
  * além de operações específicas como salvamento de progresso.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */
@@ -100,22 +99,28 @@ public class CharacterController {
     }
 
     /**
-     * Cria um novo personagem para o tutorial, fixando a classe como Guerreiro.
+     * Cria um novo personagem para o tutorial, fixando a classe como Lutador (Guerreiro).
      * <p>
-     * O personagem é inicializado com atributos base da classe Guerreiro.
+     * Este endpoint é específico para o fluxo de tutorial onde a classe
+     * é pré-determinada como Lutador para garantir uma experiência consistente
+     * de aprendizado para novos jogadores.
+     * </p>
+     * <p>
+     * O personagem é inicializado com atributos base da classe Lutador:
+     * - HP, energia e gold iniciais
+     * - Atributos de força e defesa balanceados
+     * - Habilidade especial "Investida"
      * </p>
      *
      * @param userDetails detalhes do usuário autenticado
-     * @param request mapa (ignorado, classe sempre Guerreiro)
      * @return DTO do personagem criado com status 201 Created
      */
     @PostMapping("/tutorial")
     public ResponseEntity<CharacterDTO> createTutorialCharacter(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody Map<String, String> request) {
+            @AuthenticationPrincipal UserDetails userDetails) {
 
         Integer userId = authenticationUtil.getUserIdFromUsername(userDetails.getUsername());
-        // Fixa a classe como Guerreiro para o tutorial
+        // Fixa a classe como Lutador para o tutorial
         String className = "lutador";
 
         Character newCharacter = characterService.createCharacter(userId, className);

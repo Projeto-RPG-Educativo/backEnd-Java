@@ -1,4 +1,4 @@
-package com.game.rpgbackend.dto.battle;
+package com.game.rpgbackend.dto.response.battle;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
  * por um número determinado de turnos.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

@@ -12,7 +12,7 @@ import lombok.Data;
  * a resposta do jogador para uma questão específica.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

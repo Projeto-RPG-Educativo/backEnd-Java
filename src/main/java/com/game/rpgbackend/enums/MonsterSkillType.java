@@ -7,7 +7,7 @@ package com.game.rpgbackend.enums;
  * proporcionando desafios estratégicos aos jogadores.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */
@@ -146,9 +146,20 @@ public enum MonsterSkillType {
     }
 
     /**
-     * Obtém uma skill aleatória para o monstro baseado no seu nome.
-     * @param monsterName Nome do monstro
-     * @return A skill correspondente ou null se não encontrada
+     * Obtém a habilidade especial correspondente ao nome do monstro.
+     * <p>
+     * Mapeamento de monstros para habilidades:
+     * - Diabrete Errôneo → Singular Strike (buff de dano)
+     * - Harpia Indagada → Whirlwind Question (embaralha pergunta)
+     * - Zumbi Demente → Ignorance (reduz dano recebido)
+     * - Esqueleto da Sintaxe → Syntax Collapse (atordoa jogador)
+     * - Centauro Questionador → Wh-Question Volley (pergunta extra)
+     * - Lexicógrafo → Semantic Drain (corrompe significados)
+     * - Malak → Habilidade aleatória entre 3 opções (Amnesia Blast, Syllable Scramble, Lexical Blindness)
+     * </p>
+     *
+     * @param monsterName nome do monstro (case-insensitive)
+     * @return habilidade especial do monstro ou null se o monstro não tiver habilidade definida
      */
     public static MonsterSkillType getSkillByMonsterName(String monsterName) {
         if (monsterName == null) return null;

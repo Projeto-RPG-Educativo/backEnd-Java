@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
  * podem ser destacados e mostrar tradução para auxiliar no aprendizado de idiomas.
  * </p>
  *
- * @author D0UGH5
+ * @author GABRIEL XAVIER
  * @version 1.0
  * @since 1.0
  */

@@ -11,7 +11,7 @@ import lombok.Data;
  * incluindo o monstro alvo e o nível de dificuldade desejado.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

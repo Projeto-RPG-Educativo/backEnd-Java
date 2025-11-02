@@ -9,7 +9,7 @@ import lombok.Data;
  * incluindo batalhas, questões e taxa de acerto.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

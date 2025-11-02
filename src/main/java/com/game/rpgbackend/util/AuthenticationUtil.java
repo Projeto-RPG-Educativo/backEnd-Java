@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * a partir do contexto de segurança do Spring Security.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

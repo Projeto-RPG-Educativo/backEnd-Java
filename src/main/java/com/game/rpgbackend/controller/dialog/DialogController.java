@@ -12,7 +12,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Controller responsável pelas operações de diálogos educacionais.
+ * Controller REST responsável pelas operações de diálogos educacionais.
+ * <p>
+ * Gerencia os diálogos que ensinam inglês ao jogador, incluindo
+ * a proporção de inglês/português baseada no nível do personagem,
+ * palavras-chave destacadas e contextos educacionais.
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @RestController
 @RequestMapping("/api/dialogs")
@@ -22,7 +31,15 @@ public class DialogController {
     private final DialogService dialogService;
 
     /**
-     * Busca diálogos por nível do personagem e conteúdo.
+     * Busca diálogos filtrados por nível do personagem e conteúdo educacional.
+     * <p>
+     * Os diálogos são adaptados ao nível do jogador, com proporção
+     * adequada de inglês/português e palavras-chave destacadas.
+     * </p>
+     *
+     * @param contentId identificador do conteúdo educacional
+     * @param characterLevel nível atual do personagem para ajuste de dificuldade
+     * @return lista de diálogos adaptados ao nível do personagem
      */
     @GetMapping("/content/{contentId}")
     public ResponseEntity<List<DialogResponseDto>> getDialogsByLevel(
@@ -35,7 +52,13 @@ public class DialogController {
     }
 
     /**
-     * Busca um diálogo específico por ID.
+     * Busca um diálogo educacional específico por seu identificador.
+     * <p>
+     * Retorna o diálogo completo com texto, palavras-chave e NPC associado.
+     * </p>
+     *
+     * @param dialogId identificador único do diálogo
+     * @return DTO completo do diálogo ou 404 se não encontrado
      */
     @GetMapping("/{dialogId}")
     public ResponseEntity<DialogResponseDto> getDialogById(@PathVariable Integer dialogId) {
@@ -45,7 +68,15 @@ public class DialogController {
     }
 
     /**
-     * Calcula a proporção de inglês/português para um diálogo.
+     * Calcula a proporção de inglês/português ideal para um diálogo.
+     * <p>
+     * A proporção é calculada baseada no nível do personagem:
+     * - Níveis baixos: mais português
+     * - Níveis altos: mais inglês
+     * </p>
+     *
+     * @param characterLevel nível atual do personagem
+     * @return proporção calculada de inglês vs português
      */
     @GetMapping("/language-ratio")
     public ResponseEntity<LanguageRatioResponse> calculateLanguageRatio(
@@ -57,6 +88,12 @@ public class DialogController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Converte a resposta do serviço de diálogo para DTO de resposta.
+     *
+     * @param response objeto de resposta do serviço de diálogo
+     * @return DTO formatado para envio ao cliente
+     */
     private DialogResponseDto mapToDto(DialogService.DialogResponse response) {
         DialogResponseDto dto = new DialogResponseDto();
         dto.setId(response.getId());
@@ -66,6 +103,12 @@ public class DialogController {
         return dto;
     }
 
+    /**
+     * Converte palavra-chave do serviço para DTO de resposta.
+     *
+     * @param response objeto de resposta com dados da palavra-chave
+     * @return DTO da palavra-chave formatado para o cliente
+     */
     private KeywordResponseDto mapKeywordToDto(DialogService.KeywordResponse response) {
         KeywordResponseDto dto = new KeywordResponseDto();
         dto.setPalavra(response.getPalavra());

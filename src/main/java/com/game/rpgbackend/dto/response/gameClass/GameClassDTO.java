@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * Retorna dados da classe sem expor relacionamentos (como lista de personagens).
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

@@ -13,7 +13,7 @@ import java.util.List;
  * recompensas como XP, ouro e itens. Podem envolver múltiplos personagens.
  * </p>
  *
- * @author D0UGH5
+ * @author GABRIEL XAVIER
  * @version 1.0
  * @since 1.0
  */

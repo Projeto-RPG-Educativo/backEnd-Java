@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * de dados e os converte para o formato UserDetails do Spring.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

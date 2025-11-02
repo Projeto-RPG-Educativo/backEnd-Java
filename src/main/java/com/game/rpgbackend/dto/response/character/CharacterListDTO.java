@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
  * essenciais para exibição em listas, melhorando a performance.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

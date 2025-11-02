@@ -13,7 +13,7 @@ import java.util.List;
  * Cada habilidade possui um custo, tipo e efeito específico.
  * </p>
  *
- * @author D0UGH5
+ * @author GABRIEL XAVIER
  * @version 1.0
  * @since 1.0
  */

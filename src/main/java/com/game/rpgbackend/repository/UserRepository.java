@@ -12,7 +12,7 @@ import java.util.Optional;
  * por username e email, além das operações CRUD padrão do JPA.
  * </p>
  *
- * @author D0UGH5
+ * @author GABRIEL XAVIER
  * @version 1.0
  * @since 1.0
  */

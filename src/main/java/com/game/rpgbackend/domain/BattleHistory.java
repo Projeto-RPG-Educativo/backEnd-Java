@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * inimigo enfrentado, experiência ganha e data da batalha.
  * </p>
  *
- * @author D0UGH5
+ * @author GABRIEL XAVIER
  * @version 1.0
  * @since 1.0
  */

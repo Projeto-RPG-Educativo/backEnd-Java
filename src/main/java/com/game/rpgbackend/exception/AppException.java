@@ -7,7 +7,7 @@ package com.game.rpgbackend.exception;
  * Armazena o código de status HTTP associado ao erro.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

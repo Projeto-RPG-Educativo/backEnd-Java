@@ -12,59 +12,97 @@ import java.util.List;
  * nível mínimo, conteúdo e combinações destes critérios.
  * </p>
  *
- * @author D0UGH5
+ * @author GABRIEL XAVIER
  * @version 1.0
  * @since 1.0
  */
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Integer> {
     /**
-     * Busca questões por ID do conteúdo.
+     * Busca todas as questões de um conteúdo educacional específico.
+     *
+     * @param contentId identificador do conteúdo
+     * @return lista de questões do conteúdo
      */
     List<Question> findByContentId(Integer contentId);
 
     /**
-     * Busca questões por dificuldade.
+     * Busca questões por nível de dificuldade.
+     *
+     * @param difficulty nível (easy, medium, hard)
+     * @return lista de questões da dificuldade especificada
      */
     List<Question> findByDifficulty(String difficulty);
 
     /**
      * Busca questões por categoria de conteúdo.
+     *
+     * @param questionContent categoria da questão
+     * @return lista de questões da categoria
      */
     List<Question> findByQuestionContent(String questionContent);
 
     /**
-     * Busca questões com nível mínimo menor ou igual ao especificado.
+     * Busca questões acessíveis para um determinado nível de jogador.
+     *
+     * @param level nível do jogador
+     * @return lista de questões com minLevel menor ou igual ao nível fornecido
      */
     List<Question> findByMinLevelLessThanEqual(Integer level);
 
     /**
-     * Conta questões por dificuldade e nível mínimo.
+     * Conta questões de uma dificuldade acessíveis para um nível.
+     *
+     * @param difficulty nível de dificuldade
+     * @param level nível do jogador
+     * @return quantidade de questões que atendem os critérios
      */
     long countByDifficultyAndMinLevelLessThanEqual(String difficulty, Integer level);
 
     /**
-     * Conta questões por dificuldade, nível e conteúdo.
+     * Conta questões de uma dificuldade, nível e conteúdo específicos.
+     *
+     * @param difficulty nível de dificuldade
+     * @param level nível do jogador
+     * @param contentId identificador do conteúdo
+     * @return quantidade de questões que atendem os critérios
      */
     long countByDifficultyAndMinLevelLessThanEqualAndContentId(String difficulty, Integer level, Integer contentId);
 
     /**
-     * Busca questões por dificuldade e nível mínimo.
+     * Busca questões de uma dificuldade acessíveis para um nível.
+     *
+     * @param difficulty nível de dificuldade
+     * @param level nível do jogador
+     * @return lista de questões que atendem os critérios
      */
     List<Question> findByDifficultyAndMinLevelLessThanEqual(String difficulty, Integer level);
 
     /**
-     * Busca questões por dificuldade, nível e conteúdo.
+     * Busca questões de uma dificuldade, nível e conteúdo específicos.
+     *
+     * @param difficulty nível de dificuldade
+     * @param level nível do jogador
+     * @param contentId identificador do conteúdo
+     * @return lista de questões que atendem os critérios
      */
     List<Question> findByDifficultyAndMinLevelLessThanEqualAndContentId(String difficulty, Integer level, Integer contentId);
 
     /**
-     * Conta questões com múltiplas dificuldades e nível.
+     * Conta questões de múltiplas dificuldades acessíveis para um nível.
+     *
+     * @param difficulties lista de níveis de dificuldade
+     * @param level nível do jogador
+     * @return quantidade de questões que atendem os critérios
      */
     long countByDifficultyInAndMinLevelLessThanEqual(List<String> difficulties, Integer level);
 
     /**
-     * Busca questões com múltiplas dificuldades e nível.
+     * Busca questões de múltiplas dificuldades acessíveis para um nível.
+     *
+     * @param difficulties lista de níveis de dificuldade
+     * @param level nível do jogador
+     * @return lista de questões que atendem os critérios
      */
     List<Question> findByDifficultyInAndMinLevelLessThanEqual(List<String> difficulties, Integer level);
 }

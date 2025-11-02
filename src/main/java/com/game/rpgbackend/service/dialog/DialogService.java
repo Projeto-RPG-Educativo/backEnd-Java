@@ -11,7 +11,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Serviço responsável pela gestão de diálogos educacionais.
+ * Serviço responsável pela gestão de diálogos educacionais multilíngues.
+ * <p>
+ * Gerencia diálogos em português e inglês usados para ensinar idiomas aos jogadores.
+ * Calcula dinamicamente a proporção de cada idioma mostrada com base no nível
+ * do personagem, implementando aprendizado progressivo.
+ * </p>
+ * <p>
+ * Sistema de progressão de idioma:
+ * - Nível mínimo: 20% inglês / 80% português
+ * - Cada nível acima: +20% inglês
+ * - Máximo: 100% inglês
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @Service
 @RequiredArgsConstructor
@@ -21,7 +36,15 @@ public class DialogService {
     private final DialogRepository dialogRepository;
 
     /**
-     * Busca diálogos por nível do personagem e conteúdo.
+     * Busca diálogos educacionais acessíveis para um nível específico.
+     * <p>
+     * Filtra diálogos por conteúdo educacional e nível mínimo necessário,
+     * retornando apenas aqueles que o personagem tem permissão para ver.
+     * </p>
+     *
+     * @param characterLevel nível atual do personagem
+     * @param contentId identificador do conteúdo educacional
+     * @return lista de diálogos adaptados ao nível do personagem
      */
     public List<DialogResponse> getDialogsByLevel(Integer characterLevel, Integer contentId) {
         List<Dialog> dialogs = dialogRepository.findByContentIdAndMinLevelLessThanEqual(contentId, characterLevel);
@@ -32,7 +55,15 @@ public class DialogService {
     }
 
     /**
-     * Busca um diálogo específico por ID.
+     * Busca um diálogo educacional específico por ID.
+     * <p>
+     * Retorna o diálogo completo em ambos os idiomas (português e inglês)
+     * junto com as palavras-chave destacadas.
+     * </p>
+     *
+     * @param dialogId identificador único do diálogo
+     * @return diálogo completo com textos e palavras-chave
+     * @throws NotFoundException se o diálogo não for encontrado
      */
     public DialogResponse getDialogById(Integer dialogId) {
         Dialog dialog = dialogRepository.findById(dialogId)
@@ -42,9 +73,21 @@ public class DialogService {
     }
 
     /**
-     * Calcula a proporção de inglês/português baseado no nível.
-     * Se o personagem está no nível mínimo, mostra 20% em inglês.
-     * A cada nível acima do mínimo, aumenta 20% de inglês.
+     * Calcula a proporção dinâmica de inglês/português para um diálogo.
+     * <p>
+     * A proporção aumenta progressivamente com o nível do personagem:
+     * - No nível mínimo do diálogo: 20% inglês
+     * - Cada nível acima adiciona 20% de inglês
+     * - Máximo de 100% inglês (totalmente em inglês)
+     * </p>
+     * <p>
+     * Exemplo: Se dialogMinLevel = 5 e characterLevel = 7,
+     * ratio = 0.2 + (2 * 0.2) = 0.6 (60% inglês, 40% português)
+     * </p>
+     *
+     * @param characterLevel nível atual do personagem
+     * @param dialogMinLevel nível mínimo do diálogo
+     * @return valor entre 0.2 e 1.0 representando a proporção de inglês
      */
     public double calculateLanguageRatio(Integer characterLevel, Integer dialogMinLevel) {
         if (characterLevel.equals(dialogMinLevel)) {
@@ -56,7 +99,14 @@ public class DialogService {
     }
 
     /**
-     * Mapeia Dialog para DialogResponse.
+     * Converte entidade Dialog para DTO de resposta.
+     * <p>
+     * Mapeia todas as informações do diálogo incluindo textos em ambos
+     * os idiomas e palavras-chave destacadas com traduções.
+     * </p>
+     *
+     * @param dialog entidade de diálogo do banco de dados
+     * @return DTO formatado para resposta ao cliente
      */
     private DialogResponse mapToDialogResponse(Dialog dialog) {
         DialogResponse response = new DialogResponse();

@@ -7,7 +7,7 @@ package com.game.rpgbackend.enums;
  * custando energia e proporcionando vantagens estratégicas.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */
@@ -65,9 +65,19 @@ public enum CharacterSkillType {
     }
 
     /**
-     * Obtém a skill correspondente à classe do personagem.
-     * @param className Nome da classe (paladino, tank, lutador, mago, ladino, bardo)
-     * @return A skill correspondente ou null se não encontrada
+     * Obtém a habilidade especial correspondente ao nome da classe do personagem.
+     * <p>
+     * Mapeamento de classes para habilidades:
+     * - Paladino → Cura
+     * - Tank → Eu Aguento!
+     * - Lutador → Investida
+     * - Mago → Clarividência
+     * - Ladino → Fraqueza
+     * - Bardo → Lábia
+     * </p>
+     *
+     * @param className nome da classe do personagem (case-insensitive)
+     * @return habilidade especial da classe ou null se a classe não for reconhecida
      */
     public static CharacterSkillType getByClassName(String className) {
         if (className == null) return null;

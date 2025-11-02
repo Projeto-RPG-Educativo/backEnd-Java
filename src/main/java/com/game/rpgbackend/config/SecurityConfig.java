@@ -21,7 +21,27 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Configuração de segurança da aplicação.
+ * Configuração de segurança da aplicação Spring Security.
+ * <p>
+ * Define as políticas de segurança do sistema, incluindo:
+ * - Autenticação via JWT (JSON Web Tokens)
+ * - Autorização de endpoints (públicos vs protegidos)
+ * - Configuração CORS para frontend
+ * - Criptografia de senhas com BCrypt
+ * - Gerenciamento de sessões stateless
+ * </p>
+ * <p>
+ * Endpoints públicos (sem autenticação):
+ * - /api/auth/** (registro e login)
+ * - /api/classes/** (consulta de classes de personagem)
+ * </p>
+ * <p>
+ * Todos os outros endpoints requerem token JWT válido no header Authorization.
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @Configuration
 @EnableWebSecurity
@@ -30,6 +50,21 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    /**
+     * Configura a cadeia de filtros de segurança do Spring Security.
+     * <p>
+     * Configurações aplicadas:
+     * - CSRF desabilitado (API REST stateless)
+     * - CORS habilitado para frontend React
+     * - Sessões stateless (sem cookies de sessão)
+     * - Endpoints públicos definidos
+     * - Filtro JWT adicionado antes da autenticação padrão
+     * </p>
+     *
+     * @param http objeto HttpSecurity para configuração
+     * @return cadeia de filtros configurada
+     * @throws Exception se houver erro na configuração
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -48,6 +83,19 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Configura o CORS (Cross-Origin Resource Sharing) da aplicação.
+     * <p>
+     * Permite requisições dos frontends em desenvolvimento:
+     * - http://localhost:3000 (Create React App padrão)
+     * - http://localhost:5173 (Vite padrão)
+     * </p>
+     * <p>
+     * Métodos HTTP permitidos: GET, POST, PUT, DELETE, OPTIONS
+     * </p>
+     *
+     * @return fonte de configuração CORS
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -61,11 +109,33 @@ public class SecurityConfig {
         return source;
     }
 
+    /**
+     * Define o codificador de senhas usado para criptografia.
+     * <p>
+     * Utiliza BCrypt, um algoritmo de hash adaptativo que:
+     * - Adiciona salt automático
+     * - Aumenta o custo computacional ao longo do tempo
+     * - É resistente a ataques de força bruta
+     * </p>
+     *
+     * @return codificador BCrypt configurado
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Configura o gerenciador de autenticação do Spring Security.
+     * <p>
+     * Usado internamente para validar credenciais de usuário
+     * durante o processo de login.
+     * </p>
+     *
+     * @param config configuração de autenticação do Spring
+     * @return gerenciador de autenticação
+     * @throws Exception se houver erro na configuração
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

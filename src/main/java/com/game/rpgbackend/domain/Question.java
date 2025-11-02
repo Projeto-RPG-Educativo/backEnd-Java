@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
  * em dificuldade e conteúdo educacional.
  * </p>
  *
- * @author D0UGH5
+ * @author GABRIEL XAVIER
  * @version 1.0
  * @since 1.0
  */
@@ -61,6 +61,7 @@ public class Question {
     @Column(name = "level_minimo", nullable = false)
     private Integer minLevel = 1;
 
+    /** Dica para auxiliar na resposta (habilidade especial da classe Ladino) */
     @Column (name="hint", nullable = false)
     private String hint;
 

@@ -11,7 +11,7 @@ import lombok.Data;
  * incluindo nome, email e senha. Todos os campos são opcionais.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

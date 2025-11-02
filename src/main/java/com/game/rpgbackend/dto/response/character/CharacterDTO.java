@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * recursos, classe e informações do jogador, sem referências circulares.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

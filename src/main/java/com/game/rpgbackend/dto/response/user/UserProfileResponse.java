@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * incluindo estatísticas básicas como total de personagens.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

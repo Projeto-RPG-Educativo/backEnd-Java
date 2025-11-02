@@ -1,59 +1,61 @@
 package com.game.rpgbackend.dto.response.hub;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * DTO de resposta para NPCs (Non-Player Characters) do Palco da Retórica.
+ * <p>
+ * Representa um personagem não-jogável com o qual o jogador pode interagir
+ * no Hub. NPCs podem oferecer diálogos, quests, serviços (vendas, treinamento)
+ * e informações sobre o lore do jogo.
+ * </p>
+ * <p>
+ * Tipos de NPC:
+ * - Mercador: Vende itens e equipamentos
+ * - Mentor: Oferece conselhos e ensina mecânicas
+ * - Guarda: Protege áreas específicas
+ * - QuestGiver: Oferece missões e quests
+ * </p>
+ * <p>
+ * Usado no frontend para:
+ * - Exibir NPCs disponíveis por localização
+ * - Mostrar informações ao clicar no NPC
+ * - Iniciar diálogos e interações
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class NpcDto {
+
+    /**
+     * Identificador único do NPC.
+     */
     private Integer id;
+
+    /**
+     * Nome do NPC.
+     */
     private String name;
+
+    /**
+     * Descrição e história do NPC.
+     */
     private String description;
+
+    /**
+     * Tipo/função do NPC (mercador, mentor, guarda, questgiver, etc.).
+     */
     private String type;
+
+    /**
+     * Localização onde o NPC pode ser encontrado no jogo.
+     */
     private String location;
-
-    public NpcDto() {}
-
-    public NpcDto(Integer id, String name, String description, String type, String location) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.type = type;
-        this.location = location;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
 }

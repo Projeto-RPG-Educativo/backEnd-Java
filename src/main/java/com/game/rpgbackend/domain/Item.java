@@ -13,7 +13,7 @@ import java.util.List;
  * Cada item possui um tipo (arma, armadura, consumível, etc.) e valor.
  * </p>
  *
- * @author D0UGH5
+ * @author GABRIEL XAVIER
  * @version 1.0
  * @since 1.0
  */

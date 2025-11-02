@@ -13,7 +13,7 @@ import java.util.List;
  * Cada loja possui um inventário de itens disponíveis para venda.
  * </p>
  *
- * @author D0UGH5
+ * @author GABRIEL XAVIER
  * @version 1.0
  * @since 1.0
  */

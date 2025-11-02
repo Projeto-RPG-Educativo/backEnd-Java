@@ -18,7 +18,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Serviço responsável pelas estatísticas e progresso do jogador.
+ * Serviço responsável pela gestão de estatísticas e progresso do jogador.
+ * <p>
+ * Gerencia todos os aspectos relacionados ao progresso e desempenho do jogador:
+ * - Estatísticas gerais (nível, XP, ouro, batalhas, questões)
+ * - Conquistas (achievements) desbloqueadas
+ * - Histórico de batalhas realizadas
+ * - Ranking global de jogadores
+ * - Atualização de progresso após eventos do jogo
+ * </p>
+ * <p>
+ * Este serviço é usado principalmente no Hub do jogo para exibir
+ * informações sobre o desempenho e progresso do jogador.
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @Service
 @RequiredArgsConstructor
@@ -31,7 +47,22 @@ public class PlayerService {
     private final UserRepository userRepository;
 
     /**
-     * Busca ou cria as estatísticas do jogador.
+     * Busca as estatísticas do jogador ou cria um novo registro se não existir.
+     * <p>
+     * Se o jogador ainda não tiver estatísticas registradas (novo jogador),
+     * um novo registro é criado automaticamente com valores iniciais:
+     * - Nível: 1
+     * - XP, Ouro, Batalhas: 0
+     * - Questões corretas/erradas: 0
+     * - Pontos de habilidade: 0
+     * </p>
+     * <p>
+     * Este método garante que sempre haja estatísticas disponíveis para o jogador.
+     * </p>
+     *
+     * @param userId identificador único do usuário
+     * @return estatísticas do jogador (existentes ou recém-criadas)
+     * @throws NotFoundException se o usuário não for encontrado no banco de dados
      */
     @Transactional
     public PlayerStats getPlayerStats(Integer userId) {
@@ -55,14 +86,37 @@ public class PlayerService {
     }
 
     /**
-     * Busca as conquistas de um jogador.
+     * Busca todas as conquistas desbloqueadas por um jogador.
+     * <p>
+     * Conquistas são marcos especiais alcançados durante o jogo, como:
+     * - Primeira vitória em batalha
+     * - Alcançar nível X
+     * - Responder N questões corretamente
+     * - Completar missões específicas
+     * </p>
+     *
+     * @param userId identificador único do usuário
+     * @return lista de conquistas desbloqueadas pelo jogador
      */
     public List<Achievement> getAchievements(Integer userId) {
         return achievementRepository.findByUserId(userId);
     }
 
     /**
-     * Busca o histórico de batalhas de um jogador (últimas 10).
+     * Retorna o histórico das últimas 10 batalhas do jogador.
+     * <p>
+     * O histórico inclui informações sobre cada batalha:
+     * - Resultado (vitória, derrota)
+     * - Nome do inimigo enfrentado
+     * - Experiência ganha
+     * - Data e hora da batalha
+     * </p>
+     * <p>
+     * As batalhas são ordenadas por data decrescente (mais recentes primeiro).
+     * </p>
+     *
+     * @param userId identificador único do usuário
+     * @return lista das 10 últimas batalhas realizadas
      */
     public List<BattleHistoryResponse> getBattleHistory(Integer userId) {
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "date"));
@@ -78,7 +132,20 @@ public class PlayerService {
     }
 
     /**
-     * Busca o ranking dos jogadores (top 10).
+     * Retorna o ranking global dos top 10 jogadores.
+     * <p>
+     * O ranking é ordenado por:
+     * 1. Nível (decrescente) - jogadores de nível mais alto primeiro
+     * 2. Total de XP (decrescente) - em caso de empate no nível
+     * </p>
+     * <p>
+     * Exibe para cada jogador:
+     * - Nome de usuário
+     * - Nível atual
+     * - Total de experiência acumulada
+     * </p>
+     *
+     * @return lista dos 10 melhores jogadores do ranking global
      */
     public List<RankingResponse> getRankings() {
         Sort sort = Sort.by(
@@ -97,7 +164,28 @@ public class PlayerService {
     }
 
     /**
-     * Atualiza as estatísticas do jogador.
+     * Atualiza as estatísticas de um jogador com novos valores.
+     * <p>
+     * Permite atualização parcial - apenas os campos não-nulos no objeto
+     * de atualização serão modificados. Campos não fornecidos mantêm seus
+     * valores atuais.
+     * </p>
+     * <p>
+     * Campos atualizáveis:
+     * - level: Nível do jogador
+     * - totalXpGanhos: Total de XP acumulado
+     * - totalOuroGanho: Total de ouro ganho
+     * - battlesWon: Batalhas vencidas
+     * - battlesLost: Batalhas perdidas
+     * - questionsRight: Questões respondidas corretamente
+     * - questionsWrong: Questões respondidas incorretamente
+     * - skillPoints: Pontos de habilidade disponíveis
+     * </p>
+     *
+     * @param userId identificador único do usuário
+     * @param update objeto contendo os novos valores (campos opcionais)
+     * @return estatísticas atualizadas e persistidas
+     * @throws NotFoundException se as estatísticas do jogador não forem encontradas
      */
     @Transactional
     public PlayerStats updatePlayerStats(Integer userId, PlayerStatsUpdate update) {
@@ -132,7 +220,13 @@ public class PlayerService {
         return playerStatsRepository.save(stats);
     }
 
-    // Classes internas
+    /**
+     * DTO para atualização parcial de estatísticas do jogador.
+     * <p>
+     * Todos os campos são opcionais. Apenas os valores não-nulos
+     * serão aplicados às estatísticas do jogador.
+     * </p>
+     */
     public static class PlayerStatsUpdate {
         private Integer level;
         private Integer totalXpGanhos;
@@ -169,6 +263,12 @@ public class PlayerService {
         public void setSkillPoints(Integer skillPoints) { this.skillPoints = skillPoints; }
     }
 
+    /**
+     * DTO de resposta para histórico de batalhas.
+     * <p>
+     * Contém informações resumidas de uma batalha realizada.
+     * </p>
+     */
     public static class BattleHistoryResponse {
         private String result;
         private String enemyName;
@@ -188,6 +288,12 @@ public class PlayerService {
         public java.time.LocalDateTime getDate() { return date; }
     }
 
+    /**
+     * DTO de resposta para ranking de jogadores.
+     * <p>
+     * Contém informações de um jogador no ranking global.
+     * </p>
+     */
     public static class RankingResponse {
         private String nomeUsuario;
         private Integer level;

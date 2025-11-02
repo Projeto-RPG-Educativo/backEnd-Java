@@ -23,7 +23,7 @@ import java.io.IOException;
  * Herda de OncePerRequestFilter para garantir execução única por requisição.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

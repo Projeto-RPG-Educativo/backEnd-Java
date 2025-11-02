@@ -13,7 +13,23 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Serviço responsável pela gestão de saves do jogo.
+ * Serviço responsável pela gestão de salvamentos (saves) do jogo.
+ * <p>
+ * Gerencia slots de salvamento onde jogadores podem salvar e carregar
+ * o progresso de seus personagens. Suporta múltiplos slots por usuário
+ * e armazena o estado completo do personagem em formato JSON.
+ * </p>
+ * <p>
+ * Funcionalidades:
+ * - Criar novos saves ou atualizar existentes
+ * - Listar saves por usuário
+ * - Carregar save específico por slot
+ * - Deletar saves
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @Service
 @RequiredArgsConstructor
@@ -24,7 +40,27 @@ public class SaveService {
     private final CharacterRepository characterRepository;
 
     /**
-     * Cria um novo save ou atualiza um existente com o mesmo nome de slot.
+     * Cria um novo salvamento ou atualiza um existente no mesmo slot.
+     * <p>
+     * Se já existir um save com o mesmo slotName para o usuário,
+     * ele será sobrescrito com os novos dados. Caso contrário,
+     * um novo save é criado.
+     * </p>
+     * <p>
+     * O estado do personagem é armazenado como JSON contendo:
+     * - HP, XP, ouro atuais
+     * - Inventário completo
+     * - Progresso em quests
+     * - Localização atual
+     * </p>
+     *
+     * @param userId identificador do usuário
+     * @param characterId identificador do personagem a ser salvo
+     * @param slotName nome do slot (ex: "slot1", "slot2", "quicksave")
+     * @param currentState estado completo do jogo em formato JSON
+     * @return save criado ou atualizado
+     * @throws NotFoundException se o personagem não for encontrado
+     * @throws IllegalArgumentException se o personagem não pertencer ao usuário
      */
     @Transactional
     public GameSave createOrUpdateSave(Integer userId, Integer characterId, String slotName, String currentState) {

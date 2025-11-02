@@ -19,7 +19,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Controller responsável pelas operações de save do jogo.
+ * Controller REST responsável pelas operações de salvamento do jogo.
+ * <p>
+ * Gerencia os slots de save onde o jogador pode salvar e carregar
+ * o progresso de seus personagens. Cada save contém o estado completo
+ * do personagem (HP, XP, ouro, inventário, etc.) e informações de progresso.
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @RestController
 @RequestMapping("/api/saves")
@@ -30,7 +39,15 @@ public class SaveController {
     private final AuthenticationUtil authenticationUtil;
 
     /**
-     * Cria ou atualiza um save.
+     * Cria um novo save ou atualiza um save existente.
+     * <p>
+     * Se já existir um save no slot especificado para o usuário,
+     * ele será atualizado. Caso contrário, um novo save é criado.
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @param request dados do save (ID do personagem, slot e estado atual)
+     * @return DTO do save criado/atualizado com status 201 Created
      */
     @PostMapping
     public ResponseEntity<GameSaveDto> createOrUpdateSave(
@@ -57,7 +74,14 @@ public class SaveController {
     }
 
     /**
-     * Busca todos os saves de um usuário.
+     * Retorna todos os saves do usuário autenticado.
+     * <p>
+     * Lista simplificada com informações essenciais de cada save:
+     * slot, data, personagem associado.
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @return lista com todos os saves do usuário
      */
     @GetMapping
     public ResponseEntity<List<SaveResponseDto>> getUserSaves(
@@ -70,7 +94,14 @@ public class SaveController {
     }
 
     /**
-     * Busca um save específico por slot.
+     * Busca um save específico pelo nome do slot.
+     * <p>
+     * Retorna o save completo com todo o estado do personagem salvo.
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @param slotName nome do slot de save (ex: "slot1", "slot2")
+     * @return DTO completo do save ou 404 se não encontrado
      */
     @GetMapping("/slot/{slotName}")
     public ResponseEntity<GameSaveDto> getSaveBySlot(
@@ -84,7 +115,13 @@ public class SaveController {
     }
 
     /**
-     * Deleta um save.
+     * Remove um save do sistema.
+     * <p>
+     * Libera o slot para ser usado novamente.
+     * </p>
+     *
+     * @param saveId identificador único do save a ser deletado
+     * @return resposta vazia com status 204 No Content
      */
     @DeleteMapping("/{saveId}")
     public ResponseEntity<Void> deleteSave(@PathVariable Integer saveId) {
@@ -92,6 +129,12 @@ public class SaveController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Converte entidade GameSave para DTO de resposta.
+     *
+     * @param save entidade de save
+     * @return DTO formatado para envio ao cliente
+     */
     private GameSaveDto mapToDto(GameSave save) {
         GameSaveDto dto = new GameSaveDto();
         dto.setId(save.getId());
@@ -103,6 +146,12 @@ public class SaveController {
         return dto;
     }
 
+    /**
+     * Converte resposta do serviço de save para DTO simplificado.
+     *
+     * @param response objeto de resposta do serviço
+     * @return DTO formatado para listagem de saves
+     */
     private SaveResponseDto mapSaveResponseToDto(SaveService.SaveResponse response) {
         SaveResponseDto dto = new SaveResponseDto(
             response.getId(),

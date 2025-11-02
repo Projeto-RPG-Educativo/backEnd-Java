@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * gerando tokens JWT para autenticação nas requisições subsequentes.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */
