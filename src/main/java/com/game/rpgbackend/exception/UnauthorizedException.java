@@ -7,7 +7,7 @@ package com.game.rpgbackend.exception;
  * tentativas de acesso não autorizado. Resulta em resposta HTTP 401 Unauthorized.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

@@ -18,7 +18,16 @@ import jakarta.validation.Valid;
 import java.util.stream.Collectors;
 
 /**
- * Controller responsável pelas operações de questões educacionais.
+ * Controller REST responsável pelas operações de questões educacionais.
+ * <p>
+ * Fornece endpoints para buscar questões de inglês, verificar respostas
+ * e obter dicas (habilidade especial da classe Ladino).
+ * As questões são filtradas por dificuldade, nível do jogador e conteúdo.
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @RestController
 @RequestMapping("/api/questions")
@@ -28,7 +37,16 @@ public class QuestionController {
     private final QuestionService questionService;
 
     /**
-     * Busca uma questão aleatória baseada na dificuldade e nível do jogador.
+     * Busca uma questão aleatória adaptada ao nível e dificuldade.
+     * <p>
+     * A questão é selecionada aleatoriamente respeitando os filtros fornecidos.
+     * Pode ser filtrada opcionalmente por um conteúdo educacional específico.
+     * </p>
+     *
+     * @param difficulty nível de dificuldade (easy, medium, hard)
+     * @param playerLevel nível atual do jogador para filtrar questões apropriadas
+     * @param contentId (opcional) ID do conteúdo para filtrar questões relacionadas
+     * @return questão aleatória sem revelar a resposta correta
      */
     @GetMapping("/random")
     public ResponseEntity<QuestionDto> getRandomQuestion(
@@ -53,7 +71,10 @@ public class QuestionController {
     }
 
     /**
-     * Busca questões por conteúdo.
+     * Busca todas as questões relacionadas a um conteúdo educacional específico.
+     *
+     * @param contentId identificador único do conteúdo educacional
+     * @return lista de questões do conteúdo especificado
      */
     @GetMapping("/content/{contentId}")
     public ResponseEntity<List<QuestionDto>> getQuestionsByContent(@PathVariable Integer contentId) {
@@ -62,6 +83,12 @@ public class QuestionController {
         return ResponseEntity.ok(dtos);
     }
 
+    /**
+     * Converte entidade Question para DTO de resposta.
+     *
+     * @param question entidade de questão
+     * @return DTO formatado para envio ao cliente
+     */
     private QuestionDto mapToDto(Question question) {
         QuestionDto dto = new QuestionDto();
         dto.setId(question.getId());
@@ -79,7 +106,13 @@ public class QuestionController {
     }
 
     /**
-     * Verifica se uma resposta está correta.
+     * Verifica se uma resposta fornecida está correta.
+     * <p>
+     * Compara a resposta do jogador com a resposta correta da questão.
+     * </p>
+     *
+     * @param request dados contendo ID da questão e resposta fornecida
+     * @return indicação se a resposta está correta ou incorreta
      */
     @PostMapping("/check")
     public ResponseEntity<CheckAnswerResponse> checkAnswer(@Valid @RequestBody CheckAnswerRequest request) {
@@ -90,6 +123,18 @@ public class QuestionController {
         CheckAnswerResponse response = new CheckAnswerResponse(isCorrect);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * Retorna uma dica para auxiliar na resposta da questão.
+     * <p>
+     * Esta funcionalidade é uma habilidade especial da classe Ladino.
+     * TODO: Implementar verificação de classe e restrições de uso.
+     * </p>
+     *
+     * @param id identificador único da questão
+     * @return texto da dica ou mensagem padrão se não houver dica disponível
+     * @throws NotFoundException se a questão não for encontrada
+     */
     @GetMapping("/{id}/hint")
     @PreAuthorize("isAuthenticated()") // Garante que apenas usuarios logados acessem
     public ResponseEntity<String> getQuestionHint(@PathVariable Integer id) {

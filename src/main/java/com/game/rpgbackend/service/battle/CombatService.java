@@ -1,7 +1,7 @@
 package com.game.rpgbackend.service.battle;
 
 import com.game.rpgbackend.dto.response.battle.BattleStateResponse;
-import com.game.rpgbackend.dto.battle.BattleEffect;
+import com.game.rpgbackend.dto.response.battle.BattleEffect;
 import com.game.rpgbackend.config.GameConfig;
 import com.game.rpgbackend.enums.CharacterSkillType;
 import com.game.rpgbackend.enums.MonsterSkillType;
@@ -9,7 +9,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
- * Serviço responsável pela lógica de combate, cálculo de dano e processamento de turnos.
+ * Serviço responsável pela lógica de combate e cálculos de batalha.
+ * <p>
+ * Gerencia todos os aspectos matemáticos e mecânicos do combate:
+ * - Cálculo de dano de personagens e monstros
+ * - Aplicação de modificadores de defesa
+ * - Processamento de habilidades especiais
+ * - Gerenciamento de efeitos de batalha (buffs/debuffs)
+ * - Execução de ações de ataque, defesa e skills
+ * - Lógica de comportamento dos monstros (IA básica)
+ * </p>
+ * <p>
+ * Os cálculos consideram atributos de classe, nível, equipamentos
+ * e efeitos temporários ativos na batalha.
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @Service
 @RequiredArgsConstructor
@@ -18,9 +35,14 @@ public class CombatService {
     private final GameConfig gameConfig;
 
     /**
-     * Calcula o dano base de um personagem com base em sua classe.
-     * @param characterInfo Informações do personagem em batalha.
-     * @return O valor do dano.
+     * Calcula o dano base do personagem baseado na classe.
+     * <p>
+     * Classes físicas (Tank, Lutador, Ladino, Paladino) usam Força.
+     * Classes mágicas (Mago, Bardo) usam Inteligência.
+     * </p>
+     *
+     * @param characterInfo informações do personagem em batalha
+     * @return valor do dano base calculado
      */
     public int calculateCharacterDamage(BattleStateResponse.CharacterBattleInfo characterInfo) {
         String className = characterInfo.getClassName().toLowerCase();
@@ -42,11 +64,17 @@ public class CombatService {
     }
 
     /**
-     * Calcula o dano do monstro considerando defesa do personagem.
-     * @param monsterDamage Dano base do monstro.
-     * @param characterDefense Defesa base do personagem.
-     * @param isCharacterDefending Se o personagem está ativamente defendendo.
-     * @return Dano final após defesa.
+     * Calcula o dano que o monstro causa ao personagem após mitigação por defesa.
+     * <p>
+     * Fórmula de redução:
+     * - Defesa passiva: reduz 1% de dano a cada 2 pontos de defesa
+     * - Defesa ativa (ação defender): reduz 50% adicional do dano resultante
+     * </p>
+     *
+     * @param monsterDamage dano base do monstro
+     * @param characterDefense valor de defesa do personagem
+     * @param isCharacterDefending true se o personagem usou a ação "defender"
+     * @return dano final que será aplicado ao HP do personagem (mínimo 0)
      */
     public int calculateMonsterDamage(int monsterDamage, int characterDefense, boolean isCharacterDefending) {
         // Reduz 1% de dano por 2 pontos de defesa base
@@ -62,11 +90,17 @@ public class CombatService {
     }
 
     /**
-     * Calcula o dano do personagem considerando defesa do monstro.
-     * @param characterDamage Dano base do personagem.
-     * @param monsterDefense Defesa base do monstro.
-     * @param isMonsterDefending Se o monstro está ativamente defendendo.
-     * @return Dano final após defesa.
+     * Calcula o dano que o personagem causa ao monstro após mitigação por defesa.
+     * <p>
+     * Fórmula de redução:
+     * - Defesa passiva: reduz 1% de dano a cada 2 pontos de defesa
+     * - Defesa ativa (monstro defendendo): reduz 50% adicional do dano resultante
+     * </p>
+     *
+     * @param characterDamage dano base do personagem
+     * @param monsterDefense valor de defesa do monstro
+     * @param isMonsterDefending true se o monstro está em postura defensiva
+     * @return dano final que será aplicado ao HP do monstro (mínimo 0)
      */
     public int calculateCharacterDamageWithDefense(int characterDamage, int monsterDefense, boolean isMonsterDefending) {
         // Reduz 1% de dano por 2 pontos de defesa base do monstro

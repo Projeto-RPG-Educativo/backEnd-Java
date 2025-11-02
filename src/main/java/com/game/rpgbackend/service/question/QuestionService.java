@@ -12,6 +12,21 @@ import java.util.Random;
 
 /**
  * Serviço responsável pela gestão de questões educacionais.
+ * <p>
+ * Gerencia o banco de questões do sistema, incluindo:
+ * - Seleção aleatória de questões baseada em critérios
+ * - Filtragem por dificuldade, nível e conteúdo
+ * - Validação de respostas
+ * - Fornecimento de dicas (habilidade do Ladino)
+ * </p>
+ * <p>
+ * As questões são fundamentais para o sistema de batalhas,
+ * onde acertar ou errar influencia o resultado do combate.
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @Service
 @RequiredArgsConstructor
@@ -22,8 +37,22 @@ public class QuestionService {
     private final Random random = new Random();
 
     /**
-     * Busca uma pergunta aleatória baseada na dificuldade e nível do jogador.
-     * Remove a resposta correta do objeto antes de retornar.
+     * Busca uma questão aleatória baseada em critérios específicos.
+     * <p>
+     * A questão selecionada:
+     * - Corresponde à dificuldade especificada
+     * - É acessível para o nível do jogador (minLevel ≤ playerLevel)
+     * - Opcionalmente filtrada por conteúdo educacional
+     * </p>
+     * <p>
+     * A resposta correta NÃO é incluída no retorno para evitar trapaças.
+     * </p>
+     *
+     * @param difficulty nível de dificuldade (easy, medium, hard)
+     * @param playerLevel nível atual do jogador
+     * @param contentId (opcional) ID do conteúdo para filtrar questões relacionadas
+     * @return questão aleatória que atende aos critérios, sem a resposta correta
+     * @throws NotFoundException se nenhuma questão adequada for encontrada
      */
     public Question getRandomQuestion(String difficulty, Integer playerLevel, Integer contentId) {
         // Normaliza a dificuldade (primeira letra maiúscula)
@@ -68,7 +97,16 @@ public class QuestionService {
     }
 
     /**
-     * Busca uma pergunta baseada em múltiplas dificuldades.
+     * Busca uma questão aleatória de múltiplos níveis de dificuldade.
+     * <p>
+     * Útil para batalhas que aceitam questões de diferentes dificuldades
+     * ou para variação no desafio apresentado ao jogador.
+     * </p>
+     *
+     * @param difficulties lista de níveis de dificuldade aceitos
+     * @param playerLevel nível atual do jogador
+     * @return questão aleatória de uma das dificuldades especificadas
+     * @throws NotFoundException se nenhuma questão adequada for encontrada
      */
     public Question getQuestionByDifficultyRange(List<String> difficulties, Integer playerLevel) {
         long questionCount = questionRepository.countByDifficultyInAndMinLevelLessThanEqual(
@@ -93,14 +131,25 @@ public class QuestionService {
     }
 
     /**
-     * Busca questões por conteúdo.
+     * Busca todas as questões relacionadas a um conteúdo educacional específico.
+     *
+     * @param contentId identificador do conteúdo educacional
+     * @return lista de questões do conteúdo especificado
      */
     public List<Question> getQuestionsByContent(Integer contentId) {
         return questionRepository.findByContentId(contentId);
     }
 
     /**
-     * Busca uma questão por ID (inclui resposta correta - usar apenas no backend).
+     * Busca uma questão completa por ID, incluindo a resposta correta.
+     * <p>
+     * ATENÇÃO: Este método retorna a resposta correta e deve ser usado
+     * apenas em operações backend. Nunca enviar diretamente ao frontend.
+     * </p>
+     *
+     * @param questionId identificador único da questão
+     * @return questão completa com resposta correta
+     * @throws NotFoundException se a questão não for encontrada
      */
     public Question getQuestionById(Integer questionId) {
         return questionRepository.findById(questionId)
@@ -108,19 +157,37 @@ public class QuestionService {
     }
 
     /**
-     * Verifica se uma resposta está correta.
+     * Valida se uma resposta fornecida está correta.
+     * <p>
+     * A comparação é case-insensitive e ignora espaços em branco extras.
+     * </p>
+     *
+     * @param questionId identificador da questão
+     * @param answer resposta fornecida pelo jogador
+     * @return true se a resposta estiver correta, false caso contrário
+     * @throws NotFoundException se a questão não for encontrada
      */
     public boolean checkAnswer(Integer questionId, String answer) {
         Question question = getQuestionById(questionId);
         return question.getCorrectAnswer().trim().equalsIgnoreCase(answer.trim());
     }
 
-    // --- NOVO MÉTODO ADICIONADO ---
     /**
-     * Busca a dica para uma questão específica pelo seu ID.
-     * @param questionId O ID da questão.
-     * @return A string contendo a dica, ou null se não houver dica.
-     * @throws NotFoundException Se a questão não for encontrada.
+     * Busca a dica de uma questão específica.
+     * <p>
+     * Este método é usado pela habilidade "Fraqueza" da classe Ladino.
+     * Retorna uma dica que ajuda o jogador a encontrar a resposta correta.
+     * </p>
+     * <p>
+     * TODO: Implementar verificações adicionais:
+     * - Confirmar que o personagem é da classe Ladino
+     * - Verificar cooldown da habilidade
+     * - Descontar custo de energia
+     * </p>
+     *
+     * @param questionId identificador da questão
+     * @return texto da dica ou null se não houver dica disponível
+     * @throws NotFoundException se a questão não for encontrada
      */
     public String getHintForQuestion(Integer questionId) {
         Question question = getQuestionById(questionId); // Reutiliza o método que já busca e lança exceção

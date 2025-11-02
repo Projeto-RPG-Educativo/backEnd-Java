@@ -15,7 +15,33 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * Serviço responsável pelo Sebo da Linguística (Loja).
+ * Serviço responsável pela gestão do Sebo da Linguística (Sistema de Lojas).
+ * <p>
+ * O Sebo da Linguística é o estabelecimento comercial do Hub onde jogadores
+ * podem comprar itens usando ouro acumulado durante o jogo. Gerencia todas
+ * as operações comerciais incluindo listagem de produtos, verificação de
+ * estoque, validação de moeda e processamento de transações.
+ * </p>
+ * <p>
+ * Funcionalidades principais:
+ * - Listar lojas disponíveis no jogo
+ * - Exibir inventário de itens de cada loja
+ * - Processar compras com verificação de saldo e estoque
+ * - Atualizar inventário do jogador após compra
+ * - Gerenciar estoque das lojas
+ * </p>
+ * <p>
+ * Sistema de transações:
+ * - Verifica ouro suficiente antes da compra
+ * - Valida disponibilidade de estoque
+ * - Deduz ouro do jogador automaticamente
+ * - Adiciona item ao inventário do personagem
+ * - Atualiza estoque da loja
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @Service
 @RequiredArgsConstructor
@@ -27,21 +53,63 @@ public class StoreService {
     private final PlayerStatsRepository playerStatsRepository;
 
     /**
-     * Busca todas as lojas disponíveis.
+     * Retorna todas as lojas disponíveis no Sebo da Linguística.
+     * <p>
+     * Lista completa de estabelecimentos comerciais onde o jogador
+     * pode realizar compras. Cada loja pode ter um inventário
+     * especializado (armas, armaduras, consumíveis, livros, etc.).
+     * </p>
+     *
+     * @return lista de todas as lojas ativas no jogo
      */
     public List<Store> getStores() {
         return storeRepository.findAll();
     }
 
     /**
-     * Busca os itens de uma loja específica.
+     * Busca o inventário completo de uma loja específica.
+     * <p>
+     * Retorna todos os itens disponíveis para compra na loja especificada,
+     * incluindo:
+     * - Informações detalhadas do item
+     * - Preço em ouro
+     * - Quantidade em estoque
+     * - Descrição e efeitos
+     * </p>
+     * <p>
+     * Apenas itens com estoque disponível devem ser exibidos ao jogador.
+     * </p>
+     *
+     * @param lojaId identificador único da loja
+     * @return lista de itens disponíveis na loja com preços e estoque
      */
     public List<ItemStore> getStoreItems(Integer lojaId) {
         return itemLojaRepository.findByStoreId(lojaId);
     }
 
     /**
-     * Processa a compra de um item da loja.
+     * Processa uma transação de compra de item na loja.
+     * <p>
+     * Executa todas as validações necessárias e efetiva a compra:
+     * 1. Valida existência do jogador e do item
+     * 2. Verifica se o jogador possui ouro suficiente
+     * 3. Verifica disponibilidade em estoque
+     * 4. Deduz o preço do ouro do jogador
+     * 5. Adiciona o item ao inventário do jogador
+     * 6. Atualiza o estoque da loja (reduz em 1)
+     * 7. Persiste todas as alterações no banco
+     * </p>
+     * <p>
+     * Operação transacional: Em caso de erro, todas as alterações
+     * são revertidas automaticamente (rollback).
+     * </p>
+     *
+     * @param userId identificador único do usuário comprador
+     * @param lojaId identificador da loja onde a compra está sendo realizada
+     * @param itemId identificador do item a ser comprado
+     * @return resultado da compra com item adquirido, preço pago e ouro restante
+     * @throws NotFoundException se jogador, loja ou item não forem encontrados
+     * @throws BadRequestException se ouro for insuficiente ou item sem estoque
      */
     @Transactional
     public PurchaseResult purchaseStoreItem(Integer userId, Integer lojaId, Integer itemId) {
@@ -76,7 +144,15 @@ public class StoreService {
         return new PurchaseResult(itemStore.getItem(), itemStore.getPrice(), player.getTotalGoldEarned());
     }
 
-    // Classe interna para resultado de compra
+    /**
+     * DTO de resposta para resultado de compra na loja.
+     * <p>
+     * Contém todas as informações sobre a transação realizada:
+     * - Item comprado
+     * - Preço pago
+     * - Ouro restante do jogador
+     * </p>
+     */
     public static class PurchaseResult {
         private com.game.rpgbackend.domain.Item item;
         private Integer pricePaid;

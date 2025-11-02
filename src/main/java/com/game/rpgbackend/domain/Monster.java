@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
  * Cada monstro possui atributos como HP e dano que determinam sua força.
  * </p>
  *
- * @author D0UGH5
+ * @author GABRIEL XAVIER
  * @version 1.0
  * @since 1.0
  */

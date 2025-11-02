@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  * além de visualizar estatísticas de jogo do usuário autenticado.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

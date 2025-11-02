@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Mapper para converter entidades GameClass em DTOs.
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

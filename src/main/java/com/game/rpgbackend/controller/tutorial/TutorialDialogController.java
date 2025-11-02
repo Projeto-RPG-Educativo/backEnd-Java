@@ -10,7 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Controlador REST para operações relacionadas a TutorialDialog.
+ * Controller REST responsável pelos diálogos do tutorial inicial.
+ * <p>
+ * Gerencia os diálogos introdutórios que guiam novos jogadores
+ * através dos primeiros passos do jogo, explicando mecânicas básicas
+ * e apresentando o universo do RPG educacional.
+ * </p>
  *
  * @author MURILO FURTADO
  * @version 1.0
@@ -24,10 +29,14 @@ public class TutorialDialogController {
     private TutorialDialogService service;
 
     /**
-     * Busca um TutorialDialog pelo ID.
+     * Busca um diálogo de tutorial específico por seu identificador.
+     * <p>
+     * Retorna o diálogo completo com conteúdo, resposta e informações
+     * do NPC que apresenta o tutorial.
+     * </p>
      *
-     * @param id o ID do TutorialDialog
-     * @return ResponseEntity contendo o TutorialDialog
+     * @param id identificador único do diálogo de tutorial
+     * @return DTO do diálogo com informações do NPC ou 404 se não encontrado
      */
     @GetMapping("/{id}")
     public ResponseEntity<DialogueResponseDto> getById(@PathVariable Integer id) {

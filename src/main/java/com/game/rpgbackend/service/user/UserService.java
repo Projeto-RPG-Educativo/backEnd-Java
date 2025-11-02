@@ -22,6 +22,22 @@ import java.util.Optional;
 
 /**
  * Serviço responsável pela gestão de usuários e autenticação.
+ * <p>
+ * Gerencia todo o ciclo de vida do usuário no sistema:
+ * - Registro de novos usuários com validação de unicidade
+ * - Autenticação via credenciais com geração de token JWT
+ * - Atualização de perfil e senha
+ * - Consulta de estatísticas e progresso
+ * - Inicialização de dados relacionados (PlayerStats)
+ * </p>
+ * <p>
+ * As senhas são sempre criptografadas usando BCrypt antes
+ * de serem armazenadas no banco de dados.
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @Service
 @RequiredArgsConstructor
@@ -35,6 +51,18 @@ public class UserService {
 
     /**
      * Registra um novo usuário no sistema.
+     * <p>
+     * Processo de registro:
+     * 1. Valida campos obrigatórios
+     * 2. Verifica unicidade de username e email
+     * 3. Criptografa a senha
+     * 4. Cria o usuário no banco
+     * 5. Inicializa estatísticas de jogo (PlayerStats) com valores padrão
+     * </p>
+     *
+     * @param request dados de registro (username, email, senha)
+     * @return usuário criado e persistido
+     * @throws BadRequestException se campos obrigatórios faltarem ou username/email já existirem
      */
     @Transactional
     public User registerUser(RegisterRequest request) {
@@ -77,7 +105,19 @@ public class UserService {
     }
 
     /**
-     * Autentica um usuário e retorna um token JWT.
+     * Autentica um usuário e retorna um token JWT para acesso às rotas protegidas.
+     * <p>
+     * Processo de autenticação:
+     * 1. Busca o usuário pelo username
+     * 2. Valida a senha usando BCrypt
+     * 3. Gera um token JWT válido por tempo configurado
+     * 4. Retorna dados do usuário e token
+     * </p>
+     *
+     * @param username nome de usuário para login
+     * @param password senha em texto plano para validação
+     * @return DTO contendo mensagem, dados do usuário e token JWT
+     * @throws UnauthorizedException se as credenciais forem inválidas
      */
     public LoginResponseDto loginUser(String username, String password) {
         User user = userRepository.findByUsername(username)
@@ -96,21 +136,27 @@ public class UserService {
     }
 
     /**
-     * Busca um usuário por ID.
+     * Busca um usuário por seu identificador único.
+     *
+     * @param id identificador do usuário
+     * @return Optional contendo o usuário se encontrado
      */
     public Optional<User> findById(Integer id) {
         return userRepository.findById(id);
     }
 
     /**
-     * Busca um usuário por nome de usuário.
+     * Busca um usuário pelo nome de usuário.
+     *
+     * @param username nome de usuário
+     * @return Optional contendo o usuário se encontrado
      */
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
     /**
-     * Busca um usuário por email.
+     * Busca um usuário pelo endereço de email.
      */
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);

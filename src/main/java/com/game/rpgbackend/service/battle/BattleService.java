@@ -23,6 +23,24 @@ import java.util.List;
 
 /**
  * Serviço principal de batalha que orquestra todo o sistema de combate.
+ * <p>
+ * Responsável por gerenciar o fluxo completo de uma batalha, incluindo:
+ * - Início de novas batalhas
+ * - Processamento de ações de combate (ataque, defesa, habilidades)
+ * - Sistema de turnos (jogador e monstro)
+ * - Recuperação de energia através de questões
+ * - Finalização de batalhas (vitória/derrota)
+ * - Salvamento de resultados e atualização de estatísticas
+ * </p>
+ * <p>
+ * O sistema de batalha funciona com turnos alternados onde o jogador
+ * executa uma ação e o monstro responde. Questões educacionais podem
+ * ser respondidas entre turnos para recuperar energia.
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
  */
 @Service
 @RequiredArgsConstructor
@@ -40,7 +58,17 @@ public class BattleService {
 
 
     /**
-     * Orquestra a ação de ATAQUE.
+     * Executa a ação de ataque do personagem contra o monstro.
+     * <p>
+     * Consome energia do personagem e prepara o dano a ser causado.
+     * O dano só é efetivamente aplicado após o turno do monstro.
+     * Verifica se é o turno do jogador e se ele possui energia suficiente.
+     * </p>
+     *
+     * @param userId identificador do usuário realizando a ação
+     * @return estado atualizado da batalha com ação de ataque pendente
+     * @throws NotFoundException se não houver batalha ativa
+     * @throws BadRequestException se o jogador estiver atordoado, sem energia ou não for seu turno
      */
     @Transactional
     public BattleStateResponse attack(Integer userId) {
@@ -96,7 +124,18 @@ public class BattleService {
     }
 
     /**
-     * Orquestra a ação de DEFESA.
+     * Executa a ação de defesa do personagem.
+     * <p>
+     * Consome energia e coloca o personagem em postura defensiva.
+     * Reduz significativamente o dano recebido no próximo ataque do monstro.
+     * A defesa dura apenas o turno atual e é removida automaticamente
+     * se o monstro não causar dano.
+     * </p>
+     *
+     * @param userId identificador do usuário realizando a ação
+     * @return estado atualizado da batalha em postura defensiva
+     * @throws NotFoundException se não houver batalha ativa
+     * @throws BadRequestException se o jogador estiver atordoado, sem energia ou não for seu turno
      */
     @Transactional
     public BattleStateResponse defend(Integer userId) {
@@ -151,7 +190,26 @@ public class BattleService {
     }
 
     /**
-     * Orquestra a ação de USAR HABILIDADE.
+     * Executa a habilidade especial da classe do personagem.
+     * <p>
+     * Cada classe possui uma habilidade única:
+     * - Lutador: Investida (dano massivo ignorando defesa parcial)
+     * - Mago: Bola de Fogo (dano mágico)
+     * - Bardo: Canto Inspirador (aumenta dano de ataques)
+     * - Ladino: Ataque Furtivo (dano crítico)
+     * - Paladino: Cura Divina (restaura HP)
+     * - Tank: Provocar (força monstro a atacar)
+     * </p>
+     * <p>
+     * Habilidades podem ser bloqueadas por efeitos como "DISABLE_SKILL"
+     * e consomem mais energia que ações básicas.
+     * </p>
+     *
+     * @param userId identificador do usuário realizando a ação
+     * @return estado atualizado da batalha após usar a habilidade
+     * @throws NotFoundException se não houver batalha ativa
+     * @throws BadRequestException se o jogador estiver atordoado, sem energia,
+     *                            com habilidades bloqueadas ou não for seu turno
      */
     @Transactional
     public BattleStateResponse useSkill(Integer userId) {
@@ -333,6 +391,28 @@ public class BattleService {
 
     /**
      * Inicia uma nova batalha.
+     */
+    /**
+     * Inicia uma nova batalha entre um personagem e um monstro.
+     * <p>
+     * Cria o estado inicial da batalha com:
+     * - HP do personagem restaurado ao máximo
+     * - Energia do personagem restaurada ao máximo
+     * - HP e estatísticas base do monstro
+     * - Primeira questão educacional gerada
+     * - Sistema de turnos inicializado (jogador começa)
+     * </p>
+     * <p>
+     * A dificuldade influencia a complexidade das questões apresentadas.
+     * </p>
+     *
+     * @param userId identificador do usuário iniciando a batalha
+     * @param monsterId identificador do monstro a ser enfrentado
+     * @param difficulty nível de dificuldade (easy, medium, hard)
+     * @param characterId identificador do personagem que lutará
+     * @return estado inicial da batalha pronto para começar
+     * @throws BadRequestException se o personagem não pertencer ao usuário ou dados inválidos
+     * @throws NotFoundException se o monstro ou personagem não for encontrado
      */
     @Transactional
     public BattleStateResponse startBattle(Integer userId, Integer monsterId, String difficulty, Integer characterId) {

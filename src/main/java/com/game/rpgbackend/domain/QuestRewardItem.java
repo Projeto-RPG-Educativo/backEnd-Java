@@ -13,7 +13,7 @@ import java.io.Serializable;
  * são recebidos ao completar uma quest específica.
  * </p>
  *
- * @author D0UGH5
+ * @author GABRIEL XAVIER
  * @version 1.0
  * @since 1.0
  */

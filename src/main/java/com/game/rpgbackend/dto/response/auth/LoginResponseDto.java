@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
  * incluindo mensagem de confirmação, dados do usuário e token JWT.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */

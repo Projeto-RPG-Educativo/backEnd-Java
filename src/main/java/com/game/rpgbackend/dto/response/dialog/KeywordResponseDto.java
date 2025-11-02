@@ -1,39 +1,45 @@
 package com.game.rpgbackend.dto.response.dialog;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * DTO de resposta para palavras-chave destacadas em diálogos educacionais.
+ * <p>
+ * Representa uma palavra importante no diálogo que possui tradução
+ * e pode ser destacada visualmente para auxiliar no aprendizado de idiomas.
+ * Palavras-chave ajudam o jogador a entender termos específicos sem
+ * precisar consultar dicionários externos.
+ * </p>
+ * <p>
+ * Uso no frontend:
+ * - Palavras com destaque=true devem ser sublinhadas ou com cor diferente
+ * - Ao passar o mouse ou clicar, exibir a tradução em tooltip
+ * - Facilita aprendizado contextual de vocabulário
+ * </p>
+ *
+ * @author MURILO FURTADO
+ * @version 1.0
+ * @since 1.0
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class KeywordResponseDto {
+
+    /**
+     * Palavra no idioma original (inglês ou português).
+     */
     private String palavra;
+
+    /**
+     * Tradução da palavra para o outro idioma.
+     */
     private String traducao;
+
+    /**
+     * Indica se a palavra deve ser destacada visualmente no diálogo.
+     */
     private Boolean destaque;
-
-    public KeywordResponseDto() {}
-
-    public KeywordResponseDto(String palavra, String traducao, Boolean destaque) {
-        this.palavra = palavra;
-        this.traducao = traducao;
-        this.destaque = destaque;
-    }
-
-    public String getPalavra() {
-        return palavra;
-    }
-
-    public void setPalavra(String palavra) {
-        this.palavra = palavra;
-    }
-
-    public String getTraducao() {
-        return traducao;
-    }
-
-    public void setTraducao(String traducao) {
-        this.traducao = traducao;
-    }
-
-    public Boolean getDestaque() {
-        return destaque;
-    }
-
-    public void setDestaque(Boolean destaque) {
-        this.destaque = destaque;
-    }
 }

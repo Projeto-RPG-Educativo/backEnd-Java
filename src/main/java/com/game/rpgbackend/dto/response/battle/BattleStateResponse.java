@@ -1,6 +1,5 @@
 package com.game.rpgbackend.dto.response.battle;
 
-import com.game.rpgbackend.dto.battle.BattleEffect;
 import lombok.Data;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,7 @@ import java.util.Map;
  * incluindo dados do personagem, do monstro e da questão atual.
  * </p>
  *
- * @author D0UGH5
+ * @author MURILO FURTADO
  * @version 1.0
  * @since 1.0
  */
