@@ -55,6 +55,7 @@ public class BattleService {
     private final QuestionRepository questionRepository;
     private final GameConfig gameConfig;
     private final PlayerStatsRepository playerStatsRepository;
+    private final com.game.rpgbackend.service.hub.QuestService questService;
 
 
     /**
@@ -479,6 +480,13 @@ public class BattleService {
 
         battleState.setIsFinished(false);
 
+        // Busca quests ativas do personagem
+        System.out.println("DEBUG BattleService: Buscando quests para character.getId() = " + character.getId());
+        List<com.game.rpgbackend.dto.response.hub.QuestDto> activeQuests =
+            questService.getActiveQuestsByCharacterId(character.getId());
+        System.out.println("DEBUG BattleService: Quests retornadas: " + (activeQuests != null ? activeQuests.size() : "null"));
+        battleState.setActiveQuests(activeQuests);
+
         // 3. Salva o estado
         battleStateService.setActiveBattle(userId, battleState);
 
@@ -550,6 +558,15 @@ public class BattleService {
         // 2.2. Atualiza estatísticas da questão
         if (isCorrect) {
             stats.setQuestionsRight(stats.getQuestionsRight() + 1);
+
+            // Atualiza progresso de quests de ANSWER_QUESTIONS e obtém lista atualizada
+            try {
+                List<com.game.rpgbackend.dto.response.hub.QuestDto> updatedQuests =
+                    questService.updateQuestionProgressForAllActiveQuests(character.getId());
+                battle.setActiveQuests(updatedQuests);
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar progresso de quest: " + e.getMessage());
+            }
         } else {
             stats.setQuestionsWrong(stats.getQuestionsWrong() + 1);
         }
@@ -590,6 +607,18 @@ public class BattleService {
                 ch.setXp(ch.getXp() + gameConfig.getBattle().getXpWinReward());
                 characterRepository.save(ch);
             });
+
+            // Atualiza progresso de quests WIN_BATTLES e DEFEAT_MONSTER
+            try {
+                // Primeiro atualiza quest de monstro específico
+                questService.updateMonsterDefeatProgress(character.getId(), updatedBattle.getMonster().getId());
+                // Depois atualiza quest de vitórias e obtém lista completa atualizada
+                List<com.game.rpgbackend.dto.response.hub.QuestDto> updatedQuests =
+                    questService.updateBattleWinProgress(character.getId());
+                updatedBattle.setActiveQuests(updatedQuests);
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar progresso de quest: " + e.getMessage());
+            }
 
             CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(
                 updatedBattle.getCharacter().getId()

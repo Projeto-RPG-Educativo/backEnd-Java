@@ -69,6 +69,9 @@ public class BattleStateResponse {
     /** Número de ataques garantidos que o monstro deve realizar (usado por skills como Singular Strike do Diabrete) */
     private Integer monsterGuaranteedAttacks = 0;
 
+    /** Lista de todas as quests ativas do jogador com progresso atualizado */
+    private java.util.List<com.game.rpgbackend.dto.response.hub.QuestDto> activeQuests;
+
     /**
      * Classe interna com informações do personagem durante a batalha.
      * Inclui atributos, status e efeitos ativos.
