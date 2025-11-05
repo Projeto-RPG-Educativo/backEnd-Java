@@ -25,7 +25,8 @@ public class DatabaseSeeder {
             StoreRepository storeRepository,
             ItemLojaRepository itemLojaRepository,
             NPCRepository npcRepository,
-            DialogueRepository dialogueRepository
+            DialogueRepository dialogueRepository,
+            QuestRepository questRepository
     ) {
         return args -> {
             System.out.println("--- INICIANDO O DATABASE SEEDER INTELIGENTE ---");
@@ -34,11 +35,12 @@ public class DatabaseSeeder {
             seedClasses(classRepository);
             Map<String, Content> contentMap = seedContent(contentRepository);
             seedQuestions(questionRepository, contentMap);
-            seedMonsters(monsterRepository);
+            Map<String, Monster> monsterMap = seedMonsters(monsterRepository);
             Map<String, Item> itemMap = seedItems(itemRepository);
             seedLoja(storeRepository, itemLojaRepository, itemMap);
             seedNpc(npcRepository);
             seedDialogue(dialogueRepository, npcRepository);
+            seedQuests(questRepository, monsterMap);
 
             System.out.println("--- DATABASE SEEDER FINALIZADO ---");
         };
@@ -193,7 +195,7 @@ public class DatabaseSeeder {
     }
 
     // Método para popular a tabela de Monstros
-    private void seedMonsters(MonsterRepository monsterRepository) {
+    private Map<String, Monster> seedMonsters(MonsterRepository monsterRepository) {
         Map<String, Monster> existingMonsters = monsterRepository.findAll().stream()
                 .collect(Collectors.toMap(Monster::getMonsterName, Function.identity()));
 
@@ -257,10 +259,14 @@ public class DatabaseSeeder {
 
         if (!desiredMonsters.isEmpty()) {
             System.out.println("Inserindo " + desiredMonsters.size() + " novos monstros...");
-            monsterRepository.saveAll(desiredMonsters);
+            List<Monster> savedMonsters = monsterRepository.saveAll(desiredMonsters);
+            // Adiciona os novos monstros ao mapa de existentes
+            savedMonsters.forEach(m -> existingMonsters.put(m.getMonsterName(), m));
         } else {
             System.out.println("Tabela 'monster' já está atualizada.");
         }
+
+        return existingMonsters;
     }
 
     // Método para popular a tabela de Itens
@@ -916,6 +922,125 @@ public class DatabaseSeeder {
             newDialogue.setContent(content);
             newDialogue.setResponse(response); // Define a resposta (pode ser null)
             desiredDialogues.add(newDialogue);
+        }
+    }
+
+    // Método para popular a tabela de Quests
+    private void seedQuests(QuestRepository questRepository, Map<String, Monster> monsterMap) {
+        System.out.println("Verificando/adicionando quests...");
+
+        Map<String, Quest> existingQuests = questRepository.findAll().stream()
+                .collect(Collectors.toMap(Quest::getTitle, Function.identity()));
+
+        List<Quest> desiredQuests = new ArrayList<>();
+
+        // Quest 1: Acertar 15 perguntas
+        if (!existingQuests.containsKey("Domínio do Conhecimento")) {
+            Quest quest1 = new Quest();
+            quest1.setTitle("Domínio do Conhecimento");
+            quest1.setDescription("Demonstre seu conhecimento acertando 15 perguntas em batalhas. A Guardiã dos Verbos Furiosos testará sua sabedoria!");
+            quest1.setXpReward(500);
+            quest1.setGoldReward(100);
+            quest1.setType(com.game.rpgbackend.enums.QuestType.ANSWER_QUESTIONS);
+            quest1.setTargetValue(15);
+            desiredQuests.add(quest1);
+        }
+
+        // Quest 2: Derrotar Diabrete Errôneo
+        Monster diabrete = monsterMap.get("Diabrete Errôneo");
+        if (!existingQuests.containsKey("A Ameaça Errônea") && diabrete != null) {
+            Quest quest2 = new Quest();
+            quest2.setTitle("A Ameaça Errônea");
+            quest2.setDescription("O Diabrete Errôneo tem atormentado os viajantes com erros gramaticais. Derrote-o 3 vezes para restaurar a ordem!");
+            quest2.setXpReward(300);
+            quest2.setGoldReward(75);
+            quest2.setType(com.game.rpgbackend.enums.QuestType.DEFEAT_MONSTER);
+            quest2.setTargetValue(3);
+            quest2.setTargetId(diabrete.getId());
+            desiredQuests.add(quest2);
+        }
+
+        // Quest 3: Vencer 10 batalhas
+        if (!existingQuests.containsKey("Caminho do Guerreiro")) {
+            Quest quest3 = new Quest();
+            quest3.setTitle("Caminho do Guerreiro");
+            quest3.setDescription("Prove sua força vencendo 10 batalhas contra qualquer adversário. Mostre que você é um verdadeiro guerreiro de Aetheria!");
+            quest3.setXpReward(400);
+            quest3.setGoldReward(80);
+            quest3.setType(com.game.rpgbackend.enums.QuestType.WIN_BATTLES);
+            quest3.setTargetValue(10);
+            desiredQuests.add(quest3);
+        }
+
+        // Quest 4: Derrotar Harpia Indagada
+        Monster harpia = monsterMap.get("Harpia Indagada");
+        if (!existingQuests.containsKey("Silenciando a Harpia") && harpia != null) {
+            Quest quest4 = new Quest();
+            quest4.setTitle("Silenciando a Harpia");
+            quest4.setDescription("A Harpia Indagada não para de fazer perguntas intermináveis. Derrote-a 2 vezes para trazer paz aos ouvidos de todos!");
+            quest4.setXpReward(350);
+            quest4.setGoldReward(85);
+            quest4.setType(com.game.rpgbackend.enums.QuestType.DEFEAT_MONSTER);
+            quest4.setTargetValue(2);
+            quest4.setTargetId(harpia.getId());
+            desiredQuests.add(quest4);
+        }
+
+        // Quest 5: Acertar 25 perguntas (Quest avançada)
+        if (!existingQuests.containsKey("Mestre do Vocabulário")) {
+            Quest quest5 = new Quest();
+            quest5.setTitle("Mestre do Vocabulário");
+            quest5.setDescription("Apenas os mais dedicados conseguem acertar 25 perguntas. Aceite este desafio e torne-se um Mestre do Vocabulário!");
+            quest5.setXpReward(800);
+            quest5.setGoldReward(150);
+            quest5.setType(com.game.rpgbackend.enums.QuestType.ANSWER_QUESTIONS);
+            quest5.setTargetValue(25);
+            desiredQuests.add(quest5);
+        }
+
+        // Quest 6: Derrotar Zumbi Demente
+        Monster zumbi = monsterMap.get("Zumbi Demente");
+        if (!existingQuests.containsKey("Desfazendo a Demência") && zumbi != null) {
+            Quest quest6 = new Quest();
+            quest6.setTitle("Desfazendo a Demência");
+            quest6.setDescription("O Zumbi Demente espalha confusão por onde passa. Derrote-o 2 vezes para limpar as terras de sua influência maligna!");
+            quest6.setXpReward(450);
+            quest6.setGoldReward(100);
+            quest6.setType(com.game.rpgbackend.enums.QuestType.DEFEAT_MONSTER);
+            quest6.setTargetValue(2);
+            quest6.setTargetId(zumbi.getId());
+            desiredQuests.add(quest6);
+        }
+
+        // Quest 7: Vencer 5 batalhas (Quest iniciante)
+        if (!existingQuests.containsKey("Primeiros Passos")) {
+            Quest quest7 = new Quest();
+            quest7.setTitle("Primeiros Passos");
+            quest7.setDescription("Todo grande aventureiro começa em algum lugar. Vença suas primeiras 5 batalhas e inicie sua jornada épica!");
+            quest7.setXpReward(200);
+            quest7.setGoldReward(50);
+            quest7.setType(com.game.rpgbackend.enums.QuestType.WIN_BATTLES);
+            quest7.setTargetValue(5);
+            desiredQuests.add(quest7);
+        }
+
+        // Quest 8: Acertar 10 perguntas (Quest iniciante)
+        if (!existingQuests.containsKey("Aprendiz da Gramática")) {
+            Quest quest8 = new Quest();
+            quest8.setTitle("Aprendiz da Gramática");
+            quest8.setDescription("Todo conhecimento começa com os fundamentos. Acerte 10 perguntas para provar que está pronto para desafios maiores!");
+            quest8.setXpReward(250);
+            quest8.setGoldReward(60);
+            quest8.setType(com.game.rpgbackend.enums.QuestType.ANSWER_QUESTIONS);
+            quest8.setTargetValue(10);
+            desiredQuests.add(quest8);
+        }
+
+        if (!desiredQuests.isEmpty()) {
+            System.out.println("Inserindo " + desiredQuests.size() + " novas quests...");
+            questRepository.saveAll(desiredQuests);
+        } else {
+            System.out.println("Tabela 'quest' já está atualizada.");
         }
     }
 }

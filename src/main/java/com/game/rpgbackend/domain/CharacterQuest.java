@@ -54,4 +54,8 @@ public class CharacterQuest {
     /** Status da quest (in_progress, completed, failed) */
     @Column(nullable = false)
     private String status = "in_progress";
+
+    /** Progresso atual da quest (ex: 5 de 15 perguntas respondidas) */
+    @Column(nullable = false)
+    private Integer progress = 0;
 }

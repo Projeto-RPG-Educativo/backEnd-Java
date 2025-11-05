@@ -1,9 +1,11 @@
 package com.game.rpgbackend.controller.hub;
 
 import com.game.rpgbackend.domain.*;
+import com.game.rpgbackend.dto.request.hub.AcceptQuestRequest;
 import com.game.rpgbackend.dto.request.hub.PurchaseItemRequest;
 import com.game.rpgbackend.dto.request.hub.PurchaseSkillRequest;
 import com.game.rpgbackend.dto.response.hub.BookDto;
+import com.game.rpgbackend.dto.response.hub.QuestDto;
 import com.game.rpgbackend.dto.response.hub.SkillDto;
 import com.game.rpgbackend.service.hub.*;
 import com.game.rpgbackend.util.AuthenticationUtil;
@@ -42,6 +44,7 @@ public class HubController {
     private final StoreService storeService;
     private final StageService stageService;
     private final PlayerService playerService;
+    private final QuestService questService;
     private final AuthenticationUtil authenticationUtil;
 
     // === BIBLIOTECA SILENCIOSA ===
@@ -279,12 +282,87 @@ public class HubController {
         return ResponseEntity.ok(playerService.getRankings());
     }
 
+    // === TORRE DO CONHECIMENTO - QUESTS ===
+
     /**
-     * Converte entidade Book para DTO de resposta.
+     * Retorna todas as quests disponíveis na Torre do Conhecimento para um personagem.
+     * <p>
+     * Inclui informações de progresso se o personagem já aceitou alguma quest.
+     * </p>
      *
-     * @param book entidade de livro
-     * @return DTO formatado para envio ao cliente
+     * @param userDetails detalhes do usuário autenticado
+     * @param characterId ID do personagem (obrigatório)
+     * @return lista de quests disponíveis com progresso
      */
+    @GetMapping("/tower/quests")
+    public ResponseEntity<List<QuestDto>> getAvailableQuests(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam Integer characterId) {
+
+        // TODO: Validar que personagem pertence ao usuário
+        List<QuestDto> quests = questService.getAvailableQuestsForCharacter(characterId);
+        return ResponseEntity.ok(quests);
+    }
+
+    /**
+     * Retorna as quests ativas (em progresso) de um personagem específico.
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @param characterId ID do personagem (obrigatório)
+     * @return lista de quests ativas
+     */
+    @GetMapping("/tower/quests/active")
+    public ResponseEntity<List<QuestDto>> getActiveQuests(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam Integer characterId) {
+
+        // TODO: Validar que personagem pertence ao usuário
+        List<QuestDto> quests = questService.getActiveQuests(characterId);
+        return ResponseEntity.ok(quests);
+    }
+
+    /**
+     * Aceita uma quest da Torre do Conhecimento para um personagem específico.
+     * <p>
+     * Cada personagem só pode ter uma quest ativa por vez.
+     * </p>
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @param request dados da quest a aceitar (questId e characterId)
+     * @return informações da quest aceita
+     */
+    @PostMapping("/tower/quests/accept")
+    public ResponseEntity<com.game.rpgbackend.dto.response.hub.AcceptQuestResponse> acceptQuest(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody AcceptQuestRequest request) {
+
+        Integer userId = authenticationUtil.getUserIdFromUsername(userDetails.getUsername());
+        com.game.rpgbackend.dto.response.hub.AcceptQuestResponse response =
+            questService.acceptQuest(userId, request.getQuestId(), request.getCharacterId());
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Abandona uma quest ativa de um personagem específico.
+     *
+     * @param userDetails detalhes do usuário autenticado
+     * @param questId ID da quest a abandonar
+     * @param characterId ID do personagem (obrigatório)
+     * @return resposta de sucesso
+     */
+    @DeleteMapping("/tower/quests/{questId}/abandon")
+    public ResponseEntity<String> abandonQuest(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Integer questId,
+            @RequestParam Integer characterId) {
+
+        Integer userId = authenticationUtil.getUserIdFromUsername(userDetails.getUsername());
+        questService.abandonQuest(userId, questId, characterId);
+        return ResponseEntity.ok("Quest abandonada com sucesso");
+    }
+
+    // === MÉTODOS AUXILIARES ===
+
     /**
      * Converte entidade Book para DTO de resposta.
      *
