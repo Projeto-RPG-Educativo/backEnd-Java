@@ -269,9 +269,16 @@ public class BattleService {
                         String correctAnswer = question.getCorrectAnswer();
                         List<String> opcoes = new ArrayList<>(battle.getCurrentQuestion().getOpcoes());
 
-                        // Remove primeira opção incorreta
-                        opcoes.removeIf(opt -> !opt.equalsIgnoreCase(correctAnswer));
-                        if (opcoes.size() < battle.getCurrentQuestion().getOpcoes().size()) {
+                        // Remove apenas a primeira opção incorreta encontrada
+                        boolean removed = false;
+                        for (int i = 0; i < opcoes.size() && !removed; i++) {
+                            if (!opcoes.get(i).equalsIgnoreCase(correctAnswer)) {
+                                opcoes.remove(i);
+                                removed = true;
+                            }
+                        }
+
+                        if (removed) {
                             battle.getCurrentQuestion().setOpcoes(opcoes);
                             turnResult += " Uma opção incorreta foi eliminada!";
                         }
