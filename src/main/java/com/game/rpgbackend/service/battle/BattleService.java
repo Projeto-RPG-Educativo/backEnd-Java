@@ -495,6 +495,11 @@ public class BattleService {
         System.out.println("DEBUG BattleService: Quests retornadas: " + (activeQuests != null ? activeQuests.size() : "null"));
         battleState.setActiveQuests(activeQuests);
 
+        // Busca quests completadas do personagem
+        List<com.game.rpgbackend.dto.response.hub.QuestDto> completedQuests =
+            questService.getCompletedQuests(character.getId());
+        battleState.setCompletedQuests(completedQuests);
+
         // 3. Salva o estado
         battleStateService.setActiveBattle(userId, battleState);
 
@@ -589,6 +594,11 @@ public class BattleService {
                     questService.updateQuestionProgressForAllActiveQuests(character.getId());
                 battle.setActiveQuests(updatedQuests);
 
+                // Atualiza lista de quests completadas
+                List<com.game.rpgbackend.dto.response.hub.QuestDto> completedQuests =
+                    questService.getCompletedQuests(character.getId());
+                battle.setCompletedQuests(completedQuests);
+
                 // Recarrega o personagem do banco para pegar XP e Gold atualizados pelas recompensas de quest
                 Character updatedCharacter = characterRepository.findById(character.getId())
                     .orElse(character);
@@ -646,6 +656,11 @@ public class BattleService {
                 List<com.game.rpgbackend.dto.response.hub.QuestDto> updatedQuests =
                     questService.updateBattleWinProgress(character.getId());
                 updatedBattle.setActiveQuests(updatedQuests);
+
+                // Atualiza lista de quests completadas
+                List<com.game.rpgbackend.dto.response.hub.QuestDto> completedQuests =
+                    questService.getCompletedQuests(character.getId());
+                updatedBattle.setCompletedQuests(completedQuests);
 
                 // Recarrega o personagem do banco para pegar XP e Gold atualizados pelas recompensas de quest
                 Character updatedCharacter = characterRepository.findById(character.getId())
