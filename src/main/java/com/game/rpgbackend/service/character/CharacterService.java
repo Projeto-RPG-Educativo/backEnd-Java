@@ -145,24 +145,44 @@ public class CharacterService {
         PlayerStats stats = character.getUser().getStats();
         int currentLevel = stats.getLevel();
         int currentXp = character.getXp();
-        int xpNeeded = calculateXpForNextLevel(currentLevel);
 
-        if (currentXp >= xpNeeded) {
-            // LEVEL UP!
-            int newLevel = currentLevel + 1;
-            int remainingXp = currentXp - xpNeeded;
-            int skillPointsGained = 1;
+        // Variáveis para rastrear múltiplos level ups
+        int levelsGained = 0;
+        int totalSkillPointsGained = 0;
 
+        // Loop para verificar múltiplos level ups
+        while (true) {
+            int xpNeeded = calculateXpForNextLevel(currentLevel);
+
+            if (currentXp >= xpNeeded) {
+                // LEVEL UP!
+                currentLevel++;
+                levelsGained++;
+                currentXp -= xpNeeded;
+                totalSkillPointsGained += 1;
+            } else {
+                // Não tem XP suficiente para o próximo nível
+                break;
+            }
+        }
+
+        // Se subiu pelo menos um nível
+        if (levelsGained > 0) {
             // Atualiza estatísticas do jogador
-            stats.setLevel(newLevel);
-            stats.setSkillPoints(stats.getSkillPoints() + skillPointsGained);
+            stats.setLevel(currentLevel);
+            stats.setSkillPoints(stats.getSkillPoints() + totalSkillPointsGained);
             playerStatsRepository.save(stats);
 
             // Atualiza XP do personagem
-            character.setXp(remainingXp);
+            character.setXp(currentXp);
             characterRepository.save(character);
 
-            return new LevelUpResult(true, String.format("Parabéns! Você alcançou o nível %d!", newLevel));
+            // Mensagem diferente para múltiplos níveis
+            if (levelsGained == 1) {
+                return new LevelUpResult(true, String.format("Parabéns! Você alcançou o nível %d!", currentLevel));
+            } else {
+                return new LevelUpResult(true, String.format("Incrível! Você subiu %d níveis e alcançou o nível %d!", levelsGained, currentLevel));
+            }
         }
 
         return new LevelUpResult(false, "Você ganhou XP!");

@@ -114,6 +114,9 @@ public class BattleStateResponse {
         /** Experiência máxima necessária para o próximo nível */
         private Integer maxXpForLevel;
 
+        /** Ouro do personagem */
+        private Integer gold;
+
         /** Indica se o personagem está defendendo */
         private Boolean isDefending = false;
 

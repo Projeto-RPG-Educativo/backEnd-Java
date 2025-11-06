@@ -461,6 +461,7 @@ public class BattleService {
         charInfo.setXp(character.getXp());
         int maxXpForLevel = (int) (gameConfig.getLeveling().getBaseXp() * Math.pow(gameConfig.getLeveling().getXpMultiplier(), playerLevel));
         charInfo.setMaxXpForLevel(maxXpForLevel);
+        charInfo.setGold(character.getGold());
         battleState.setCharacter(charInfo);
 
         BattleStateResponse.MonsterBattleInfo monsterInfo = new BattleStateResponse.MonsterBattleInfo();
@@ -544,9 +545,17 @@ public class BattleService {
                     ch.setXp(ch.getXp() + xpReward);
                     characterRepository.save(ch);
                 });
+
+                // Verifica level up após vitória do Bardo
+                CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(battle.getCharacter().getId());
+                String turnResult = "Incrível! Sua Lábia funcionou e você encerrou o combate com maestria, ganhando o dobro de XP!";
+                if (levelUpResult.isLeveledUp()) {
+                    turnResult += " " + levelUpResult.getMessage();
+                }
+
                 battleStateService.removeActiveBattle(userId);
                 battle.setIsFinished(true);
-                battle.setTurnResult("Incrível! Sua Lábia funcionou e você encerrou o combate com maestria, ganhando o dobro de XP!");
+                battle.setTurnResult(turnResult);
                 return battle;
             } else {
                 // Atualiza estatísticas do Bardo (derrota + questão errada)
@@ -555,9 +564,17 @@ public class BattleService {
                 playerStatsRepository.save(stats);
 
                 battle.getCharacter().setHp(battle.getCharacter().getHp() - 30);
+
+                // Verifica level up mesmo após derrota (jogador pode ter completado quests durante a batalha)
+                CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(battle.getCharacter().getId());
+                String turnResult = "Sua Lábia falhou! Você irritou o monstro e foi derrotado.";
+                if (levelUpResult.isLeveledUp()) {
+                    turnResult += " " + levelUpResult.getMessage();
+                }
+
                 battleStateService.removeActiveBattle(userId);
                 battle.setIsFinished(true);
-                battle.setTurnResult("Sua Lábia falhou! Você irritou o monstro e foi derrotado.");
+                battle.setTurnResult(turnResult);
                 return battle;
             }
         }
@@ -571,6 +588,12 @@ public class BattleService {
                 List<com.game.rpgbackend.dto.response.hub.QuestDto> updatedQuests =
                     questService.updateQuestionProgressForAllActiveQuests(character.getId());
                 battle.setActiveQuests(updatedQuests);
+
+                // Recarrega o personagem do banco para pegar XP e Gold atualizados pelas recompensas de quest
+                Character updatedCharacter = characterRepository.findById(character.getId())
+                    .orElse(character);
+                battle.getCharacter().setXp(updatedCharacter.getXp());
+                battle.getCharacter().setGold(updatedCharacter.getGold());
             } catch (Exception e) {
                 System.err.println("Erro ao atualizar progresso de quest: " + e.getMessage());
             }
@@ -623,6 +646,12 @@ public class BattleService {
                 List<com.game.rpgbackend.dto.response.hub.QuestDto> updatedQuests =
                     questService.updateBattleWinProgress(character.getId());
                 updatedBattle.setActiveQuests(updatedQuests);
+
+                // Recarrega o personagem do banco para pegar XP e Gold atualizados pelas recompensas de quest
+                Character updatedCharacter = characterRepository.findById(character.getId())
+                    .orElse(character);
+                updatedBattle.getCharacter().setXp(updatedCharacter.getXp());
+                updatedBattle.getCharacter().setGold(updatedCharacter.getGold());
             } catch (Exception e) {
                 System.err.println("Erro ao atualizar progresso de quest: " + e.getMessage());
             }
@@ -640,6 +669,14 @@ public class BattleService {
             // Incrementar batalhas perdidas
             stats.setBattlesLost(stats.getBattlesLost() + 1);
             playerStatsRepository.save(stats);
+
+            // Verifica level up mesmo após derrota (jogador pode ter completado quests durante a batalha)
+            CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(
+                updatedBattle.getCharacter().getId()
+            );
+            if (levelUpResult.isLeveledUp()) {
+                turnResult += " " + levelUpResult.getMessage();
+            }
 
             battleStateService.removeActiveBattle(userId);
         }
@@ -831,6 +868,12 @@ public class BattleService {
                 .orElseThrow(() -> new NotFoundException("Estatísticas não encontradas"));
             stats.setBattlesLost(stats.getBattlesLost() + 1);
             playerStatsRepository.save(stats);
+
+            // Verifica level up mesmo após derrota (jogador pode ter completado quests durante a batalha)
+            CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(battle.getCharacter().getId());
+            if (levelUpResult.isLeveledUp()) {
+                turnResult += " " + levelUpResult.getMessage();
+            }
 
             battleStateService.removeActiveBattle(userId);
         } else {
