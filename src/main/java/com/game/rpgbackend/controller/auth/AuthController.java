@@ -42,12 +42,7 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@Valid @RequestBody RegisterUserDto request) {
-        UserService.RegisterRequest registerRequest = new UserService.RegisterRequest();
-        registerRequest.setNomeUsuario(request.getUsername());
-        registerRequest.setEmail(request.getEmail());
-        registerRequest.setSenha(request.getPassword());
-
-        User user = userService.registerUser(registerRequest);
+        User user = userService.registerUser(request);
 
         UserDto userDto = new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt());
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);

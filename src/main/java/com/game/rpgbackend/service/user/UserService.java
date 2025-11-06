@@ -65,13 +65,13 @@ public class UserService {
      * @throws BadRequestException se campos obrigatórios faltarem ou username/email já existirem
      */
     @Transactional
-    public User registerUser(RegisterRequest request) {
-        if (request.getNomeUsuario() == null || request.getSenha() == null || request.getEmail() == null) {
+    public User registerUser(com.game.rpgbackend.dto.request.auth.RegisterUserDto request) {
+        if (request.getUsername() == null || request.getPassword() == null || request.getEmail() == null) {
             throw new BadRequestException("Nome de usuário, email e senha são obrigatórios.");
         }
 
         // Verifica se o usuário já existe
-        if (userRepository.findByUsername(request.getNomeUsuario()).isPresent()) {
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new BadRequestException("Este nome de usuário já está em uso.");
         }
 
@@ -81,9 +81,9 @@ public class UserService {
 
         // Cria o novo usuário
         User newUser = new User();
-        newUser.setUsername(request.getNomeUsuario());
+        newUser.setUsername(request.getUsername());
         newUser.setEmail(request.getEmail());
-        newUser.setHashedPassword(passwordEncoder.encode(request.getSenha()));
+        newUser.setHashedPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setCreatedAt(LocalDateTime.now());
 
         User savedUser = userRepository.save(newUser);
@@ -283,21 +283,5 @@ public class UserService {
 
         userRepository.save(user);
         return getUserProfile(user.getUsername());
-    }
-
-    // Classe interna para Request de registro
-    public static class RegisterRequest {
-        private String nomeUsuario;
-        private String email;
-        private String senha;
-
-        public String getNomeUsuario() { return nomeUsuario; }
-        public void setNomeUsuario(String nomeUsuario) { this.nomeUsuario = nomeUsuario; }
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-
-        public String getSenha() { return senha; }
-        public void setSenha(String senha) { this.senha = senha; }
     }
 }

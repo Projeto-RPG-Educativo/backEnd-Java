@@ -28,7 +28,7 @@ public class UserDto {
     /**
      * Nome de usuário para exibição.
      */
-    private String nomeUsuario;
+    private String username;
 
     /**
      * Email do usuário.
@@ -38,5 +38,5 @@ public class UserDto {
     /**
      * Data e hora de criação da conta.
      */
-    private LocalDateTime criadoEm;
+    private LocalDateTime createdAt;
 }
