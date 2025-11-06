@@ -72,6 +72,8 @@ public class BattleStateResponse {
     /** Lista de todas as quests ativas do jogador com progresso atualizado */
     private java.util.List<com.game.rpgbackend.dto.response.hub.QuestDto> activeQuests;
 
+    /** Lista de todas as quests completadas pelo jogador */
+    private java.util.List<com.game.rpgbackend.dto.response.hub.QuestDto> completedQuests;
     /**
      * Classe interna com informações do personagem durante a batalha.
      * Inclui atributos, status e efeitos ativos.

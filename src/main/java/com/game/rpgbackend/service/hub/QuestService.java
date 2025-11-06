@@ -175,6 +175,41 @@ public class QuestService {
     }
 
     /**
+     * Retorna todas as quests completadas de um personagem.
+     *
+     * @param characterId ID do personagem
+     * @return lista de QuestDto das quests completadas
+     */
+    public List<QuestDto> getCompletedQuests(Integer characterId) {
+        List<CharacterQuest> completedQuests = characterQuestRepository.findByCharacterId(characterId).stream()
+            .filter(cq -> "completed".equals(cq.getStatus()))
+            .collect(Collectors.toList());
+
+        return completedQuests.stream().map(cq -> {
+            Quest quest = cq.getQuest();
+            QuestDto dto = new QuestDto();
+            dto.setId(quest.getId());
+            dto.setTitle(quest.getTitle());
+            dto.setDescription(quest.getDescription());
+            dto.setXpReward(quest.getXpReward());
+            dto.setGoldReward(quest.getGoldReward());
+            dto.setType(quest.getType());
+            dto.setTargetValue(quest.getTargetValue());
+            dto.setTargetId(quest.getTargetId());
+            dto.setProgress(cq.getProgress());
+            dto.setStatus(cq.getStatus());
+
+            if (quest.getType() == QuestType.DEFEAT_MONSTER && quest.getTargetId() != null) {
+                monsterRepository.findById(quest.getTargetId()).ifPresent(monster ->
+                    dto.setTargetName(monster.getMonsterName())
+                );
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    /**
      * Aceita uma quest para um personagem específico.
      *
      * @param userId ID do usuário
