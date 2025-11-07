@@ -400,6 +400,38 @@ public class QuestService {
     }
 
     /**
+     * Atualiza progresso quando o personagem causa dano e retorna todas as quests ativas.
+     *
+     * @param characterId ID do personagem
+     * @param damageDealt quantidade de dano causado
+     * @return Lista de todas as quests ativas com progresso atualizado
+     */
+    @Transactional
+    public List<QuestDto> updateDamageProgress(Integer characterId, int damageDealt) {
+        // Buscar quests ativas de causar dano
+        List<CharacterQuest> damageQuests = characterQuestRepository.findByCharacterId(characterId)
+            .stream()
+            .filter(cq -> "in_progress".equals(cq.getStatus()))
+            .filter(cq -> cq.getQuest().getType() == QuestType.DEAL_DAMAGE)
+            .collect(Collectors.toList());
+
+        // Atualiza progresso das quests de causar dano
+        for (CharacterQuest characterQuest : damageQuests) {
+            characterQuest.setProgress(characterQuest.getProgress() + damageDealt);
+
+            Quest quest = characterQuest.getQuest();
+            if (characterQuest.getProgress() >= quest.getTargetValue()) {
+                completeQuest(characterQuest);
+            } else {
+                characterQuestRepository.save(characterQuest);
+            }
+        }
+
+        // Retorna TODAS as quests ativas (atualizadas)
+        return getActiveQuests(characterId);
+    }
+
+    /**
      * Completa uma quest e distribui recompensas.
      *
      * @param characterQuest quest a ser completada
