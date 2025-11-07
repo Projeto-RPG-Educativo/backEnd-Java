@@ -6,12 +6,14 @@ import com.game.rpgbackend.domain.Monster;
 import com.game.rpgbackend.domain.PlayerStats;
 import com.game.rpgbackend.domain.Question;
 import com.game.rpgbackend.dto.response.battle.BattleStateResponse;
+import com.game.rpgbackend.enums.AchievementType;
 import com.game.rpgbackend.exception.BadRequestException;
 import com.game.rpgbackend.exception.NotFoundException;
 import com.game.rpgbackend.repository.CharacterRepository;
 import com.game.rpgbackend.repository.MonsterRepository;
 import com.game.rpgbackend.repository.PlayerStatsRepository;
 import com.game.rpgbackend.repository.QuestionRepository;
+import com.game.rpgbackend.service.achievement.AchievementService;
 import com.game.rpgbackend.service.character.CharacterService;
 import com.game.rpgbackend.service.question.QuestionService;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +58,7 @@ public class BattleService {
     private final GameConfig gameConfig;
     private final PlayerStatsRepository playerStatsRepository;
     private final com.game.rpgbackend.service.hub.QuestService questService;
-
+    private final AchievementService achievementService;
 
     /**
      * Executa a ação de ataque do personagem contra o monstro.
@@ -377,6 +379,32 @@ public class BattleService {
                 characterRepository.save(ch);
             });
 
+            // Registra vitória nas conquistas
+            try {
+                achievementService.updateAchievementProgress(
+                    battle.getCharacter().getId().longValue(),
+                    AchievementType.WIN_FIRST_BATTLE,
+                    1
+                );
+                achievementService.updateAchievementProgress(
+                    battle.getCharacter().getId().longValue(),
+                    AchievementType.WIN_10_BATTLES,
+                    1
+                );
+                achievementService.updateAchievementProgress(
+                    battle.getCharacter().getId().longValue(),
+                    AchievementType.WIN_50_BATTLES,
+                    1
+                );
+                achievementService.updateAchievementProgress(
+                    battle.getCharacter().getId().longValue(),
+                    AchievementType.WIN_100_BATTLES,
+                    1
+                );
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar conquistas de vitória: " + e.getMessage());
+            }
+
             // Verifica level up
             CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(battle.getCharacter().getId());
             turnResult += " " + levelUpResult.getMessage();
@@ -546,6 +574,27 @@ public class BattleService {
                 stats.setTotalXpEarned(stats.getTotalXpEarned() + xpReward);
                 playerStatsRepository.save(stats);
 
+                // Registra conquistas de questões respondidas
+                try {
+                    achievementService.updateAchievementProgress(
+                        character.getId().longValue(),
+                        AchievementType.ANSWER_10_QUESTIONS,
+                        1
+                    );
+                    achievementService.updateAchievementProgress(
+                        character.getId().longValue(),
+                        AchievementType.ANSWER_50_QUESTIONS,
+                        1
+                    );
+                    achievementService.updateAchievementProgress(
+                        character.getId().longValue(),
+                        AchievementType.ANSWER_100_QUESTIONS,
+                        1
+                    );
+                } catch (Exception e) {
+                    System.err.println("Erro ao atualizar conquistas de questões: " + e.getMessage());
+                }
+
                 characterRepository.findById(battle.getCharacter().getId()).ifPresent(ch -> {
                     ch.setXp(ch.getXp() + xpReward);
                     characterRepository.save(ch);
@@ -606,6 +655,27 @@ public class BattleService {
                 battle.getCharacter().setGold(updatedCharacter.getGold());
             } catch (Exception e) {
                 System.err.println("Erro ao atualizar progresso de quest: " + e.getMessage());
+            }
+
+            // Registra conquistas de questões respondidas
+            try {
+                achievementService.updateAchievementProgress(
+                    character.getId().longValue(),
+                    AchievementType.ANSWER_10_QUESTIONS,
+                    1
+                );
+                achievementService.updateAchievementProgress(
+                    character.getId().longValue(),
+                    AchievementType.ANSWER_50_QUESTIONS,
+                    1
+                );
+                achievementService.updateAchievementProgress(
+                    character.getId().longValue(),
+                    AchievementType.ANSWER_100_QUESTIONS,
+                    1
+                );
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar conquistas de questões: " + e.getMessage());
             }
         } else {
             stats.setQuestionsWrong(stats.getQuestionsWrong() + 1);
@@ -669,6 +739,32 @@ public class BattleService {
                 updatedBattle.getCharacter().setGold(updatedCharacter.getGold());
             } catch (Exception e) {
                 System.err.println("Erro ao atualizar progresso de quest: " + e.getMessage());
+            }
+
+            // Registra vitória nas conquistas
+            try {
+                achievementService.updateAchievementProgress(
+                    character.getId().longValue(),
+                    AchievementType.WIN_FIRST_BATTLE,
+                    1
+                );
+                achievementService.updateAchievementProgress(
+                    character.getId().longValue(),
+                    AchievementType.WIN_10_BATTLES,
+                    1
+                );
+                achievementService.updateAchievementProgress(
+                    character.getId().longValue(),
+                    AchievementType.WIN_50_BATTLES,
+                    1
+                );
+                achievementService.updateAchievementProgress(
+                    character.getId().longValue(),
+                    AchievementType.WIN_100_BATTLES,
+                    1
+                );
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar conquistas de vitória: " + e.getMessage());
             }
 
             CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(
@@ -857,6 +953,27 @@ public class BattleService {
                 System.err.println("Erro ao atualizar progresso de quest DEAL_DAMAGE: " + e.getMessage());
             }
 
+            // Registra conquistas de dano causado
+            try {
+                achievementService.updateAchievementProgress(
+                    battle.getCharacter().getId().longValue(),
+                    AchievementType.DEAL_1000_DAMAGE,
+                    finalDamage
+                );
+                achievementService.updateAchievementProgress(
+                    battle.getCharacter().getId().longValue(),
+                    AchievementType.DEAL_5000_DAMAGE,
+                    finalDamage
+                );
+                achievementService.updateAchievementProgress(
+                    battle.getCharacter().getId().longValue(),
+                    AchievementType.DEAL_10000_DAMAGE,
+                    finalDamage
+                );
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar conquistas de dano: " + e.getMessage());
+            }
+
             // Limpa o dano pendente
             battle.setPendingDamageToMonster(0);
         }
@@ -891,6 +1008,32 @@ public class BattleService {
                 ch.setXp(ch.getXp() + gameConfig.getBattle().getXpWinReward());
                 characterRepository.save(ch);
             });
+
+            // Registra vitória nas conquistas
+            try {
+                achievementService.updateAchievementProgress(
+                    battle.getCharacter().getId().longValue(),
+                    AchievementType.WIN_FIRST_BATTLE,
+                    1
+                );
+                achievementService.updateAchievementProgress(
+                    battle.getCharacter().getId().longValue(),
+                    AchievementType.WIN_10_BATTLES,
+                    1
+                );
+                achievementService.updateAchievementProgress(
+                    battle.getCharacter().getId().longValue(),
+                    AchievementType.WIN_50_BATTLES,
+                    1
+                );
+                achievementService.updateAchievementProgress(
+                    battle.getCharacter().getId().longValue(),
+                    AchievementType.WIN_100_BATTLES,
+                    1
+                );
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar conquistas de vitória: " + e.getMessage());
+            }
 
             // Verifica level up
             CharacterService.LevelUpResult levelUpResult = characterService.checkForLevelUp(battle.getCharacter().getId());

@@ -5,6 +5,7 @@ import com.game.rpgbackend.domain.Character;
 import com.game.rpgbackend.domain.GameClass;
 import com.game.rpgbackend.domain.Inventory;
 import com.game.rpgbackend.domain.PlayerStats;
+import com.game.rpgbackend.enums.AchievementType;
 import com.game.rpgbackend.exception.NotFoundException;
 import com.game.rpgbackend.repository.CharacterRepository;
 import com.game.rpgbackend.repository.ClassRepository;
@@ -49,6 +50,7 @@ public class CharacterService {
     private final InventoryRepository inventoryRepository;
     private final UserRepository userRepository;
     private final GameConfig gameConfig;
+    private final com.game.rpgbackend.service.achievement.AchievementService achievementService;
 
     /**
      * Busca um personagem por seu identificador único.
@@ -176,6 +178,34 @@ public class CharacterService {
             // Atualiza XP do personagem
             character.setXp(currentXp);
             characterRepository.save(character);
+
+            // Registra conquistas de nível alcançado
+            try {
+                // Verifica conquistas de nível específico
+                if (currentLevel >= 5) {
+                    achievementService.updateAchievementProgress(
+                        character.getId().longValue(),
+                        AchievementType.REACH_LEVEL_5,
+                        currentLevel
+                    );
+                }
+                if (currentLevel >= 10) {
+                    achievementService.updateAchievementProgress(
+                        character.getId().longValue(),
+                        AchievementType.REACH_LEVEL_10,
+                        currentLevel
+                    );
+                }
+                if (currentLevel >= 20) {
+                    achievementService.updateAchievementProgress(
+                        character.getId().longValue(),
+                        AchievementType.REACH_LEVEL_20,
+                        currentLevel
+                    );
+                }
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar conquistas de nível: " + e.getMessage());
+            }
 
             // Mensagem diferente para múltiplos níveis
             if (levelsGained == 1) {
