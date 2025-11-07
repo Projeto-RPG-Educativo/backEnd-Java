@@ -37,6 +37,12 @@ public enum QuestType {
      * Quest para alcançar um nível específico.
      * Target = nível a alcançar
      */
-    REACH_LEVEL
+    REACH_LEVEL,
+
+    /**
+     * Quest para causar uma quantidade específica de dano.
+     * Target = quantidade de dano ao causar
+     */
+    DEAL_DAMAGE
 }
 

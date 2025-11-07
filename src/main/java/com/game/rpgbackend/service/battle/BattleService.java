@@ -832,6 +832,31 @@ public class BattleService {
             battle.getMonster().setHp(battle.getMonster().getHp() - finalDamage);
             battle.setCharacterDamageDealt(finalDamage);
 
+            // Atualiza progresso de quests DEAL_DAMAGE
+            try {
+                questService.updateDamageProgress(battle.getCharacter().getId(), finalDamage);
+
+                // Atualiza lista de quests ativas
+                List<com.game.rpgbackend.dto.response.hub.QuestDto> updatedQuests =
+                    questService.getActiveQuestsByCharacterId(battle.getCharacter().getId());
+                battle.setActiveQuests(updatedQuests);
+
+                // Atualiza lista de quests completadas
+                List<com.game.rpgbackend.dto.response.hub.QuestDto> completedQuests =
+                    questService.getCompletedQuests(battle.getCharacter().getId());
+                battle.setCompletedQuests(completedQuests);
+
+                // Recarrega o personagem para pegar XP e Gold atualizados pelas recompensas
+                Character updatedCharacter = characterRepository.findById(battle.getCharacter().getId())
+                    .orElse(null);
+                if (updatedCharacter != null) {
+                    battle.getCharacter().setXp(updatedCharacter.getXp());
+                    battle.getCharacter().setGold(updatedCharacter.getGold());
+                }
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar progresso de quest DEAL_DAMAGE: " + e.getMessage());
+            }
+
             // Limpa o dano pendente
             battle.setPendingDamageToMonster(0);
         }
