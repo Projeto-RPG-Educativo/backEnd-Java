@@ -2,6 +2,7 @@ package com.game.rpgbackend.service.hub;
 
 import com.game.rpgbackend.domain.*;
 import com.game.rpgbackend.dto.response.hub.QuestDto;
+import com.game.rpgbackend.enums.AchievementType;
 import com.game.rpgbackend.enums.QuestType;
 import com.game.rpgbackend.exception.BadRequestException;
 import com.game.rpgbackend.exception.NotFoundException;
@@ -33,6 +34,7 @@ public class QuestService {
     private final CharacterQuestRepository characterQuestRepository;
     private final com.game.rpgbackend.repository.CharacterRepository characterRepository;
     private final MonsterRepository monsterRepository;
+    private final com.game.rpgbackend.service.achievement.AchievementService achievementService;
 
     /**
      * Retorna todas as quests disponíveis no jogo.
@@ -453,6 +455,27 @@ public class QuestService {
         }
 
         characterRepository.save(character);
+
+        // Registra conclusão de quest nas conquistas
+        try {
+            achievementService.updateAchievementProgress(
+                character.getId().longValue(),
+                AchievementType.COMPLETE_FIRST_QUEST,
+                1
+            );
+            achievementService.updateAchievementProgress(
+                character.getId().longValue(),
+                AchievementType.COMPLETE_10_QUESTS,
+                1
+            );
+            achievementService.updateAchievementProgress(
+                character.getId().longValue(),
+                AchievementType.COMPLETE_25_QUESTS,
+                1
+            );
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar conquistas de quest: " + e.getMessage());
+        }
     }
 
     /**

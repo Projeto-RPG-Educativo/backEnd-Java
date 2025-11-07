@@ -99,7 +99,13 @@ public class PlayerService {
      * @return lista de conquistas desbloqueadas pelo jogador
      */
     public List<Achievement> getAchievements(Integer userId) {
-        return achievementRepository.findByUserId(userId);
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        // Buscar conquistas de todos os personagens do usuário
+        return user.getCharacters().stream()
+            .flatMap(character -> achievementRepository.findByCharacterId(character.getId().longValue()).stream())
+            .collect(Collectors.toList());
     }
 
     /**
