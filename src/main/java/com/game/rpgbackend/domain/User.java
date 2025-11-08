@@ -77,11 +77,6 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private PlayerStats stats;
 
-    /**
-     * Lista de conquistas desbloqueadas pelo usuário.
-     */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Achievement> achievements;
 
     /**
      * Histórico de batalhas do usuário.

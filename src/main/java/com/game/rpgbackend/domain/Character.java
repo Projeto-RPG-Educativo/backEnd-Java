@@ -79,4 +79,11 @@ public class Character {
      */
     @OneToOne(mappedBy = "character", cascade = CascadeType.ALL)
     private Inventory inventory;
+
+    /**
+     * Lista de conquistas (achievements) desbloqueadas pelo personagem.
+     * Relacionamento OneToMany - um personagem pode ter várias conquistas.
+     */
+    @OneToMany(mappedBy = "character", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Achievement> achievements;
 }
