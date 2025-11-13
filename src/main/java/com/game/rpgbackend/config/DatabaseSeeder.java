@@ -38,7 +38,7 @@ public class DatabaseSeeder {
             Map<String, Monster> monsterMap = seedMonsters(monsterRepository);
             Map<String, Item> itemMap = seedItems(itemRepository);
             seedLoja(storeRepository, itemLojaRepository, itemMap);
-            seedNpc(npcRepository);
+            seedNPC(npcRepository);
             seedDialogue(dialogueRepository, npcRepository);
             seedQuests(questRepository, monsterMap);
 
@@ -47,90 +47,53 @@ public class DatabaseSeeder {
     }
 
     // Método para popular a tabela de Classes
+
+    private void addClassesIfNotExists(List<GameClass> desiredClasses, Map<String, GameClass> existingClasses,
+                                       String name, Integer hp, Integer stamina, Integer strength,
+                                       Integer intelligence, Integer defense, Integer agility,
+                                       Integer charisma, Integer luck) {
+
+
+        if (name == null || hp <= 0 || stamina <= 0 || strength < 0 ||
+                intelligence < 0 || defense < 0 || agility < 0 ||
+                charisma < 0 || luck < 0) {
+            System.err.println("Dados incorretos, a classe não será adicionada.");
+            return;
+        }
+        if (!existingClasses.containsKey(name)) {
+            GameClass gameClass = new GameClass();
+            gameClass.setName(name);
+            gameClass.setHp(hp);
+            gameClass.setStamina(stamina);
+            gameClass.setStrength(strength);
+            gameClass.setIntelligence(intelligence);
+            gameClass.setDefense(defense);
+            gameClass.setAgility(agility);
+            gameClass.setCharisma(charisma);
+            gameClass.setLuck(luck);
+            desiredClasses.add(gameClass);
+        }
+    }
+
     private void seedClasses(ClassRepository classRepository) {
         // Busca classes existentes pelo nome para evitar duplicatas
         Map<String, GameClass> existingClasses = classRepository.findAll().stream()
                 .collect(Collectors.toMap(GameClass::getName, Function.identity()));
 
         List<GameClass> desiredClasses = new ArrayList<>();
-        if (!existingClasses.containsKey("tank")) {
-            GameClass tank = new GameClass();
-            tank.setName("tank");
-            tank.setHp(150);
-            tank.setStamina(12);
-            tank.setStrength(15);
-            tank.setIntelligence(2);
-            tank.setDefense(20);
-            tank.setAgility(5);
-            tank.setCharisma(6);
-            tank.setLuck(5);
-            desiredClasses.add(tank);
-        }
-        if (!existingClasses.containsKey("mago")) {
-            GameClass mago = new GameClass();
-            mago.setName("mago");
-            mago.setHp(80);
-            mago.setStamina(12);
-            mago.setStrength(2);
-            mago.setIntelligence(25);
-            mago.setDefense(5);
-            mago.setAgility(7);
-            mago.setCharisma(5);
-            mago.setLuck(5);
-            desiredClasses.add(mago);
-        }
-        if (!existingClasses.containsKey("lutador")) {
-            GameClass lutador = new GameClass();
-            lutador.setName("lutador");
-            lutador.setHp(120);
-            lutador.setStamina(12);
-            lutador.setStrength(20);
-            lutador.setIntelligence(2);
-            lutador.setDefense(15);
-            lutador.setAgility(10);
-            lutador.setCharisma(5);
-            lutador.setLuck(5);
-            desiredClasses.add(lutador);
-        }
-        if (!existingClasses.containsKey("ladino")) {
-            GameClass ladino = new GameClass();
-            ladino.setName("ladino");
-            ladino.setHp(90);
-            ladino.setStamina(12);
-            ladino.setStrength(20);
-            ladino.setIntelligence(9);
-            ladino.setDefense(12);
-            ladino.setAgility(12);
-            ladino.setCharisma(8);
-            ladino.setLuck(7);
-            desiredClasses.add(ladino);
-        }
-        if (!existingClasses.containsKey("paladino")) {
-            GameClass paladino = new GameClass();
-            paladino.setName("paladino");
-            paladino.setHp(130);
-            paladino.setStamina(12);
-            paladino.setStrength(18);
-            paladino.setIntelligence(5);
-            paladino.setDefense(10);
-            paladino.setAgility(8);
-            paladino.setCharisma(10);
-            paladino.setLuck(5);
-            desiredClasses.add(paladino);
-        }
-        if (!existingClasses.containsKey("bardo")) {
-            GameClass bardo = new GameClass();
-            bardo.setName("bardo");
-            bardo.setHp(85);
-            bardo.setStamina(12);
-            bardo.setStrength(5);
-            bardo.setIntelligence(15);
-            bardo.setDefense(7);
-            bardo.setAgility(10);
-            bardo.setCharisma(20);
-            bardo.setLuck(12);
-            desiredClasses.add(bardo);
-        }
+
+       addClassesIfNotExists(desiredClasses, existingClasses,
+               "tank", 150, 12, 15, 2, 20, 5, 6, 5);
+       addClassesIfNotExists(desiredClasses, existingClasses,
+               "mago", 80, 12, 2, 25, 5, 7, 5, 5);
+       addClassesIfNotExists(desiredClasses, existingClasses,
+               "lutador", 120, 12, 20, 2, 15, 10, 5, 5);
+       addClassesIfNotExists(desiredClasses, existingClasses,
+               "adino", 90, 12, 20, 9, 12, 12, 8, 7);
+       addClassesIfNotExists(desiredClasses, existingClasses,
+               "paladino", 130, 12, 18, 5, 10, 8, 10, 5);
+       addClassesIfNotExists(desiredClasses, existingClasses,
+               "bardo", 85, 12, 5, 15, 7, 10, 20, 12);
 
 
         if (!desiredClasses.isEmpty()) {
@@ -142,46 +105,37 @@ public class DatabaseSeeder {
     }
 
     // Método para popular a tabela de Conteúdos
+    private void addContentIfNotExists(List<Content> desiredContent, Map<String, Content> existingContent,
+                                       String name, String description, int minLevel) {
+        if (name == null || description == null || minLevel <= 0) {
+            System.err.println("Dados incorretos, o conteúdo não será adicionado.");
+            return;
+        }
+        if (!existingContent.containsKey(name)) {
+            Content content = new Content();
+            content.setContentName(name);
+            content.setDescription(description);
+            content.setMinLevel(minLevel);
+            desiredContent.add(content);
+        }
+    }
+
     private Map<String, Content> seedContent(ContentRepository contentRepository) {
         Map<String, Content> existingContent = contentRepository.findAll().stream()
                 .collect(Collectors.toMap(Content::getContentName, Function.identity()));
 
         List<Content> desiredContent = new ArrayList<>();
-        if (!existingContent.containsKey("Verbo To Be")) {
-            Content verboToBe = new Content();
-            verboToBe.setContentName("Verbo To Be");
-            verboToBe.setDescription("O verbo mais básico e importante do inglês");
-            verboToBe.setMinLevel(1);
-            desiredContent.add(verboToBe);
-        }
-        if (!existingContent.containsKey("Presente Simples")) {
-            Content presenteSimples = new Content();
-            presenteSimples.setContentName("Presente Simples");
-            presenteSimples.setDescription("Usado para falar de rotinas e verdades universais");
-            presenteSimples.setMinLevel(2);
-            desiredContent.add(presenteSimples);
-        }
-        if (!existingContent.containsKey("Vocabulário Básico")) {
-            Content vocabularioBasico = new Content();
-            vocabularioBasico.setContentName("Vocabulário Básico");
-            vocabularioBasico.setDescription("Palavras essenciais do dia a dia");
-            vocabularioBasico.setMinLevel(1);
-            desiredContent.add(vocabularioBasico);
-        }
-        if (!existingContent.containsKey("Presente Perfeito")) {
-            Content presentePerfeito = new Content();
-            presentePerfeito.setContentName("Presente Perfeito");
-            presentePerfeito.setDescription("Usado para conectar o passado com o presente");
-            presentePerfeito.setMinLevel(5);
-            desiredContent.add(presentePerfeito);
-        }
-        if (!existingContent.containsKey("Expressões Idiomáticas")) {
-            Content expressoesIdiomaticas = new Content();
-            expressoesIdiomaticas.setContentName("Expressões Idiomáticas");
-            expressoesIdiomaticas.setDescription("Frases com significados especiais na cultura");
-            expressoesIdiomaticas.setMinLevel(7);
-            desiredContent.add(expressoesIdiomaticas);
-        }
+        addContentIfNotExists(desiredContent, existingContent,
+                "Verbo To Be", "O verbo mais básico e importante do inglês", 1);
+        addContentIfNotExists(desiredContent, existingContent,
+                "Presente Simples", "Usado para falar de rotinas e verdades universais", 2);
+        addContentIfNotExists(desiredContent, existingContent,
+                "Vocabulário Básico", "Palavras essenciais do dia a dia", 1);
+        addContentIfNotExists(desiredContent, existingContent,
+                "Presente Perfeito", "Usado para conectar o passado com o presente", 5);
+        addContentIfNotExists(desiredContent, existingContent,
+                "Expressões Idiomáticas", "Frases com significados especiais na cultura", 7);
+
 
         if (!desiredContent.isEmpty()) {
             System.out.println("Inserindo " + desiredContent.size() + " novos conteúdos...");
@@ -195,67 +149,42 @@ public class DatabaseSeeder {
     }
 
     // Método para popular a tabela de Monstros
+    private void addMonsterIfNotExists(List<Monster> desiredMonsters, Map<String, Monster> existingMonsters,
+                                       String name, int hp, int damage, int defense) {
+        if (name == null || hp <= 0 || damage < 0 || defense < 0 ) {
+            System.err.println("Dados incorretos, o monstro não será adicionado.");
+            return;
+        }
+        if (!existingMonsters.containsKey(name)) {
+            Monster monster = new Monster();
+            monster.setMonsterName(name);
+            monster.setHp(hp);
+            monster.setMonsterDamage(damage);
+            monster.setDefense(defense);
+            desiredMonsters.add(monster);
+        }
+    }
+
     private Map<String, Monster> seedMonsters(MonsterRepository monsterRepository) {
         Map<String, Monster> existingMonsters = monsterRepository.findAll().stream()
                 .collect(Collectors.toMap(Monster::getMonsterName, Function.identity()));
 
         List<Monster> desiredMonsters = new ArrayList<>();
-        if (!existingMonsters.containsKey("Diabrete Errôneo")) {
-            Monster diabrete = new Monster();
-            diabrete.setMonsterName("Diabrete Errôneo");
-            diabrete.setHp(150);
-            diabrete.setMonsterDamage(10);
-            diabrete.setDefense(5);
-            desiredMonsters.add(diabrete);
-        }
-        if (!existingMonsters.containsKey("Harpia Indagada")) {
-            Monster harpia = new Monster();
-            harpia.setMonsterName("Harpia Indagada");
-            harpia.setHp(120);
-            harpia.setMonsterDamage(15);
-            harpia.setDefense(8);
-            desiredMonsters.add(harpia);
-        }
-        if (!existingMonsters.containsKey("Zumbi Demente")) {
-            Monster zumbi = new Monster();
-            zumbi.setMonsterName("Zumbi Demente");
-            zumbi.setHp(250);
-            zumbi.setMonsterDamage(8);
-            zumbi.setDefense(12);
-            desiredMonsters.add(zumbi);
-        }
-        if (!existingMonsters.containsKey("Centauro Questionador")) {
-            Monster centauro = new Monster();
-            centauro.setMonsterName("Centauro Questionador");
-            centauro.setHp(200);
-            centauro.setMonsterDamage(12);
-            centauro.setDefense(10);
-            desiredMonsters.add(centauro);
-        }
-        if (!existingMonsters.containsKey("Esqueleto da Sintaxe")) {
-            Monster esqueleto = new Monster();
-            esqueleto.setMonsterName("Esqueleto da Sintaxe");
-            esqueleto.setHp(500);
-            esqueleto.setMonsterDamage(20);
-            esqueleto.setDefense(15);
-            desiredMonsters.add(esqueleto);
-        }
-        if (!existingMonsters.containsKey("Lexicógrafo, o Guardião do Vazio")) {
-            Monster lexicografo = new Monster();
-            lexicografo.setMonsterName("Lexicógrafo, o Guardião do Vazio");
-            lexicografo.setHp(1500);
-            lexicografo.setMonsterDamage(40);
-            lexicografo.setDefense(25);
-            desiredMonsters.add(lexicografo);
-        }
-        if (!existingMonsters.containsKey("Malak, O Silenciador")) {
-            Monster malak = new Monster();
-            malak.setMonsterName("Malak, O Silenciador");
-            malak.setHp(5000);
-            malak.setMonsterDamage(100);
-            malak.setDefense(50);
-            desiredMonsters.add(malak);
-        }
+
+        addMonsterIfNotExists(desiredMonsters, existingMonsters,
+                "Diabrete Errôneo", 150, 10, 5);
+        addMonsterIfNotExists(desiredMonsters, existingMonsters,
+                "Harpia Indagada", 120, 15, 8);
+        addMonsterIfNotExists(desiredMonsters, existingMonsters,
+                "Zumbi Demente", 250, 8, 12);
+        addMonsterIfNotExists(desiredMonsters, existingMonsters,
+                "Centauro Questionador", 200, 12, 10);
+        addMonsterIfNotExists(desiredMonsters,existingMonsters,
+                "Esqueleto da Sintaxe", 500, 20, 15);
+        addMonsterIfNotExists(desiredMonsters, existingMonsters,
+                "Lexicógrafo, o Guardião do Vazio", 1500, 40, 25);
+        addMonsterIfNotExists(desiredMonsters, existingMonsters,
+                "Malak, O Silenciador", 5000, 100, 50);
 
         if (!desiredMonsters.isEmpty()) {
             System.out.println("Inserindo " + desiredMonsters.size() + " novos monstros...");
@@ -270,100 +199,52 @@ public class DatabaseSeeder {
     }
 
     // Método para popular a tabela de Itens
+    private void addItemIfNotExists(List<Item> desiredItems, Map<String, Item> existingItems,
+                                       String name, String type, int value, String description) {
+        if (name == null || type == null) {
+            System.err.println("Dados incorretos, o item não será adicionado.");
+            return;
+        }
+        if (!existingItems.containsKey(name)) {
+            Item item = new Item();
+            item.setName(name);
+            item.setType(type);
+            item.setValue(value);
+            item.setDescription(description);
+            desiredItems.add(item);
+        }
+    }
+
     private Map<String, Item> seedItems(ItemRepository itemRepository) {
         Map<String, Item> existingItems = itemRepository.findAll().stream()
                 .collect(Collectors.toMap(Item::getName, Function.identity()));
 
         List<Item> desiredItems = new ArrayList<>();
 
-        if (!existingItems.containsKey("Poção de Vida Pequena")) {
-            Item pocaoVida = new Item();
-            pocaoVida.setName("Poção de Vida Pequena");
-            pocaoVida.setType("potion");
-            pocaoVida.setValue(25);
-            pocaoVida.setDescription("Um frasco com líquido vermelho que restaura 50 pontos de vida.");
-            desiredItems.add(pocaoVida);
-        }
-        if (!existingItems.containsKey("Poção de Mana Pequena")) {
-            Item pocaoMana = new Item();
-            pocaoMana.setName("Poção de Mana Pequena");
-            pocaoMana.setType("potion");
-            pocaoMana.setValue(30);
-            pocaoMana.setDescription("Líquido azul cintilante que restaura 30 pontos de mana.");
-            desiredItems.add(pocaoMana);
-        }
-        if (!existingItems.containsKey("Espada Curta de Ferro")) {
-            Item espadaCurta = new Item();
-            espadaCurta.setName("Espada Curta de Ferro");
-            espadaCurta.setType("weapon");
-            espadaCurta.setValue(80);
-            espadaCurta.setDescription("Uma espada confiável para qualquer aventureiro iniciante.");
-            desiredItems.add(espadaCurta);
-        }
-        if (!existingItems.containsKey("Arco Simples")) {
-            Item arco = new Item();
-            arco.setName("Arco Simples");
-            arco.setType("weapon");
-            arco.setValue(75);
-            arco.setDescription("Feito de madeira envergada, bom para ataques à distância.");
-            desiredItems.add(arco);
-        }
-        if (!existingItems.containsKey("Cajado de Aprendiz")) {
-            Item cajado = new Item();
-            cajado.setName("Cajado de Aprendiz");
-            cajado.setType("weapon");
-            cajado.setValue(90);
-            cajado.setDescription("Canaliza magias simples. Um brilho fraco emana de sua ponta.");
-            desiredItems.add(cajado);
-        }
-        if (!existingItems.containsKey("Machado de Batalha")) {
-            Item machado = new Item();
-            machado.setName("Machado de Batalha");
-            machado.setType("weapon");
-            machado.setValue(120);
-            machado.setDescription("Pesado e lento, mas com um golpe devastador.");
-            desiredItems.add(machado);
-        }
-        if (!existingItems.containsKey("Túnica de Couro")) {
-            Item tunica = new Item();
-            tunica.setName("Túnica de Couro");
-            tunica.setType("armor");
-            tunica.setValue(60);
-            tunica.setDescription("Oferece proteção básica sem restringir os movimentos.");
-            desiredItems.add(tunica);
-        }
-        if (!existingItems.containsKey("Manto do Conjurador")) {
-            Item manto = new Item();
-            manto.setName("Manto do Conjurador");
-            manto.setType("armor");
-            manto.setValue(70);
-            manto.setDescription("Roupas encantadas que melhoram o fluxo de mana.");
-            desiredItems.add(manto);
-        }
-        if (!existingItems.containsKey("Botas de Viagem Simples")) {
-            Item botas = new Item();
-            botas.setName("Botas de Viagem Simples");
-            botas.setType("armor");
-            botas.setValue(35);
-            botas.setDescription("Botas resistentes que facilitam longas caminhadas.");
-            desiredItems.add(botas);
-        }
-        if (!existingItems.containsKey("Gema Bruta")) {
-            Item gema = new Item();
-            gema.setName("Gema Bruta");
-            gema.setType("treasure");
-            gema.setValue(200);
-            gema.setDescription("Uma pedra preciosa que pode ser vendida por um bom preço.");
-            desiredItems.add(gema);
-        }
-        if (!existingItems.containsKey("Moeda de Ouro")) {
-            Item moeda = new Item();
-            moeda.setName("Moeda de Ouro");
-            moeda.setType("currency");
-            moeda.setValue(1);
-            moeda.setDescription("Moeda utilizada para comprar itens.");
-            desiredItems.add(moeda);
-        }
+       addItemIfNotExists(desiredItems, existingItems,
+               "Poção de Vida Pequena", "Consumable", 25, "Um frasco com líquido vermelho que restaura 50 pontos de vida.");
+         addItemIfNotExists(desiredItems, existingItems,
+                "Tônico Energético", "Consumable", 30, "Um elixir amarelado que recupera 30 pontos de stamina.");
+        addItemIfNotExists(desiredItems, existingItems,
+                "Espada Curta de Ferro", "Weapon", 80, "Uma espada confiável para qualquer aventureiro iniciante.");
+        addItemIfNotExists(desiredItems, existingItems,
+                "Arco Simples", "Weapon", 75, "Feito de madeira envergada, bom para ataques à distância.");
+        addItemIfNotExists(desiredItems, existingItems,
+                "Cajado do Aprendiz", "Weapon", 90, "Canaliza magias simples. Um brilho fraco emana de sua ponta.");
+        addItemIfNotExists(desiredItems, existingItems,
+                "Machado de Batalha", "Weapon", 120, "Pesado e lento, mas com um golpe devastador.");
+        addItemIfNotExists(desiredItems, existingItems,
+                "Túnica de Couro", "Armor", 60, "Oferece proteção básica sem restringir os movimentos.");
+        addItemIfNotExists(desiredItems, existingItems,
+                "Manto do Conjurador", "Armor", 70, "Roupas encantadas que melhoram o fluxo de mana.");
+        addItemIfNotExists(desiredItems, existingItems,
+                "Botas de Viagem Simples", "Armor", 35, "Botas resistentes que facilitam longas caminhadas.");
+        addItemIfNotExists(desiredItems, existingItems,
+                "Gema Bruta", "Treasure", 200, "Uma pedra preciosa que pode ser vendida por um bom preço.");
+        addItemIfNotExists(desiredItems, existingItems,
+                "Moeda de Ouro", "Currency", 1, "Moeda utilizada para comprar itens.");
+        addItemIfNotExists(desiredItems, existingItems,
+                "Adaga do Ladrão", "weapon", 95, "Uma adaga leve e compacta, ideal para ataques rápidos e furtivos.");
 
         if (!desiredItems.isEmpty()) {
             System.out.println("Inserindo " + desiredItems.size() + " novos itens...");
@@ -373,6 +254,31 @@ public class DatabaseSeeder {
         }
         return itemRepository.findAll().stream()
                 .collect(Collectors.toMap(Item::getName, Function.identity()));
+    }
+
+    // Método helper para criar questões, evitando duplicatas
+    private void addQuestionIfNotExists(List<Question> desiredQuestions, Map<String, Question> existingQuestions, String texto, String opcaoA, String opcaoB, String opcaoC,
+                                        String resposta, String dificuldade, Content content, int levelMinimo, String hint) {
+        // Verifica se o NPC é válido antes de prosseguir
+        if (content == null) {
+            System.err.println("Atenção: Conteúdo nulo para a pergunta: '" + texto + "'. Pergunta não será adicionada.");
+            return;
+        }
+        // Verifica se a pergunta já existe pelo texto
+        if (!existingQuestions.containsKey(texto)) {
+            Question q = new Question();
+            q.setQuestionText(texto);
+            q.setOptionA(opcaoA);
+            q.setOptionB(opcaoB);
+            q.setOptionC(opcaoC);
+            q.setCorrectAnswer(resposta);
+            q.setDifficulty(dificuldade);
+            q.setQuestionContent(content.getContentName().toLowerCase().replace(" ", "_"));
+            q.setContent(content);
+            q.setMinLevel(levelMinimo);
+            q.setHint(hint);
+            desiredQuestions.add(q);
+        }
     }
 
     // Método para popular a tabela de Questões
@@ -720,7 +626,7 @@ public class DatabaseSeeder {
         // Garante que exista pelo menos uma loja
         Store store;
         if (storeRepository.count() == 0) {
-            System.out.println("Criando a loja principal...");
+            System.out.println("Criando a loja");
             store = storeRepository.save(new Store());
         } else {
             store = storeRepository.findAll().get(0); // Pega a primeira loja que encontrar
@@ -760,59 +666,46 @@ public class DatabaseSeeder {
         }
     }
 
-    // Método helper para criar questões, evitando duplicatas
-    private void addQuestionIfNotExists(List<Question> desiredQuestions, Map<String, Question> existingQuestions, String texto, String opcaoA, String opcaoB, String opcaoC,
-                                        String resposta, String dificuldade, Content content, int levelMinimo, String hint) {
-        // Verifica se o NPC é válido antes de prosseguir
-        if (content == null) {
-            System.err.println("Atenção: Conteúdo nulo para a pergunta: '" + texto + "'. Pergunta não será adicionada.");
+    // Método e helpper para popular NPCs iniciais
+    private void addNpcIfNotExists(List<NPC> desiredNpcs, Map<String, NPC> existingNpcs, String name, String descripition, String type, String location) {
+        if (name == null || descripition == null || type == null || location == null) {
+            System.err.println("Atenção: Dados incompletos para o NPC: '" + name + "'. NPC não será adicionado.");
             return;
         }
-        // Verifica se a pergunta já existe pelo texto
-        if (!existingQuestions.containsKey(texto)) {
-            Question q = new Question();
-            q.setQuestionText(texto);
-            q.setOptionA(opcaoA);
-            q.setOptionB(opcaoB);
-            q.setOptionC(opcaoC);
-            q.setCorrectAnswer(resposta);
-            q.setDifficulty(dificuldade);
-            q.setQuestionContent(content.getContentName().toLowerCase().replace(" ", "_"));
-            q.setContent(content);
-            q.setMinLevel(levelMinimo);
-            q.setHint(hint);
-            desiredQuestions.add(q);
+
+        // Verifica se o NPC já existe pelo nome
+        if (!existingNpcs.containsKey(name)) {
+            NPC npc = new NPC();
+            npc.setName(name);
+            npc.setType(type);
+            npc.setLocation(location);
+            npc.setDescription(descripition);
+            desiredNpcs.add(npc);
         }
     }
 
-    // Método para popular NPCs iniciais
-
-    private void seedNpc(NPCRepository npcRepository) {
+    private void seedNPC(NPCRepository npcRepository) {
+        System.out.println("Verificando/adicionando NPCs...");
 
         Map<String, NPC> existingNpcs = npcRepository.findAll().stream()
                 .collect(Collectors.toMap(NPC::getName, Function.identity()));
 
         List<NPC> desiredNpcs = new ArrayList<>();
 
-        if (!existingNpcs.containsKey("Goblin da Gramática")) {
-            NPC goblinGramatica = new NPC();
-            goblinGramatica.setName("Goblin da Gramática");
-            goblinGramatica.setDescription("Um guia excêntrico que ajuda os aventureiros a dominar as regras gramaticais do inglês enquanto exploram o mundo do RPG.");
-            goblinGramatica.setType("info");
-            goblinGramatica.setLocation("Cidade Principal");
-            desiredNpcs.add(goblinGramatica);
-        }
+        // Adiciona NPCs desejados
+        addNpcIfNotExists(desiredNpcs, existingNpcs,
+                "Goblin da Gramática",
+                "Um guia excêntrico que ajuda os aventureiros a dominar as regras gramaticais do inglês enquanto exploram o mundo do RPG.",
+                "Guia",
+                "Floresta Silenciosa");
 
-        if (!existingNpcs.containsKey("Grukha, A Guardiã dos Verbos Furiosos")) {
-            NPC grukhaGVF = new NPC();
-            grukhaGVF.setName("Grukha, A Guardiã dos Verbos Furiosos");
-            grukhaGVF.setDescription("Uma orc arrojada e carismática que desafia os aventureiros com suas missões repletas de verbos de ação, ajudando-os a aprimorar suas habilidades linguísticas em meio a batalhas épicas.");
-            grukhaGVF.setType("info");
-            grukhaGVF.setLocation("Cidade Principal");
-            desiredNpcs.add(grukhaGVF);
-        }
+        addNpcIfNotExists(desiredNpcs, existingNpcs,
+                "Grukha, A Guardiã dos Verbos Furiosos",
+                "Uma orc arrojada e carismática que desafia os aventureiros com suas missões repletas de verbos de ação, ajudando-os a aprimorar suas habilidades linguísticas em meio a batalhas épicas.",
+                "Info",
+                "Torre do Conhecimento");
 
-        if (!desiredNpcs.isEmpty()) { // <-- CORRIGIDO AQUI
+        if (!desiredNpcs.isEmpty()) {
             System.out.println("Inserindo " + desiredNpcs.size() + " novos NPCs...");
             npcRepository.saveAll(desiredNpcs);
         } else {
@@ -856,6 +749,8 @@ public class DatabaseSeeder {
                     "Oh, céus! Sua energia está baixa! Rápido! Veja o ícone de 'Pergunta'? É aí que a 'Língua Arcana' entra! Clique nele!", null);
             addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
                     "Responda à pergunta corretamente e—*voilà*!—você recupera energia! Aprender é poder, literalmente! Se errar... bem, tente não errar, sim? A sintaxe é importante!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
+                    "Agora vença o Diabrete Errôneo, irei te esperar para seguirmos com sua jornada!", null);
             addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
                     "Muito bem! Com o Diabrete corrigido, podemos prosseguir. Veja! Ali estão os portões da cidade principal, um dos últimos refúgios do Conhecimento.", null);
             addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
