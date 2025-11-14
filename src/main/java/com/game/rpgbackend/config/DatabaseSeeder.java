@@ -705,6 +705,24 @@ public class DatabaseSeeder {
                 "Info",
                 "Torre do Conhecimento");
 
+        addNpcIfNotExists(desiredNpcs, existingNpcs,
+                "Morphues, O protetor dos livros",
+                "Um elfo esnobe que comanda a Biblioteca Silenciosa, dando um lugar de refúgio para aqueles que buscam conhecimento e sabedoria.",
+                "Estudioso",
+                "Biblioteca Silenciosa");
+
+        addNpcIfNotExists(desiredNpcs, existingNpcs,
+                "Fenris, O Destemido Lupino",
+                "Um bestial lupino astuto que comanda as batalhas no Palco da Retórica, desafiando os aventureiros a aprimorar suas habilidades de comunicação em meio a combates emocionantes.",
+                "Gladiador",
+                "Palco da Retórica");
+
+        addNpcIfNotExists(desiredNpcs, existingNpcs,
+                "Fona, A Comerciante Tagarela",
+                "Uma bestial com muito a dizer mas pouco a ouvir, comanda o Sebo de Linguística, onde aventureiros podem encontrar os mais diversos itens a venda.",
+                "Vendedora",
+                "Sebo de Linguística");
+
         if (!desiredNpcs.isEmpty()) {
             System.out.println("Inserindo " + desiredNpcs.size() + " novos NPCs...");
             npcRepository.saveAll(desiredNpcs);
@@ -723,6 +741,9 @@ public class DatabaseSeeder {
 
         NPC goblinGramatica = npcRepository.findByName("Goblin da Gramática").orElse(null);
         NPC grukhaGVF = npcRepository.findByName("Grukha, A Guardiã dos Verbos Furiosos").orElse(null);
+        NPC morpheusPL = npcRepository.findByName("Morphues, O protetor dos livros").orElse(null);
+        NPC fenrisDR = npcRepository.findByName("Fenris, O Destemido Lupino").orElse(null);
+        NPC fonaCT = npcRepository.findByName("Fona, A Comerciante Tagarela").orElse(null);
         // Diálogos do Goblin da Gramática
         if (goblinGramatica != null) { // Adiciona diálogos apenas se o NPC foi encontrado
             addDialogueIfNotExists(desiredDialogue, existingDialogue, goblinGramatica,
@@ -787,6 +808,45 @@ public class DatabaseSeeder {
                     "Lembre-se para não é possível aceitar mais de uma quest por vez, então sempre conclua uma antes de aceitar outra.", null);
             addDialogueIfNotExists(desiredDialogue, existingDialogue, grukhaGVF,
                     "Bem vindo a torre do conhecimento, aventureiro! Que sua jornada seja repleta de glória e fama!", null);
+        }
+
+        if (morpheusPL != null){
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, morpheusPL,
+                    "Olá, viajante. Eu sou Morphues, o protetor dos livros. Este é o santuário do saber, a Biblioteca Silenciosa.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, morpheusPL,
+                    "Aqui você pode descansar e recuperar suas forças para continuar sua jornada contra o Silenciador.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, morpheusPL,
+                    "Lembre-se: o conhecimento é a arma mais poderosa contra a ignorância e o silêncio imposto por Malak.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, morpheusPL,
+                    "Sinta-se à vontade para explorar os corredores silenciosos e absorver a sabedoria contida nos livros.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, morpheusPL,
+                    "Que sua mente esteja sempre aberta e pronta para aprender. Boa sorte em sua jornada!", null);
+        }
+
+        if (fenrisDR != null){
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, fenrisDR,
+                    "Eu sou Fenris, O Destemido Lupino, mestre do Palco da Retórica!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, fenrisDR,
+                    "Aqui você pode testar suas habilidades de combate contra diversos inimigos que desafiarão seu conhecimento gramatical!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, fenrisDR,
+                    "Lembre-se: cada batalha é uma oportunidade de aprender e crescer mais forte na luta contra o Silenciador.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, fenrisDR,
+                    "Prepare-se para enfrentar desafios emocionantes e aprimorar suas habilidades linguísticas enquanto luta por Aetheria!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, fenrisDR,
+                    "Que sua coragem nunca vacile e que sua língua seja afiada como minha lâmina! Boa sorte, guerreiro!", null);
+        }
+
+        if (fonaCT != null){
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, fonaCT,
+                    "Oi, eu sou a Fona! Algumas pessoas me chamam de tagarela, eu não entendo bem de onde veio esse apelido, mas que seja! Bem-vindo ao Sebo de Linguística!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, fonaCT,
+                    "Aqui você pode encontrar uma variedade de itens que o ajudarão em sua jornada contra o Silenciador. E diga-se de passagem my Items são os melhores que você irá encontrar", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, fonaCT,
+                    "Desde poções de cura até pergaminhos mágicos, temos tudo o que você precisa para enfrentar os desafios que virão.", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, fonaCT,
+                    "Não hesite em explorar minha loja e escolher os itens que melhor se adequam ao seu estilo de combate!", null);
+            addDialogueIfNotExists(desiredDialogue, existingDialogue, fonaCT,
+                    "Lembre-se: um aventureiro bem equipado é um aventureiro preparado! Boas compras!", null);
         }
 
         else {
